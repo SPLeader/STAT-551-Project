@@ -120,3 +120,20 @@ aqi_pm2_5 <- merge_clean %>% filter(`Defining Parameter` == "PM2.5") %>% select(
 aqi_ozone %>% write_csv(here(year_path, "Final Data", "aqi_ozone.csv"))
 aqi_pm2_5 %>% write_csv(here(year_path, "Final Data", "aqi_pm2_5.csv"))
 ```
+
+```{r, message = FALSE}
+ozone_all = data.frame(matrix(ncol = 14, nrow = 0))
+pm2_5_all = data.frame(matrix(ncol = 14, nrow = 0))
+
+for (folder in list.files("Project Data")) {
+  if (folder != "Combined") {
+  ozone_all <- rbind(ozone_all, read_csv(here("Project Data", folder, "Final Data", "aqi_ozone.csv")))
+  pm2_5_all <- rbind(pm2_5_all, read_csv(here("Project Data", folder, "Final Data", "aqi_pm2_5.csv")))
+  }
+}
+
+ozone_all %>% write_csv(here("Project Data", "Combined", "aqi_ozone_all_years.csv"))
+pm2_5_all %>% write_csv(here("Project Data", "Combined", "aqi_pm2_5_all_years.csv"))
+```
+
+

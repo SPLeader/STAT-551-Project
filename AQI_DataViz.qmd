@@ -21,8 +21,12 @@ library(lubridate)
 
 ```{r}
 # Read in data
-aqi_ozone <- read_csv(here("Project Data", "2021", "Final Data", "aqi_ozone.csv"))
+aqi_ozone <- read_csv(here("Project Data", "Combined", "aqi_ozone_all_years.csv"))
 ```
+```{r}
+aqi_ozone
+```
+
 
 ```{r}
 aqi_ozone %>%
