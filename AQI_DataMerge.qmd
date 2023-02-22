@@ -1,0 +1,122 @@
+---
+title: "Dataset Joining"
+author: "Sean Leader // William Medwid // Vanessa Veto // Jose Mierzejewski"
+format: 
+  html:
+    code-fold: true
+    code-line-numbers: true
+    code-tools: true
+    self-contained: true
+editor: visual
+execute:
+  message: false
+---
+
+```{r packages, message = FALSE}
+# Load Packages
+
+library(tidyverse)
+library(here)
+```
+
+```{r dataset loading, message = FALSE}
+# Read in datasets
+year_path <- here("Project Data", "2021")
+
+
+aqi <- read_csv(here(year_path, "aqi.csv"))
+co <- read_csv(here(year_path, "co.csv"))
+ozone <- read_csv(here(year_path, "ozone.csv"))
+no2 <- read_csv(here(year_path, "no2.csv"))
+so2 <- read_csv(here(year_path, "so2.csv"))
+wind <- read_csv(here(year_path, "wind_speed.csv")) 
+temp <- read_csv(here(year_path, "temperature.csv"))
+humid <- read_csv(here(year_path, "relative_humidity.csv"))
+pressure <- read_csv(here(year_path, "pressure.csv"))
+no <- read_csv(here(year_path, "no.csv"))
+```
+
+```{r filtering}
+# Perform filtering operations for datasets that measured multiple things
+
+wind <- wind %>% filter(`Parameter Name` == "Wind Speed - Resultant")
+
+no <- no %>% filter(`Parameter Name` == "Nitric oxide (NO)")
+
+humid <- humid %>% filter(`Parameter Name` == "Relative Humidity")
+```
+
+```{r grouping function}
+# Define function that will reduce each data set to a single observation for each state/county/date combo
+# This function also makes sure column names are all correct for merging
+
+summarise_means <- function(dataset, col_name) {
+  
+  return(dataset %>% 
+           rename("Date" = "Date Local") %>% 
+           group_by(`State Code`, `County Code`, `Date`) %>% 
+           summarise(!!col_name := mean(`Arithmetic Mean`), .groups = "keep") %>%
+           ungroup())
+}
+```
+
+```{r merge column matching and grouping}
+# Apply this function to each of the data sets before merging
+
+co <- co %>% summarise_means("co")
+
+ozone <- ozone %>% summarise_means("ozone")
+
+no2 <- no2 %>% summarise_means("no2")
+
+so2 <- so2 %>% summarise_means("so2")
+
+wind <- wind %>% summarise_means("wind")
+
+temp <- temp %>% summarise_means("temp")
+
+humid <- humid %>% summarise_means("humid")
+
+pressure <- pressure %>% summarise_means("pressure")
+
+no <- no %>% summarise_means("no")
+```
+
+```{r merging}
+# Inner join all data sets on merge_cols
+
+merge_cols <- c("State Code", "County Code", "Date")
+
+merge_df <- aqi %>% 
+  inner_join(co, by = merge_cols) %>%
+  inner_join(ozone, by = merge_cols) %>%
+  inner_join(no2, by = merge_cols) %>%
+  inner_join(so2, by = merge_cols) %>%
+  inner_join(wind, by = merge_cols) %>%
+  inner_join(temp, by = merge_cols) %>% 
+  inner_join(humid, by = merge_cols) %>%
+  inner_join(pressure, by = merge_cols) %>%
+  inner_join(no, by = merge_cols)
+```
+
+```{r final cleaning}
+# Remove unnecessary columns from final merge and rename columns for clarity
+
+merge_clean <- merge_df %>% 
+  select(-`State Code`, -`County Code`, -`Defining Site`, -`Number of Sites Reporting`) %>%
+  rename("County" = "county Name", "State" = "State Name", "AQI_cat" = "Category") 
+```
+
+```{r separate aqi types}
+# Separate final merge into two data sets - AQI defined by Ozone and AQI defined by PM2.5 (Particulate Pollution)
+
+aqi_ozone <- merge_clean %>% filter(`Defining Parameter` == "Ozone") %>% select(-`Defining Parameter`)
+aqi_pm2_5 <- merge_clean %>% filter(`Defining Parameter` == "PM2.5") %>% select(-`Defining Parameter`)
+```
+
+```{r writing csvs}
+# Write out final CSVs for future use
+
+aqi_ozone %>% write_csv(here(year_path, "Final Data", "aqi_ozone.csv"))
+aqi_pm2_5 %>% write_csv(here(year_path, "Final Data", "aqi_pm2_5.csv"))
+```

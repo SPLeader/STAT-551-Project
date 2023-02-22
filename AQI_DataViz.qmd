@@ -1,0 +1,51 @@
+---
+title: "AQI Visualizations"
+author: "Sean Leader // William Medwid // Vanessa Veto // Jose Mierzejewski"
+format: 
+  html:
+    code-fold: true
+    code-line-numbers: true
+    code-tools: true
+    self-contained: true
+editor: visual
+execute:
+  message: false
+---
+
+```{r, message = FALSE}
+# Load packages
+library(tidyverse)
+library(here)
+library(lubridate)
+```
+
+```{r}
+# Read in data
+aqi_ozone <- read_csv(here("Project Data", "2021", "Final Data", "aqi_ozone.csv"))
+```
+
+```{r}
+aqi_ozone %>%
+  count(State)
+```
+
+
+```{r}
+aqi_ozone %>%
+  mutate(Month = factor(month(Date))) %>%
+  ggplot(aes(x = Month, y = AQI)) + 
+  geom_boxplot()
+  
+```
+
+```{r}
+cor(aqi_ozone %>% pull(AQI), aqi_ozone %>% pull(ozone))
+```
+```{r}
+aqi_ozone %>% ggplot(aes(x = ozone, y = AQI)) + geom_point()
+```
+
+```{r}
+aqi_ozone %>% ggplot(aes(x = humid)) + geom_histogram()
+```
+

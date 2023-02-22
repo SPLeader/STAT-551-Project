@@ -1,0 +1,35 @@
+1. Choose a year.
+
+For that year (xxxx), download the following files:
+
+daily_44201_xxxx.zip <- Ozone 
+daily_42401_xxxx.zip <- SO2
+daily_42101_xxxx.zip <- CO
+daily_42602_xxxx.zip <- NO2
+daily_WIND_xxxx.zip <- Wind
+daily_TEMP_xxxx.zip <- Temperature
+daily_PRESS_xxxx.zip <- Barometric Pressure
+daily_RH_DP_xxxx.zip <- Relative Humidity and Dewpoint
+daily_aqi_by_county_xxxx.zip <- Daily AQI by County
+daily_NONOxNOy_xxxx.zip <- NO
+
+Rename the files to the corresponding filenames:
+
+ozone.csv <- Ozone
+so2.csv <- SO2
+co.csv <- CO
+no2.csv <- NO2
+wind_speed.csv <- Wind
+temperature.csv <- Temperature
+pressure.csv <- Barometric Pressure
+relative_humidity.csv <- Relative Humidity and Dewpoint
+aqi.csv <- Daily AQI by County 
+no.csv <- NO
+
+Put the data files in the "Project Data" folder
+
+Run AQI_DataMerge.qmd
+
+Observe final files in "Final Data" folder
+
+
