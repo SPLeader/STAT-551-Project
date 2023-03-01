@@ -17,39 +17,144 @@ execute:
 library(tidyverse)
 library(here)
 library(lubridate)
+library(GGally)
 ```
 
 ```{r}
 # Read in data
 aqi_ozone <- read_csv(here("Project Data", "Combined", "aqi_ozone_all_years.csv"))
 ```
+
 ```{r}
 aqi_ozone
 ```
-
 
 ```{r}
 aqi_ozone %>%
   count(State)
 ```
-
-
 ```{r}
+aqi_ozone %>% summarise(median = median(AQI), 
+                        iqr = IQR(AQI))
+```
+
+
+```{r, fig.cap = "Figure 1. Overall distribution of AQI"}
+ggplot(aqi_ozone, aes(AQI, fill = cut(AQI, 100))) +
+  geom_histogram(show.legend = FALSE) +
+  scale_fill_discrete(h = c(200, 10), c = 200, l = 70) + 
+  theme_bw() + 
+  labs(title = "Distribution of AQI")
+
+```
+
+```{r, fig.cap = "Figure 2. Distribution of AQI scores by Month"}
 aqi_ozone %>%
   mutate(Month = factor(month(Date))) %>%
-  ggplot(aes(x = Month, y = AQI)) + 
-  geom_boxplot()
-  
+  ggplot(aes(x = Month, y = AQI, fill = Month)) + 
+  geom_boxplot() + 
+  theme_bw() + 
+  theme(legend.position = "None") +
+  labs(title = "Boxplots showing distribution of AQI scores, but by month")
 ```
+
+```{r, fig.cap = "Figure 3. Scatterplot predicting AQI from mean ozone concetration"}
+summary(lm(AQI ~ ozone, data = aqi_ozone))
+aqi_ozone %>% 
+  ggplot(aes(x = ozone, y = AQI)) + 
+  geom_point() + 
+  geom_smooth(method = "lm") + 
+  labs(title = "Scatterplot of mean ozone vs. AQI")
+```
+
+
+
+
+
+
+
 
 ```{r}
 cor(aqi_ozone %>% pull(AQI), aqi_ozone %>% pull(ozone))
 ```
+
+
+
 ```{r}
-aqi_ozone %>% ggplot(aes(x = ozone, y = AQI)) + geom_point()
+#aqi_ozone %>% select(-State, -County, -Date, -AQI_cat) %>%ggpairs()
+```
+
+
+```{r}
+aqi_model <- aqi_ozone %>% select(-c(State, County, Date, AQI_cat))
+```
+
+
+```{r}
+library(tidymodels)
 ```
 
 ```{r}
-aqi_ozone %>% ggplot(aes(x = humid)) + geom_histogram()
+ols_spec <- linear_reg() %>%
+  set_engine("lm") %>%
+  set_mode("regression")
+
+recipe <- recipe(AQI ~ ., data = aqi_model) %>%
+  step_normalize(all_numeric_predictors())
+
+ols_wf <- workflow() %>%
+  add_model(ols_spec) %>%
+  add_recipe(recipe)
+
+ols_fit <- ols_wf %>% fit(aqi_model)
+
+ols_fit %>% extract_fit_parsnip()
+```
+
+```{r, fig.cap = "Table 1. 10-fold cross-validated performance metric from OLS with all pre-existing predictors"}
+
+set.seed(13)
+aqi_cv <- vfold_cv(aqi_model, v = 10)
+
+ols_fit_cv <- ols_wf %>% fit_resamples(aqi_cv)
+
+knitr::kable(ols_fit_cv %>% collect_metrics())
+```
+
+
+```{r, fig.cap = "Figure 4. Correlation matrix heatmap to show inter-predictor relationships"}
+library(reshape2)
+melted <- melt(round(cor(aqi_model %>% select(-AQI)),2))
+ggplot(data = melted, aes(x=Var1, y=Var2, fill=value)) + 
+  geom_tile() +
+  geom_text(aes(label = round(value, 2))) +
+  #lims(fill = (c(-1, 1))) +
+  scale_fill_gradient2(low = "red", high = "darkolivegreen3", mid = "white", limit = c(-1, 1)) + 
+  theme_bw() + 
+  labs(x = "", y = "", fill = "", title = "Correlation Heatmap of Predictors")
+```
+
+```{r}
+aqi_ozone
+```
+
+```{r}
+scaled <- (aqi_ozone$AQI - min(aqi_ozone$AQI)) / (max(aqi_ozone$AQI) - min(aqi_ozone$AQI))
+```
+
+
+```{r}
+unscaled <- aqi_ozone$AQI
+```
+
+```{r, layout-nrow: 2}
+library(tidyverse)
+data.frame(unscaled) %>%
+  ggplot(aes(x = unscaled)) + 
+  geom_histogram()
+
+data.frame(scaled) %>%
+  ggplot(aes(x = scaled)) + 
+  geom_histogram()
 ```
 

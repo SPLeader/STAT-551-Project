@@ -1,4 +1,5 @@
 .RData
+.RDataTmp
 .RProj.user
 .Rhistory
 *.csv
