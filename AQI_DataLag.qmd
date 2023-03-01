@@ -1,0 +1,42 @@
+---
+title: "AQI Data Lag"
+author: "Sean Leader // William Medwid // Vanessa Veto // Jose Mierzejewski"
+format: 
+  html:
+    code-fold: true
+    code-line-numbers: true
+    code-tools: true
+    self-contained: true
+editor: visual
+execute:
+  message: false
+---
+
+```{r, message = FALSE}
+# Load packages
+library(tidyverse)
+library(here)
+library(lubridate)
+library(GGally)
+```
+
+```{r}
+# Read in data
+aqi_ozone <- read_csv(here("Project Data", "Combined", "aqi_ozone_all_years.csv"))
+```
+
+```{r}
+aqi_ozone <- aqi_ozone %>% 
+  mutate(next_date = Date + 1)
+
+aqi_lagged <- merge(aqi_ozone, aqi_ozone %>% select("Date", "AQI"), by.x = "next_date", by.y = "Date") %>% 
+  rename(AQI_current = AQI.x, AQI_tomorrow = AQI.y)
+```
+
+```{r}
+aqi_lagged
+```
+
+
+
+
