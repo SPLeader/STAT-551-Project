@@ -1,3 +1,5 @@
+https://aqs.epa.gov/aqsweb/airdata/download_files.html
+
 1. Choose a year.
 
 For that year (xxxx), download the following files:
@@ -13,7 +15,7 @@ daily_RH_DP_xxxx.zip <- Relative Humidity and Dewpoint
 daily_aqi_by_county_xxxx.zip <- Daily AQI by County
 daily_NONOxNOy_xxxx.zip <- NO
 
-Rename the files to the corresponding filenames:
+Rename the files above to the corresponding filenames:
 
 ozone.csv <- Ozone
 so2.csv <- SO2
@@ -26,9 +28,9 @@ relative_humidity.csv <- Relative Humidity and Dewpoint
 aqi.csv <- Daily AQI by County 
 no.csv <- NO
 
-Put the data files in the "Project Data" folder
+Put the data files in the "Project Data/xxxx" folder
 
-Run AQI_DataMerge.qmd
+Run AQI_DataMerge.qmd and specify year = "xxxx" at the top
 
 Observe final files in "Final Data" folder
 
