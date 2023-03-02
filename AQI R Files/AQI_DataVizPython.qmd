@@ -1,0 +1,26 @@
+---
+title: "Data Visualization"
+format: 
+  html:
+    code-fold: true
+    code-line-numbers: true
+    code-tools: true
+    self-contained: true
+editor: visual
+execute:
+  message: false
+jupyter: python3
+---
+
+```{python}
+import pandas as pd
+import numpy as np
+
+import seaborn as sns
+import matplotlib.pyplot as plt
+```
+
+```{python}
+aqi_ozone = pd.read_csv("Project Data/Combined/aqi_ozone_all_years.csv")
+```
+
