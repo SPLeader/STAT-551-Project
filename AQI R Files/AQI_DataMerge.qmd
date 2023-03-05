@@ -21,7 +21,9 @@ library(here)
 
 ```{r dataset loading, message = FALSE}
 # Read in datasets
-year_path <- here("Project Data", "2021")
+year = "2021"
+
+year_path <- here("Project Data", year)
 
 
 aqi <- read_csv(here(year_path, "aqi.csv"))
@@ -52,10 +54,17 @@ humid <- humid %>% filter(`Parameter Name` == "Relative Humidity")
 
 summarise_means <- function(dataset, col_name) {
   
+  max_col_name = str_flatten(c("max_", col_name))
+  mean_col_name = str_flatten(c("mean_", col_name))
+  min_col_name = str_flatten(c("min_", col_name))
+  
   return(dataset %>% 
            rename("Date" = "Date Local") %>% 
            group_by(`State Code`, `County Code`, `Date`) %>% 
-           summarise(!!col_name := mean(`Arithmetic Mean`), .groups = "keep") %>%
+           summarise(!!max_col_name := max(`Arithmetic Mean`), 
+                     !!mean_col_name := mean(`Arithmetic Mean`), 
+                     !!min_col_name := min(`Arithmetic Mean`),
+                     .groups = "keep") %>%
            ungroup())
 }
 ```
@@ -122,8 +131,8 @@ aqi_pm2_5 %>% write_csv(here(year_path, "Final Data", "aqi_pm2_5.csv"))
 ```
 
 ```{r, message = FALSE}
-ozone_all = data.frame(matrix(ncol = 14, nrow = 0))
-pm2_5_all = data.frame(matrix(ncol = 14, nrow = 0))
+ozone_all = data.frame(matrix(ncol = 32, nrow = 0))
+pm2_5_all = data.frame(matrix(ncol = 32, nrow = 0))
 
 for (folder in list.files("Project Data")) {
   if (folder != "Combined") {
@@ -135,5 +144,3 @@ for (folder in list.files("Project Data")) {
 ozone_all %>% write_csv(here("Project Data", "Combined", "aqi_ozone_all_years.csv"))
 pm2_5_all %>% write_csv(here("Project Data", "Combined", "aqi_pm2_5_all_years.csv"))
 ```
-
-
