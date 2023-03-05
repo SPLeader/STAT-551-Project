@@ -1,0 +1,107 @@
+---
+title: "Project: Python Prelim Models"
+author: "Jose Mierzejewski"
+format: 
+  html:
+    code-fold: true
+    code-line-numbers: true
+    code-tools: true
+    self-contained: true
+editor: visual
+execute:
+  message: false
+jupyter: python3
+---
+
+```{python, version = "python"}
+#| label: libraries-py
+#| include: false
+import pandas as pd
+
+import seaborn as sns
+import matplotlib.pyplot as plt
+
+
+from sklearn.linear_model import LinearRegression, LogisticRegression
+from sklearn.neighbors import KNeighborsRegressor, KNeighborsClassifier
+
+from sklearn.metrics import r2_score, confusion_matrix, accuracy_score, precision_score, recall_score, roc_auc_score, make_scorer
+
+from sklearn.preprocessing import OneHotEncoder, StandardScaler, LabelEncoder
+from sklearn.compose import make_column_transformer
+from sklearn.pipeline import Pipeline, make_pipeline
+
+from sklearn.model_selection import cross_val_score, GridSearchCV, KFold
+
+from sklearn.discriminant_analysis import LinearDiscriminantAnalysis
+from sklearn.discriminant_analysis import QuadraticDiscriminantAnalysis
+
+from sklearn.tree import DecisionTreeClassifier, plot_tree
+
+
+from sklearn.ensemble import BaggingClassifier, RandomForestClassifier
+
+from sklearn.metrics import roc_auc_score
+from sklearn.metrics import make_scorer
+
+```
+
+```{python}
+df = pd.read_csv('nwi.csv')
+```
+
+```{python}
+df['D2B_E8MIXA'][:5]
+```
+
+```{python}
+data = df[['cat', 'D3B', 'D2B_E8MIXA', 'D2A_EPHHM']]
+```
+
+```{python}
+from sklearn.model_selection import train_test_split
+X_train, X_test, y_train, y_test = train_test_split(data.drop(columns=['cat']), data['cat'], test_size=.2)
+```
+
+```{python}
+pipeline = make_pipeline(
+  DecisionTreeClassifier()
+)
+
+pipeline.fit(X_train, y_train)
+print(f'Train: {pipeline.score(X_train, y_train)}')
+print(f'Test: {pipeline.score(X_test, y_test)}')
+```
+
+```{python}
+from sklearn.metrics import classification_report, confusion_matrix
+
+print(classification_report(y_test,pipeline.predict(X_test)))
+```
+
+```{python}
+plt.clf()
+plt.hist(data['cat'])
+plt.xlabel('Walkability')
+plt.ylabel('Frequency')
+plt.title('Frequencies of response walkability')
+plt.show()
+```
+
+```{python}
+plt.clf()
+
+plot_tree(pipeline['decisiontreeclassifier'],
+        filled=True, feature_names=['Intersection Density', 'Employement Mix', 'Employment/Housing'], 
+        class_names=list(y_train.unique()),
+        impurity=False, label='none', proportion=True, max_depth=1)
+plt.show()
+```
+
+```{python}
+pipeline = make_pipeline(
+  DecisionTreeClassifier()
+)
+
+cross_val_score(pipeline, X_train, y_train, scoring='roc_auc_ovr').mean()
+```
