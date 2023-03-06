@@ -21,7 +21,9 @@ library(here)
 
 ```{r dataset loading, message = FALSE}
 # Read in datasets
-year_path <- here("Project Data", "2021")
+year = "2021"
+
+year_path <- here("Project Data", year)
 
 
 aqi <- read_csv(here(year_path, "aqi.csv"))

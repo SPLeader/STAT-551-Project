@@ -33,11 +33,11 @@ aqi_ozone
 aqi_ozone %>%
   count(State)
 ```
+
 ```{r}
 aqi_ozone %>% summarise(median = median(AQI), 
                         iqr = IQR(AQI))
 ```
-
 
 ```{r, fig.cap = "Figure 1. Overall distribution of AQI"}
 ggplot(aqi_ozone, aes(AQI, fill = cut(AQI, 100))) +
@@ -67,28 +67,17 @@ aqi_ozone %>%
   labs(title = "Scatterplot of mean ozone vs. AQI")
 ```
 
-
-
-
-
-
-
-
 ```{r}
 cor(aqi_ozone %>% pull(AQI), aqi_ozone %>% pull(ozone))
 ```
-
-
 
 ```{r}
 #aqi_ozone %>% select(-State, -County, -Date, -AQI_cat) %>%ggpairs()
 ```
 
-
 ```{r}
 aqi_model <- aqi_ozone %>% select(-c(State, County, Date, AQI_cat))
 ```
-
 
 ```{r}
 library(tidymodels)
@@ -121,7 +110,6 @@ ols_fit_cv <- ols_wf %>% fit_resamples(aqi_cv)
 knitr::kable(ols_fit_cv %>% collect_metrics())
 ```
 
-
 ```{r, fig.cap = "Figure 4. Correlation matrix heatmap to show inter-predictor relationships"}
 library(reshape2)
 melted <- melt(round(cor(aqi_model %>% select(-AQI)),2))
@@ -142,7 +130,6 @@ aqi_ozone
 scaled <- (aqi_ozone$AQI - min(aqi_ozone$AQI)) / (max(aqi_ozone$AQI) - min(aqi_ozone$AQI))
 ```
 
-
 ```{r}
 unscaled <- aqi_ozone$AQI
 ```
@@ -157,4 +144,3 @@ data.frame(scaled) %>%
   ggplot(aes(x = scaled)) + 
   geom_histogram()
 ```
-
