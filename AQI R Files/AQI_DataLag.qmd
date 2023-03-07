@@ -34,7 +34,6 @@ aqi_ozone_next_day <- aqi_ozone %>%
 aqi_lagged <- merge(aqi_ozone, aqi_ozone_next_day, by = c("Date", "County", "State"))
 ```
 
-
 ```{r}
 aqi_lagged %>% 
 
@@ -43,17 +42,14 @@ aqi_lagged %>%
   geom_smooth(method = "lm")
 ```
 
-
 ```{r}
 aqi_ozone %>% nrow()
 ```
-
 
 ```{r}
 aqi_lagged %>% nrow()
 ```
 
 ```{r}
-aqi_lagged %>% write.csv("Project Data/Combined/AQI_ozone_all_year_prediction.csv")
+aqi_lagged %>% write.csv(here("Project Data", "Combined", "aqi_ozone_all_years_prediction.csv"), row.names = FALSE)
 ```
-

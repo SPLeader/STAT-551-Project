@@ -80,6 +80,18 @@ plt.close()
 
 ```
 
+## Max vs mean ozone
+
+```{python}
+plt.scatter(x = aqi_ozone["max_ozone"], y = aqi_ozone["mean_ozone"], c = "Black")
+plt.xlabel("Max Daily Ozone")
+plt.ylabel("Mean Daily Ozone")
+
+plt.show()
+plt.close()
+```
+
+
 ```{python}
 aqi_ozone["mean_humid"].plot.hist(color = "Gray")
 plt.xlabel("Mean Daily Humidity")
@@ -87,6 +99,8 @@ plt.xlabel("Mean Daily Humidity")
 plt.show()
 plt.close()
 ```
+
+
 
 ## Other variables vs AQI scatterplots
 

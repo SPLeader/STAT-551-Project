@@ -1,0 +1,97 @@
+---
+title: "AQI Prediction"
+author: "Sean Leader // William Medwid // Vanessa Veto // Jose Mierzejewski"
+format: 
+  html:
+    code-fold: true
+    code-line-numbers: true
+    code-tools: true
+    self-contained: true
+editor: visual
+execute:
+  message: false
+---
+
+```{r packages, message = FALSE}
+# Load Packages
+
+library(tidyverse)
+library(tidymodels)
+library(glmnet)
+library(here)
+```
+
+```{r}
+aqi_ozone <- read_csv(here("Project Data", "Combined", "aqi_ozone_all_years_prediction.csv"))
+```
+
+```{r}
+aqi_ozone
+```
+
+```{r}
+set.seed(13)
+
+aqi_ozone_cvs <- aqi_ozone %>% 
+  vfold_cv(k = 5)
+```
+
+
+## Linear models
+
+```{r}
+lin_reg_tune <- linear_reg(penalty = tune(), mixture = tune()) %>%
+  set_engine("glmnet") %>%
+  set_mode("regression")
+
+full_recipe <- recipe(AQI_next_day ~ ., data = aqi_ozone) %>% 
+  step_normalize() %>% 
+  step_interact(terms = ~max_wind:mean_ozone) %>% 
+  step_rm(c("Date", "State", "County", "AQI_cat"))
+
+lam_grid = grid_regular(penalty(), mixture(c(0,1)), levels = 4)
+
+lm_wf <- workflow() %>% 
+  add_model(lin_reg_tune) %>% 
+  add_recipe(full_recipe)
+
+grid_results <- lm_wf %>% 
+  tune_grid(resamples = aqi_ozone_cvs, grid = lam_grid)
+
+grid_results %>% 
+  collect_metrics() %>% 
+  filter(.metric == "rsq") %>% 
+  arrange(desc(mean))
+```
+
+Out of many penalty and mixture parameters, 
+
+```{r}
+lm_best_spec <- linear_reg(penalty = 0, mixture = 1) %>%
+  set_engine("glmnet") %>%
+  set_mode("regression")
+
+lm_best_wf <- workflow() %>% 
+  add_model(lm_best_spec) %>% 
+  add_recipe(full_recipe)
+
+lm_best_fit <- lm_best_wf %>% 
+  fit(aqi_ozone)
+
+lm_best_fit %>% 
+  extract_fit_parsnip() %>% 
+  tidy() %>% 
+  arrange(desc(abs(estimate)))
+```
+
+Max ozone has a positive coeficient while min ozone has a similar (slightly smaller) negative coeficient. This could indicate that days with a max much higher than the mean are starting to have worse air quality. Until a high penalty parameter (~2, mixture = 1), min_ozone as a negative coeficient remains important, with min_ozone being the 6th to last variable to become insignificant as penalty increases. The rest of the best are: Max Ozone, AQI, min_no2, max_temp, min_humid
+
+```{r}
+lm_best_fit %>% 
+  predict(aqi_ozone) %>% 
+  mutate(truth = aqi_ozone$AQI_next_day,
+         err = truth - .pred) %>% 
+  ggplot(aes(x = .pred, y = err)) +
+  geom_point()
+```
+
