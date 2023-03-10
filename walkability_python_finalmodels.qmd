@@ -1,0 +1,310 @@
+---
+title: "Project: Python Walkability models"
+author: "Enviro Group"
+format: 
+  html:
+    code-fold: true
+    code-line-numbers: true
+    code-tools: true
+    self-contained: true
+editor: visual
+execute:
+  message: false
+jupyter: python3
+---
+
+```{python, version = "python"}
+#| label: libraries-py
+#| include: false
+import pandas as pd
+
+import seaborn as sns
+import matplotlib.pyplot as plt
+
+
+from sklearn.linear_model import LinearRegression, LogisticRegression
+from sklearn.neighbors import KNeighborsRegressor, KNeighborsClassifier
+
+from sklearn.metrics import r2_score, confusion_matrix, accuracy_score, precision_score, recall_score, roc_auc_score, make_scorer
+
+from sklearn.preprocessing import OneHotEncoder, StandardScaler, LabelEncoder
+from sklearn.compose import make_column_transformer
+from sklearn.pipeline import Pipeline, make_pipeline
+
+from sklearn.model_selection import cross_val_score, GridSearchCV, KFold
+
+from sklearn.discriminant_analysis import LinearDiscriminantAnalysis
+from sklearn.discriminant_analysis import QuadraticDiscriminantAnalysis
+
+from sklearn.tree import DecisionTreeClassifier, plot_tree, DecisionTreeRegressor
+
+
+from sklearn.ensemble import BaggingClassifier, RandomForestClassifier, RandomForestRegressor
+
+from sklearn.metrics import roc_auc_score
+from sklearn.metrics import make_scorer
+from sklearn.linear_model import Lasso
+from sklearn.model_selection import train_test_split
+import numpy as np
+from sklearn.metrics import classification_report, confusion_matrix
+
+```
+
+```{python}
+#| include: false
+def get_best_features(features, coef):
+  best_features_pairs = zip(features, coef)
+  best_features_pairs = [pair for pair in best_features_pairs if pair[1] != 0.0]
+  best_features_pairs.sort(key = lambda x: abs(x[1]), reverse=True)
+  best_features = [pair[0] for pair in best_features_pairs]
+  return best_features
+```
+
+```{python}
+df = pd.read_csv('nwi.csv')
+```
+
+```{python}
+X = df.drop(columns=['D1C8_OFF', 'CSA', 'OBJECTID', 'GEOID10', 'GEOID20', 'STATEFP', 'COUNTYFP', 'CSA_Name', 'CBSA_Name', 'cat', 'CBG', 'D4A', 'D4D', 'CBG', 'NatWalkInd', 'D2A_Ranked', 'D2B_Ranked', 'D3B_Ranked', 'D4A_Ranked'])
+y = df['NatWalkInd']
+
+all_features = list(X.columns)
+```
+
+## Feature Selection
+
+#### Lasso for feature selection
+
+```{python}
+lasso_pipeline = make_pipeline(
+  StandardScaler(),
+  Lasso(alpha=.1)
+)
+
+lasso_pipeline.fit(X, y)
+```
+
+```{python}
+lasso_best_features = get_best_features(all_features, lasso_pipeline['lasso'].coef_.squeeze())
+```
+
+Best features according to LASSO: 'D2A_EPHHM', 'D2B_E8MIXA', 'D3APO', 'D3B', 'D3BMM4', 'D3A', 'D3BMM3', 'Shape_Length', 'Pct_AO2p', 'D5DRI', 'D5DEI', 'Pct_AO1'
+
+#### Decision Tree for feature selection
+
+```{python}
+dt = DecisionTreeRegressor()
+dt.fit(X, y)
+```
+
+```{python}
+#cross_val_score(DecisionTreeRegressor(), X, y, cv=10).mean()
+```
+
+```{python}
+plt.clf()
+
+plot_tree(dt, proportion=True, max_depth=2, feature_names=all_features, 
+        class_names=list(y.unique()), filled=True)
+plt.show()
+```
+
+```{python}
+dt_best_features = get_best_features(all_features, dt.feature_importances_)
+```
+
+# Final Models:
+
+```{python}
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=.10)
+```
+
+## Decision Tree
+
+```{python}
+dt = DecisionTreeRegressor(max_depth=9)
+dt.fit(X_train[dt_best_features[:5]], y_train)
+dt.score(X_test[dt_best_features[:5]], y_test)
+```
+
+```{python}
+dt.get_depth()
+```
+
+```{python}
+cross_val_score(DecisionTreeRegressor(), X[lasso_best_features], y, cv=10).mean()
+```
+
+## KNeighbors Regression
+
+### Grid Search
+
+```{python}
+ct = make_column_transformer(
+  (StandardScaler(), dt_best_features[:10]),
+  remainder = 'drop'
+)
+
+knn_pipeline = make_pipeline(
+  ct,
+  KNeighborsRegressor()
+)
+
+param_grid = {'kneighborsregressor__n_neighbors' : list(np.linspace(0, 200, num=41, dtype=int))}
+
+grid_search = GridSearchCV(knn_pipeline, param_grid, verbose=1)
+grid_search.fit(X, y)
+```
+
+```{python}
+ct = make_column_transformer(
+  (StandardScaler(), dt_best_features[:10]),
+  remainder = 'drop'
+)
+
+knn_pipeline = make_pipeline(
+  ct,
+  KNeighborsRegressor(n_neighbors=10)
+)
+
+cross_val_score(knn_pipeline, X, y, cv=10).mean()
+```
+
+```{python}
+knn_pipeline.fit(X_train, y_train)
+preds = knn_pipeline.predict(X_test)
+resids = preds - y_test
+feature_resid_plot = dt_best_features[0]
+
+
+plt.clf()
+
+plt.scatter(X_test[feature_resid_plot], resids, s=1)
+plt.xlabel(feature_resid_plot)
+plt.ylabel('residual')
+plt.title('Residual Plot')
+plt.show()
+```
+
+## Random Forest
+
+### Grid search
+
+```{python}
+ct = make_column_transformer(
+  (StandardScaler(), dt_best_features[:10]),
+  remainder = 'drop'
+)
+
+forest_pipeline = make_pipeline(
+  ct,
+  RandomForestRegressor()
+)
+
+param_grid = {'randomforestregressor__n_estimators' : list(np.linspace(20, 200, num=10, dtype=int))}
+
+grid_search = GridSearchCV(forest_pipeline, param_grid, verbose=1)
+grid_search.fit(X, y)
+```
+
+```{python}
+ct = make_column_transformer(
+  (StandardScaler(), dt_best_features[:10]),
+  remainder = 'drop'
+)
+
+forest_pipeline = make_pipeline(
+  ct,
+  RandomForestRegressor()
+)
+
+cross_val_score(knn_pipeline, X, y, cv=10).mean()
+```
+
+```{python}
+ct = make_column_transformer(
+  (StandardScaler(), dt_best_features[:10]),
+  remainder = 'drop'
+)
+
+forest_pipeline = make_pipeline(
+  ct,
+  RandomForestRegressor()
+)
+
+forest_pipeline.fit(X_train, y_train)
+
+preds = forest_pipeline.predict(X_test)
+resids = preds - y_test
+feature_resid_plot = dt_best_features[0]
+
+
+plt.clf()
+
+plt.scatter(X_test[feature_resid_plot], resids, s=1)
+plt.xlabel(feature_resid_plot)
+plt.ylabel('residual')
+plt.title('Residual Plot')
+plt.show()
+```
+
+## Linear Regression
+
+```{python}
+lr_model = LinearRegression()
+cross_val_score(lr_model, X, y, cv=10).mean()
+
+lr_model.fit(X_train, y_train)
+```
+
+# Preliminary Stuff:
+
+```{python}
+data = df[['cat', 'D3B', 'D2B_E8MIXA', 'D2A_EPHHM']]
+```
+
+```{python}
+X_train, X_test, y_train, y_test = train_test_split(data.drop(columns=['cat']), data['cat'], test_size=.2)
+```
+
+```{python}
+pipeline = make_pipeline(
+  DecisionTreeClassifier()
+)
+
+pipeline.fit(X_train, y_train)
+print(f'Train: {pipeline.score(X_train, y_train)}')
+print(f'Test: {pipeline.score(X_test, y_test)}')
+```
+
+```{python}
+
+print(classification_report(y_test,pipeline.predict(X_test)))
+```
+
+```{python}
+plt.clf()
+plt.hist(data['cat'])
+plt.xlabel('Walkability')
+plt.ylabel('Frequency')
+plt.title('Frequencies of response walkability')
+plt.show()
+```
+
+```{python}
+plt.clf()
+
+plot_tree(pipeline['decisiontreeclassifier'],
+        filled=True, feature_names=['Intersection Density', 'Employement Mix', 'Employment/Housing'], 
+        class_names=list(y_train.unique()),
+        impurity=False, label='none', proportion=True, max_depth=1)
+plt.show()
+```
+
+```{python}
+pipeline = make_pipeline(
+  DecisionTreeClassifier()
+)
+
+cross_val_score(pipeline, X_train, y_train, scoring='roc_auc_ovr').mean()
+```
