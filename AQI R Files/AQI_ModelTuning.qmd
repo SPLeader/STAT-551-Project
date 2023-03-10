@@ -62,7 +62,7 @@ no_ozone_recipe <- recipe(AQI_next_day ~ ., data = aqi_ozone) %>%
 full_recipe <- recipe(AQI_next_day ~ ., data = aqi_ozone) %>% 
   step_normalize() # %>%  step_interact(terms = ~max_wind:mean_ozone + max_wind : max_ozone)
 
-lam_grid = grid_regular(penalty(), mixture(c(0,1)), levels = 5)
+lam_grid = grid_regular(penalty(), mixture(c(0,1)), levels = 3)
 
 lm_wf <- workflow() %>% 
   add_model(lin_reg_tune) %>% 
@@ -111,7 +111,7 @@ lm_preds %>%
   geom_smooth()
 ```
 
-We tend to under-predict 
+When our linear model predicts low o-zone values, it is ocnsistently biased towards under-prediction.
 
 ```{r}
 lm_preds %>% 
@@ -124,7 +124,7 @@ lm_preds %>%
 # Random Forest 
 
 ```{r}
-rf_mod <- rand_forest(mtry = tune(), min_n = tune()) %>%
+rf_mod <- rand_forest(mtry = tune(), min_n = tune(), trees = 500) %>%
   set_engine("ranger") %>%
   set_mode("regression")
 
@@ -165,22 +165,24 @@ rf_best_wf <- workflow() %>%
   add_recipe(no_ozone_recipe)
 
 rf_best_fit <- rf_best_wf %>% 
-  fit(aqi_ozone)
+  fit(aqi_train)
 
-rf_preds <- 
-```
+rf_preds <- rf_best_fit %>% 
+  predict(aqi_test) %>% 
+  mutate(truth = aqi_test$AQI_next_day,
+         err = .pred - truth)
 
-
-```{r}
-rf_best_fit %>% 
-  predict(aqi_ozone) %>% 
-  mutate(truth = aqi_ozone$AQI_next_day,
-         err = .pred - truth) %>% 
+rf_pred_plot <- rf_preds %>% 
   ggplot(aes(x = .pred, y = err)) +
   geom_point() +
   geom_smooth() +
   xlab("Random Forest Prediction") +
   ylab("Error")
+```
+
+
+```{r}
+
 ```
 
 Compared to our linear model, a random forest is much less biased. For its predictions between 0 and 100,the random forest isn't perfect, but isn't biased high or low. Above 100 predicted AQI, the random forest develops a tendency to under-predict, however.
@@ -201,14 +203,16 @@ tree_wflow <- workflow() %>%
 tree_fit <- tree_wflow %>%
   fit_resamples(aqi_ozone_cvs)
 
-tree_fit %>% collect_metrics()
+tree_fit %>% 
+  collect_metrics() %>% 
+  filter(.metric == "rsq")
 ```
 
 ### Tree plotted
 
 ```{r}
 tree_fit_1 <- tree_wflow %>%
-  fit(aqi_ozone)
+  fit(aqi_train)
 
 tree_fit_1$fit
 ```
@@ -218,6 +222,40 @@ tree_fitted <- tree_fit_1 %>%
   pull_workflow_fit()
 
 rpart.plot(tree_fitted$fit)
+```
+
+```{r}
+tree_preds <- tree_fit_1 %>% 
+  predict(aqi_test) %>% 
+  mutate(truth = aqi_test$AQI_next_day,
+         err = .pred - truth)
+
+tree_pred_plot <- tree_preds %>% 
+  ggplot(aes(x = .pred, y = err)) +
+  geom_point() +
+  geom_smooth() +
+  xlab("Decision Tree Prediction") +
+  ylab("Error")
+```
+
+# Combined Results Plot
+
+```{r}
+all_preds <- lm_preds %>% mutate(model = "Linear\nModel") %>% 
+  rbind(tree_preds %>% mutate(model = "Decision\nTree")) %>%
+  rbind(rf_preds %>% mutate(model = "Random\nForest")) %>% 
+  mutate(model = factor(model, levels = c("Linear\nModel", "Decision\nTree", "Random\nForest")))
+
+all_preds %>% 
+  ggplot(aes(x = .pred, y = err)) +
+  geom_point() +
+  geom_hline(yintercept = 0) + 
+  geom_smooth(se = FALSE, color = "red") +
+  facet_grid(rows = vars(model)) +
+  xlab("Prediction") +
+  ylab("Error") +
+  theme_bw() +
+  theme(strip.text.y.right = element_text(angle = 0))
 ```
 
 
@@ -249,7 +287,7 @@ The second loading is more complex, describing dry, windy days with high ozone, 
 ```{r}
 total_var <- sum(pc$sdev^2)
 
-pc$sdev^2/total_var %>% cumsum()
+(pc$sdev^2/total_var) %>% cumsum()
 
 ```
 
