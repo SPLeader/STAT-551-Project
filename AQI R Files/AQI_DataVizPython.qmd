@@ -1,5 +1,6 @@
 ---
-title: "Data Visualization"
+title: "Python AQI Data Viz"
+author: "William Medwid"
 format: 
   html:
     code-fold: true
@@ -18,9 +19,121 @@ import numpy as np
 
 import seaborn as sns
 import matplotlib.pyplot as plt
+import os
+```
+```{python}
+os.chdir('../')
+print(os.getcwd())
+
+aqi_ozone = pd.read_csv("Project Data/Combined/aqi_ozone_all_years.csv")
+```
+
+
+```{python}
+aqi_ozone["Date"] = pd.to_datetime(aqi_ozone["Date"])
+aqi_ozone["Month"] = aqi_ozone["Date"].dt.month
+
+aqi_ozone.head()
 ```
 
 ```{python}
-aqi_ozone = pd.read_csv("Project Data/Combined/aqi_ozone_all_years.csv")
+aqi_ozone["Date"].dt.month.value_counts()
 ```
+
+```{python}
+aqi_ozone[["State"]].value_counts()
+```
+
+```{python}
+aqi_ozone.boxplot(column = "AQI", by = "Month")
+
+plt.show()
+plt.close()
+```
+
+## Ozone AQI by Ozone
+
+One plot for max one for mean, one for min.
+
+```{python}
+plt.scatter(x = aqi_ozone["max_ozone"], y = aqi_ozone["AQI"], c = "Black")
+plt.xlabel("Max Daily Ozone")
+plt.ylabel("Ozone AQI")
+
+plt.show()
+plt.close()
+
+plt.scatter(x = aqi_ozone["mean_ozone"], y = aqi_ozone["AQI"], c = "Black")
+plt.xlabel("Mean Daily Ozone")
+plt.ylabel("Ozone AQI")
+
+plt.show()
+plt.close()
+
+plt.scatter(x = aqi_ozone["min_ozone"], y = aqi_ozone["AQI"], c = "Black")
+plt.xlabel("Minimum Daily Ozone")
+plt.ylabel("Ozone AQI")
+
+plt.show()
+plt.close()
+
+
+```
+
+## Max vs mean ozone
+
+```{python}
+plt.scatter(x = aqi_ozone["max_ozone"], y = aqi_ozone["mean_ozone"], c = "Black")
+plt.xlabel("Max Daily Ozone")
+plt.ylabel("Mean Daily Ozone")
+
+plt.show()
+plt.close()
+```
+
+
+```{python}
+aqi_ozone["mean_humid"].plot.hist(color = "Gray")
+plt.xlabel("Mean Daily Humidity")
+
+plt.show()
+plt.close()
+```
+
+
+
+## Other variables vs AQI scatterplots
+
+```{python}
+plt.scatter(x = aqi_ozone["max_no2"], y = aqi_ozone["AQI"], c = "Black")
+plt.xlabel("Max Daily NO2")
+plt.ylabel("Ozone AQI")
+
+plt.show()
+plt.close()
+```
+
+```{python}
+plt.scatter(x = aqi_ozone["mean_temp"], y = aqi_ozone["AQI"], c = "Black")
+plt.xlabel("Mean Daily Temp")
+plt.ylabel("Ozone AQI")
+
+plt.show()
+plt.close()
+```
+
+```{python}
+plt.scatter(x = aqi_ozone["mean_pressure"], y = aqi_ozone["AQI"], c = "Black")
+plt.xlabel("Mean Daily Pressure")
+plt.ylabel("Ozone AQI")
+
+plt.show()
+plt.close()
+```
+
+
+```{python}
+aqi_ozone.columns
+```
+
 

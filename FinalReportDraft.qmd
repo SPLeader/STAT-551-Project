@@ -1,0 +1,178 @@
+---
+title: "Final Report Draft"
+title-block-banner: true
+author: 
+- Sean Leader
+- William Medwid
+- Vanessa Veto
+- Jose Mierzejewski
+format: 
+  html:
+    code-fold: true
+    code-line-numbers: true
+    code-tools: true
+    self-contained: true
+    theme: cosmo
+  
+editor: visual
+execute:
+  message: false
+  include: false
+  echo: false
+---
+
+```{r}
+library(tidyverse)
+library(here)
+library(lubridate)
+library(knitr)
+```
+
+```{r}
+aqi <- read_csv(here("Project Data",
+                     "Combined",
+                     "aqi_ozone_all_years_prediction.csv"))
+```
+
+```{r}
+aqi
+```
+
+# Introduction
+
+-   Mention that we removed all ozone measurements and previous-day AQI from the dataset such that if for some reason ozone measurements were not taken, you could still predict the ozone AQI.
+
+The EPA is an organization fundamentally invested securing and promoting the health and well-being of the environment. In this paper, we analyze two distinct but related environmental issues: air pollution and car dependency. For both issues, we used publicly available data sourced from the EPA to construct machine learning models to make predictions. For air pollution, we predicted a county's next-day Air Quality Index (AQI) from the previous day's atmospheric conditions to determine which factors contribute to AQI and how accurately we can determine tomorrow's AQI from today's conditions. For car dependency, we predicted the 'walkability' category of a localized area based on demographic information to deduce which demographic characteristics contribute most meaningfully to the 'walkability' of a location. 
+
+# Data Collection & Description
+
+## AQI
+
+To collect information about atmospheric conditions and Air Quality Index, we downloaded two years (2021 & 2022) worth of atmospheric data from the EPA (source in the appendix). These data were collected by various monitoring stations across 43 counties in 32 states across the United States on a (mostly) daily basis. However we had to omit some of the data because predicting next-day AQI from current-day atmospheric conditions requires sequential days of all atmospheric measurements at that monitoring station, which was not always the case. **There are different AQIs for different atmospheric pollutants. For this project, we chose to predict the AQI based on ozone from atmospheric conditions (excluding ozone concentration) because the ozone AQI had the most observations in the final dataset.**
+
+**For each atmospheric measurement, we extracted the minimum, average, and maximum measurement at each weather station each day.** The following table details the atmospheric measurements we extracted.
+
+```{r, fig.cap = "Table 1. Variable summary for AQI dataset", include = TRUE}
+data.frame(`Variable Name` = c("no2", "co", "so2", 
+                               "no", "temp","wind", 
+                                   "pressure", "humid", "AQI"),
+           `Variable Description` = 
+             c("Atmospheric Concentration of Nitrogen Dioxide (ppb)",
+               "Atmospheric Concentration of Carbon Monoxide (ppm)",
+               "Atmospheric Concentration of Sulfur Dioxide (ppb)",
+               "Atmospheric Concentration of Nitrogen Monoxide (ppb)",
+               "Temperature (Celsius)",
+               "Wind Speed (knots)",
+               "Barometric Pressure (millibars)",
+               "Relative Humidity (% rh)",
+               "Next-day Air Quality Index, measured by Ozone")) %>%
+  rename(`Variable Name` = Variable.Name,
+         `Variable Description` = Variable.Description) %>%
+  kable()
+```
+
+
+
+
+
+# Exploratory Data Analysis
+
+## AQI
+
+### Overall distribution of AQI
+
+```{r, fig.cap = "Figure 1. Overall distribution of AQI", include = TRUE, message = FALSE}
+ggplot(aqi, aes(AQI_next_day, fill = cut(AQI_next_day, 100))) +
+  geom_histogram(show.legend = FALSE) +
+  scale_fill_discrete(h = c(200, 10), c = 200, l = 70) + 
+  theme_bw() + 
+  labs(y = "",
+       x = "AQI") 
+```
+
+```{r, fig.cap = "Table 2. Summary statistics of AQI", include = TRUE}
+aqi %>% 
+  summarise(Mean = round(mean(AQI_next_day), 2),
+            SD = round(sd(AQI_next_day), 2),
+            Median = median(AQI_next_day),
+            IQR = IQR(AQI_next_day)) %>%
+  kable()
+```
+
+Overall, the distribution of AQI scores is single-peaked and right-skewed, with a median next-day AQI of 44 and an interquartile range of 30. The graph is likely right-skewed because AQI is bounded on the lower end by 0, but has no upper limit.
+
+<br /> <br />
+
+### Overall distribution of AQI by month
+
+```{r, fig.cap = "Figure 2. Distribution of AQI by month", include = TRUE}
+aqi %>%
+  mutate(Month = factor(month(Date, label = TRUE))) %>%
+  ggplot(aes(x = Month, y = AQI_next_day, fill = Month)) + 
+  geom_boxplot() + 
+  theme_bw() + 
+  theme(legend.position = "None") + 
+        #axis.title.y = element_text(angle = 0, vjust = 0.5)) +
+  labs(y = "") +
+  scale_fill_manual(values = c("#034E7B", "#0570B0", "#3690C0", "#74A9CF", "#A6BDDB", "#D0D1E6",
+                                          "#F1EEF6", "#D0D1E6", "#A6BDDB", "#74A9CF", "#3690C0", "#0570B0"))
+```
+
+Figure 2 reveals the seasonal trend in AQI. AQI tends to be higher in the summer months and lower in the winter months for these data. The exact mechanism for this relationship is unknown, but some hypotheses include: 
+
+(1) Extreme heat and stagnant air can lead to an increase in ground-level ozone concentrations 
+(2) Hot and dry weather results in forest fires that can increase atmospheric pollutants
+(3) Clouds are less common at higher temperatures but are important for preventing the production of ozone
+
+```{r}
+"https://scied.ucar.edu/learning-zone/air-quality/how-weather-affects-air-quality#:~:text=Heat%20waves%20often%20lead%20to,ozone%20pollution%20and%20particulate%20pollution."
+```
+<br /> 
+<br />
+
+### Correlations between predictors and AQI
+
+```{r, fig.cap = "Figure 3. Predictor correlations with AQI, by min, mean, and max concentration", include = TRUE}
+aqi %>% select(-Date, -County, -State, 
+               -AQI, -AQI_cat, -max_ozone, 
+               -mean_ozone, -min_ozone) %>%
+  cor() %>% 
+  data.frame() %>%
+  select(AQI_next_day) %>% 
+  mutate(variable = rownames(.),
+         variable_category = str_replace(variable, ".+_", ""),
+         variable_type = str_replace(variable, "_.+", "")) %>%
+  filter(variable != "AQI_next_day") %>%
+  rename("Correlation" = AQI_next_day) %>%
+  ggplot(aes(x = factor(variable_category, 
+                        levels = c("no2", "temp", "co", 
+                                   "so2", "no", "wind", 
+                                   "pressure", "humid")), y = Correlation, fill = variable_type)) + 
+  geom_col(position = "dodge", width = 0.75) +
+  theme_bw() +
+  scale_fill_manual(values = c("#88CCEE", "#CC6677", "#DDCC77")) +
+  labs(y = "Correlation",
+       x = "Predictor",
+       fill = "")
+```
+
+Figure 3
+
+## Walkability
+
+# Model Results
+
+## AQI
+
+## Walkability
+
+# Discussion
+
+## AQI
+
+## Walkability
+
+# Conclusion
+
+# Appendix
+
