@@ -1,0 +1,125 @@
+---
+title: "Final Report Draft: Python"
+author: "Sean Leader // William Medwid // Vanessa Veto // Jose Mierzejewski"
+format: 
+  html:
+    code-fold: true
+    code-line-numbers: true
+    code-tools: true
+    self-contained: true
+editor: visual
+execute:
+  message: false
+jupyter: python3
+---
+
+```{python, version = "python"}
+#| label: libraries-py
+#| include: false
+import pandas as pd
+
+import seaborn as sns
+import matplotlib.pyplot as plt
+
+
+from sklearn.linear_model import LinearRegression, LogisticRegression
+from sklearn.neighbors import KNeighborsRegressor, KNeighborsClassifier
+
+from sklearn.metrics import r2_score, confusion_matrix, accuracy_score, precision_score, recall_score, roc_auc_score, make_scorer
+
+from sklearn.preprocessing import OneHotEncoder, StandardScaler, LabelEncoder
+from sklearn.compose import make_column_transformer
+from sklearn.pipeline import Pipeline, make_pipeline
+
+from sklearn.model_selection import cross_val_score, GridSearchCV, KFold
+
+from sklearn.discriminant_analysis import LinearDiscriminantAnalysis
+from sklearn.discriminant_analysis import QuadraticDiscriminantAnalysis
+
+from sklearn.tree import DecisionTreeClassifier, plot_tree, DecisionTreeRegressor
+
+
+from sklearn.ensemble import BaggingClassifier, RandomForestClassifier, RandomForestRegressor
+
+from sklearn.metrics import roc_auc_score
+from sklearn.metrics import make_scorer
+from sklearn.linear_model import Lasso
+from sklearn.model_selection import train_test_split
+import numpy as np
+from sklearn.metrics import classification_report, confusion_matrix
+
+```
+
+# Introduction
+
+# Exploratory Data Analysis
+
+-   Insert graphs from phase 2
+
+## AQI
+
+### Overall distribution of AQI
+
+Overall, the distribution of AQI scores is single-peaked and right-skewed, with a median next-day AQI of 44 and an interquartile range of 30. The graph is likely right-skewed because AQI is bounded on the lower end by 0, but has no upper limit.
+
+### Overall distribution of AQI by month
+
+### Correlations with predictors
+
+## Walkability
+
+-   Walkability hist
+
+![](images/image-697901616.png){width="586"}
+
+-   Feature Selection done with Lasso and Decision Trees
+
+![](images/image-847630593.png){width="723"}
+
+-   Results mostly agreed with each other
+
+-   According to the feature importances in the decision tree, the top 6 features had a Gini importance of meaningful order of magnitude, so we kept those for our final models
+
+![](images/image-1009396188.png)
+
+# Model Results
+
+## AQI
+
+## Walkability
+
+### Decision Tree Regression
+
+-   R-squared: 0.8895 on 10-fold CV
+
+-   Hyperparameter tuning led us to institute a maximum depth of the tree to avoid overfitting.
+
+![](images/image-276412279.png)
+
+### Random Forest Regression
+
+![](images/image-291341085.png)
+
+### K-Neighbors Regression
+
+-   R-squared: 0.8929 on 10-fold CV
+
+-   Hyperparameter tuning led us to use kneighbors = 10
+
+![](images/image-987151630.png)
+
+### Linear Regression
+
+![](images/image-1320738919.png)
+
+-   Interpret coefficients
+
+-   Linear regression cross validation R2score: 0.7503
+
+# Discussion
+
+## AQI
+
+## Walkability
+
+![](images/image-500239886.png)
