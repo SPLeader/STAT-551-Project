@@ -58,10 +58,32 @@ def get_best_features(features, coef):
   best_features_pairs.sort(key = lambda x: abs(x[1]), reverse=True)
   best_features = [pair[0] for pair in best_features_pairs]
   return best_features
+
+def get_best_features_pairs(features, coef):
+  best_features_pairs = zip(features, coef)
+  best_features_pairs = [pair for pair in best_features_pairs if pair[1] != 0.0]
+  best_features_pairs.sort(key = lambda x: abs(x[1]), reverse=True)
+  return best_features_pairs
 ```
 
 ```{python}
 df = pd.read_csv('nwi.csv')
+```
+
+# Exploratory
+
+```{python}
+plt.clf()
+
+sns.set_theme()
+
+df['NatWalkInd'].hist()
+plt.title('Walkability occurrences')
+plt.xlabel('Walkability Index')
+plt.ylabel('Occurrences')
+
+plt.savefig('NWI_histogram.png')
+plt.show()
 ```
 
 ```{python}
@@ -86,6 +108,21 @@ lasso_pipeline.fit(X, y)
 
 ```{python}
 lasso_best_features = get_best_features(all_features, lasso_pipeline['lasso'].coef_.squeeze())
+lasso_best_features_pairs = get_best_features_pairs(all_features, lasso_pipeline['lasso'].coef_.squeeze())
+```
+
+```{python}
+features = [pair[0] for pair in lasso_best_features_pairs]
+coefficients = [pair[1] for pair in lasso_best_features_pairs]
+
+plt.clf()
+plt.figure().set_figwidth(20)
+
+sns.barplot(x=features[:6], y=np.abs(coefficients[:6]))
+plt.title('Top Lasso Coefficients')
+plt.ylabel('Coefficient')
+plt.savefig('test.png')
+plt.show()
 ```
 
 Best features according to LASSO: 'D2A_EPHHM', 'D2B_E8MIXA', 'D3APO', 'D3B', 'D3BMM4', 'D3A', 'D3BMM3', 'Shape_Length', 'Pct_AO2p', 'D5DRI', 'D5DEI', 'Pct_AO1'
@@ -104,8 +141,14 @@ dt.fit(X, y)
 ```{python}
 plt.clf()
 
-plot_tree(dt, proportion=True, max_depth=2, feature_names=all_features, 
+plt.figure().set_figwidth(200)
+plt.figure().set_figheight(7)
+
+plot_tree(dt, proportion=True, max_depth=1, feature_names=all_features, 
         class_names=list(y.unique()), filled=True)
+plt.title('Decision Tree on all predictors')
+
+plt.savefig('decision_tree_feature_selection.png')
 plt.show()
 ```
 
@@ -132,7 +175,31 @@ dt.get_depth()
 ```
 
 ```{python}
-cross_val_score(DecisionTreeRegressor(), X[lasso_best_features], y, cv=10).mean()
+cross_val_score(DecisionTreeRegressor(max_depth=9), X[dt_best_features[:6]], y, cv=10).mean()
+```
+
+```{python}
+dt = DecisionTreeRegressor(max_depth=9)
+dt.fit(X_train, y_train)
+preds = dt.predict(X_test)
+resids = preds - y_test
+
+plt.clf()
+sns.set_theme()
+plt.figure().set_figwidth(10)
+
+plt.scatter(preds, resids, s=1)
+plt.axhline(y = 0, color = 'k', linestyle = '--')
+plt.xlabel('Walkability Index prediction')
+plt.ylabel('Residual')
+plt.title('Decision Tree Residuals')
+
+
+plt.ylim(-3, 3)
+plt.savefig('DT_residuals.png')
+
+
+plt.show()
 ```
 
 ## KNeighbors Regression
@@ -158,7 +225,7 @@ grid_search.fit(X, y)
 
 ```{python}
 ct = make_column_transformer(
-  (StandardScaler(), dt_best_features[:10]),
+  (StandardScaler(), dt_best_features[:5]),
   remainder = 'drop'
 )
 
@@ -176,13 +243,19 @@ preds = knn_pipeline.predict(X_test)
 resids = preds - y_test
 feature_resid_plot = dt_best_features[0]
 
-
 plt.clf()
+sns.set_theme()
+plt.figure().set_figwidth(10)
 
-plt.scatter(X_test[feature_resid_plot], resids, s=1)
-plt.xlabel(feature_resid_plot)
-plt.ylabel('residual')
-plt.title('Residual Plot')
+plt.scatter(preds, resids, s=1)
+plt.axhline(y = 0, color = 'k', linestyle = '--')
+plt.xlabel('Walkability Index prediction')
+plt.ylabel('Residual')
+plt.title('KNN Residuals')
+
+plt.ylim(-3, 3)
+plt.savefig('KNN_residuals.png')
+
 plt.show()
 ```
 
@@ -209,7 +282,7 @@ grid_search.fit(X, y)
 
 ```{python}
 ct = make_column_transformer(
-  (StandardScaler(), dt_best_features[:10]),
+  (StandardScaler(), dt_best_features[:4]),
   remainder = 'drop'
 )
 
@@ -217,13 +290,11 @@ forest_pipeline = make_pipeline(
   ct,
   RandomForestRegressor()
 )
-
-cross_val_score(knn_pipeline, X, y, cv=10).mean()
 ```
 
 ```{python}
 ct = make_column_transformer(
-  (StandardScaler(), dt_best_features[:10]),
+  (StandardScaler(), dt_best_features[:4]),
   remainder = 'drop'
 )
 
@@ -233,28 +304,107 @@ forest_pipeline = make_pipeline(
 )
 
 forest_pipeline.fit(X_train, y_train)
+```
 
+```{python}
 preds = forest_pipeline.predict(X_test)
 resids = preds - y_test
-feature_resid_plot = dt_best_features[0]
+
+plt.clf()
+sns.set_theme()
+
+plt.figure().set_figwidth(10)
+
+
+plt.scatter(preds, resids, s=1)
+plt.axhline(y = 0, color = 'k', linestyle = '--')
+plt.xlabel('Walkability Index prediction')
+plt.ylabel('Residual')
+plt.title('Random Forest Residuals')
+plt.ylim(-3, 3)
+
+
+plt.savefig('RF_residuals.png')
+plt.show()
+```
+
+```{python}
+rf_preds = forest_pipeline.predict(X_test)[:1000]
+rf_resids = (preds - y_test)[:1000]
+
+dt_preds = dt.predict(X_test)[:1000]
+dt_resids =(preds - y_test)[:1000]
+
+knn_preds = knn_pipeline.predict(X_test)[:1000]
+knn_resids = (preds - y_test)[:1000]
+
+
 
 
 plt.clf()
+sns.set_theme()
+plt.figure().set_figwidth(20)
+plt.figure().set_figheight(1)
 
-plt.scatter(X_test[feature_resid_plot], resids, s=1)
-plt.xlabel(feature_resid_plot)
-plt.ylabel('residual')
-plt.title('Residual Plot')
+fig, axs = plt.subplots(3, 1, sharex=True)
+
+axs[0].scatter(dt_preds, dt_resids, s=.3)
+axs[0].axhline(y = 0, color = 'k', linestyle = '--', linewidth=.5)
+axs[0].set_title('DT', fontdict={'fontsize' : 8})
+axs[0].set_ylim(-3, 3)
+
+axs[1].scatter(rf_preds, rf_resids, s=.3)
+axs[1].axhline(y = 0, color = 'k', linestyle = '--', linewidth=.5)
+axs[1].set_title('RF', fontdict={'fontsize' : 8})
+axs[1].set_ylim(-3, 3)
+
+axs[2].scatter(knn_preds, knn_resids, s=.3)
+axs[2].axhline(y = 0, color = 'k', linestyle = '--', linewidth=.5)
+axs[2].set_title('KNN', fontdict={'fontsize' : 8})
+axs[2].set_ylim(-3, 3)
+
+plt.suptitle('Residual Plots')
+fig.supxlabel('Walkability Index Prediction')
+fig.supylabel('Residual')
+
+plt.savefig('multi_residuals.png')
+
 plt.show()
 ```
 
 ## Linear Regression
 
 ```{python}
-lr_model = LinearRegression()
-cross_val_score(lr_model, X, y, cv=10).mean()
+num_features = 8
+ct = make_column_transformer(
+  (StandardScaler(), dt_best_features[:num_features]),
+  remainder = 'drop'
+)
 
-lr_model.fit(X_train, y_train)
+lr_pipeline = make_pipeline(
+  ct,
+  LinearRegression()
+)
+
+cross_val_score(lr_pipeline,X, y, cv=10).mean()
+
+lr_pipeline.fit(X_train, y_train)
+```
+
+```{python}
+features = [pair[0] for pair in lasso_best_features_pairs[:num_features]]
+coefficients = lr_pipeline['linearregression'].coef_
+
+plt.clf()
+sns.set_theme(context='notebook', style='darkgrid', palette='deep')
+
+plt.figure().set_figwidth(20)
+
+sns.barplot(x=features, y=np.abs(coefficients))
+plt.title('Linear Regression Coefficients')
+plt.ylabel('Coefficient')
+plt.savefig('LR_coefficients.png')
+plt.show()
 ```
 
 # Preliminary Stuff:
