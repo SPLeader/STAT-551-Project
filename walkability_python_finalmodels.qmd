@@ -87,6 +87,12 @@ plt.show()
 ```
 
 ```{python}
+
+df['D3B'].mean()
+df['D3B'].median()
+```
+
+```{python}
 X = df.drop(columns=['D1C8_OFF', 'CSA', 'OBJECTID', 'GEOID10', 'GEOID20', 'STATEFP', 'COUNTYFP', 'CSA_Name', 'CBSA_Name', 'cat', 'CBG', 'D4A', 'D4D', 'CBG', 'NatWalkInd', 'D2A_Ranked', 'D2B_Ranked', 'D3B_Ranked', 'D4A_Ranked'])
 y = df['NatWalkInd']
 
@@ -165,9 +171,10 @@ X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=.10)
 ## Decision Tree
 
 ```{python}
+n_features = 5
 dt = DecisionTreeRegressor(max_depth=9)
-dt.fit(X_train[dt_best_features[:5]], y_train)
-dt.score(X_test[dt_best_features[:5]], y_test)
+dt.fit(X_train[dt_best_features[:n_features]], y_train)
+dt.score(X_test[dt_best_features[:n_features]], y_test)
 ```
 
 ```{python}
@@ -175,7 +182,21 @@ dt.get_depth()
 ```
 
 ```{python}
-cross_val_score(DecisionTreeRegressor(max_depth=9), X[dt_best_features[:6]], y, cv=10).mean()
+plt.clf()
+
+plt.figure().set_figwidth(200)
+plt.figure().set_figheight(7)
+
+plot_tree(dt, proportion=True, max_depth=1, feature_names=dt_best_features[:n_features], 
+        class_names=list(y.unique()), filled=True)
+plt.title('Decision Tree on all predictors')
+
+plt.savefig('decision_tree_feature_selection.png')
+plt.show()
+```
+
+```{python}
+cross_val_score(DecisionTreeRegressor(max_depth=9), X[dt_best_features[:6]], y, cv=10, scoring='neg_mean_squared_error').mean()
 ```
 
 ```{python}
@@ -234,7 +255,57 @@ knn_pipeline = make_pipeline(
   KNeighborsRegressor(n_neighbors=10)
 )
 
-cross_val_score(knn_pipeline, X, y, cv=10).mean()
+knn_pipeline.fit(X_train, y_train)
+#cross_val_score(knn_pipeline, X, y, cv=10, scoring='neg_mean_squared_error').mean()
+```
+
+```{python}
+n = 1000
+plt.clf()
+
+preds = lr_pipeline.predict(X_test[:n])
+
+plt.scatter(X_test['D2A_EPHHM'][:n], preds[:n], s=1)
+plt.scatter(X_test['D2A_EPHHM'][:n], y_test[:n], s=1)
+
+plt.show()
+
+```
+
+```{python}
+n_neighbor_values = range(1, 50, 2)
+
+results = []
+
+for n in n_neighbor_values:
+  ct = make_column_transformer(
+  (StandardScaler(), dt_best_features[:5]),
+  remainder = 'drop'
+  )
+
+  knn_pipeline = make_pipeline(
+    ct,
+    KNeighborsRegressor(n_neighbors=n)
+  )
+  
+  knn_pipeline.fit(X_train, y_train)
+  results += [knn_pipeline.score(X_test, y_test)]
+```
+
+```{python}
+plt.clf()
+
+
+plt.figure().set_figwidth(10)
+
+plt.plot(n_neighbor_values, results)
+
+plt.title('Validation R2-Scores')
+plt.xlabel('N-Neighbors')
+plt.ylabel('Val R2-score')
+
+plt.savefig('KNN_n_scores.png')
+plt.show()
 ```
 
 ```{python}
@@ -303,10 +374,11 @@ forest_pipeline = make_pipeline(
   RandomForestRegressor()
 )
 
-forest_pipeline.fit(X_train, y_train)
+cross_val_score(forest_pipeline, X, y, cv=5, scoring='neg_mean_squared_error').mean()
 ```
 
 ```{python}
+forest_pipeline.fit(X_train, y_train)
 preds = forest_pipeline.predict(X_test)
 resids = preds - y_test
 
@@ -386,7 +458,7 @@ lr_pipeline = make_pipeline(
   LinearRegression()
 )
 
-cross_val_score(lr_pipeline,X, y, cv=10).mean()
+cross_val_score(lr_pipeline,X, y, cv=10, scoring='neg_mean_squared_error').mean()
 
 lr_pipeline.fit(X_train, y_train)
 ```
@@ -400,9 +472,11 @@ sns.set_theme(context='notebook', style='darkgrid', palette='deep')
 
 plt.figure().set_figwidth(20)
 
-sns.barplot(x=features, y=np.abs(coefficients))
+sns.barplot(x=features, y=coefficients)
 plt.title('Linear Regression Coefficients')
 plt.ylabel('Coefficient')
+plt.axhline(y = 0, color = 'k', linestyle = '-', linewidth=4)
+
 plt.savefig('LR_coefficients.png')
 plt.show()
 ```
