@@ -40,11 +40,9 @@ aqi
 
 # Introduction
 
-- Feel free to rewrite this section as much as you'd like, I just put some general details in here based on phase 2 for the time being
+-   Feel free to rewrite this section as much as you'd like, I just put some general details in here based on phase 2 for the time being
 
-The EPA is an organization fundamentally invested securing and promoting the health and well-being of the environment. In this paper, we analyze two distinct but related environmental issues: air pollution and car dependency. For both issues, we used publicly available data sourced from the EPA to construct machine learning models to make predictions. For air pollution, we predicted a county's next-day Air Quality Index (AQI) from the previous day's atmospheric conditions to determine which factors contribute to AQI and how accurately we can determine tomorrow's AQI from today's conditions. For car dependency, we predicted the 'walkability' category of a localized area based on demographic information to deduce which demographic characteristics contribute most meaningfully to the 'walkability' of a location. 
-
-
+The EPA is an organization fundamentally invested securing and promoting the health and well-being of the environment. In this paper, we analyze two distinct but related environmental issues: air pollution and car dependency. For both issues, we used publicly available data sourced from the EPA to construct machine learning models to make predictions. For air pollution, we predicted a county's next-day Air Quality Index (AQI) from the previous day's atmospheric conditions to determine which factors contribute to AQI and how accurately we can determine tomorrow's AQI from today's conditions. For car dependency, we predicted the 'walkability' category of a localized area based on demographic information to deduce which demographic characteristics contribute most meaningfully to the 'walkability' of a location.
 
 ```{r}
 # Previous Work - should we include this??? If so, we need to update citations in appendix
@@ -55,9 +53,6 @@ One paper in the American Journal of Epidemiology used a linear regression appro
 
 Another article with goals similar to goals of our project’s is this paper. These researchers also analyzed walkability, but viewed it only through the lens of the built environment, rather than including sociodemographic characteristics. Additionally, this paper specifically focused on a single metropolitan area whereas we will use data from all 50 U.S. states (and Washington D.C.). These researchers used PCA as their main analysis. (Denc, C. et al.) We plan on also using PCA, but only as a preprocessing step before fitting KNN models. Overall, this study uses very similar predictors and target variables to ours, and we hope to expand upon its findings."
 ```
-
-
-
 
 # Data Collection & Description
 
@@ -87,7 +82,6 @@ data.frame(`Variable Name` = c("no2", "co", "so2",
          `Variable Description` = Variable.Description) %>%
   kable()
 ```
-
 
 ## Walkability
 
@@ -136,17 +130,17 @@ aqi %>%
                                           "#F1EEF6", "#D0D1E6", "#A6BDDB", "#74A9CF", "#3690C0", "#0570B0"))
 ```
 
-Figure 2 reveals the seasonal trend in AQI. AQI tends to be higher in the summer months and lower in the winter months for these data. The exact mechanism for this relationship is unknown, but some hypotheses include: 
+Figure 2 reveals the seasonal trend in AQI. AQI tends to be higher in the summer months and lower in the winter months for these data. The exact mechanism for this relationship is unknown, but some hypotheses include:
 
-(1) Extreme heat and stagnant air can lead to an increase in ground-level ozone concentrations 
+(1) Extreme heat and stagnant air can lead to an increase in ground-level ozone concentrations
 (2) Hot and dry weather results in forest fires that can increase atmospheric pollutants
 (3) Clouds are less common at higher temperatures but are important for preventing the production of ozone
 
 ```{r}
 "https://scied.ucar.edu/learning-zone/air-quality/how-weather-affects-air-quality#:~:text=Heat%20waves%20often%20lead%20to,ozone%20pollution%20and%20particulate%20pollution."
 ```
-<br /> 
-<br />
+
+<br /> <br />
 
 ### Correlations between predictors and AQI
 
@@ -175,18 +169,17 @@ aqi %>% select(-Date, -County, -State,
   ylim(c(-0.6, 0.6))
 ```
 
-Figure 3 shows how the different atmospheric measurements correlate with next-day AQI. For most atmospheric measurements, the correlation is in the same direction for the minimum, mean, and maximum. However, wind speed is a notable exception to this trend, where we can see that although the mean and minimum wind speed are negatively correlated with next-day AQI, the maximum wind speed has a slight positive correlation with next-day AQI. The single variable with the most positive correlation is maximum no2, with a correlation of ~0.59. The single variable with the most negative correlation is minimum humidity, with a correlation of ~-0.50. 
+Figure 3 shows how the different atmospheric measurements correlate with next-day AQI. For most atmospheric measurements, the correlation is in the same direction for the minimum, mean, and maximum. However, wind speed is a notable exception to this trend, where we can see that although the mean and minimum wind speed are negatively correlated with next-day AQI, the maximum wind speed has a slight positive correlation with next-day AQI. The single variable with the most positive correlation is maximum no2, with a correlation of \~0.59. The single variable with the most negative correlation is minimum humidity, with a correlation of \~-0.50.
 
-<br />
-<br />
+<br /> <br />
 
 ```{r}
+# Correlation between each variable and next-day AQI 
 aqi %>% select(-Date, -County, -State, 
                -AQI, -AQI_cat, -max_ozone, 
                -mean_ozone, -min_ozone) %>%
   cor() %>% data.frame() %>% select(AQI_next_day) 
 ```
-
 
 ## Walkability
 
@@ -194,30 +187,73 @@ aqi %>% select(-Date, -County, -State,
 
 # Model Results
 
-- This section is meant to detail empirical results from the model building process
-- What were the performance metrics for each of the models?
-- What variables were not
+-   This section is meant to detail empirical results from the model building process
+-   What were the performance metrics for each of the models?
+-   What variables were not
 
 ## AQI
 
-**you know what to put here :^)**
+We used three different types of models to predict AQI: linear models, decision trees, and random forests. Each model predicts the next day's AQI based on the min, mean, and max values of our 8 predictor measurements. Notably, this does not include any measurements of the day's Ozone or AQI. We measured each model's performance by cross-validating on data the model had not been trained on. The R-Squared and Root Mean Squared Error metrics are displayed below:
+
+```{r, fig.cap = "Table 2. Accuracy metrics for our four model varieties", include = TRUE}
+tibble(
+  "Model" = c("Linear Regression", "Decision Tree", "Random Forest"),
+  "R-Squared" = c(0.5901049, 0.5552405, 0.6756383),
+  "Root Mean Squared Error" = c(23.33427, 24.3146, 20.95272)) %>% 
+  kable(digits = 3)
+```
+
+These metrics indicate that the Random Forest is our overall most effective model, with an R-Squared value of 0.676 and a RMSE of 20.953. This indicates that the random forest could successfully predict 67.6% of the variability in AQI, only being wrong by an average of about 20.953 AQI points. Our linear model was markedly worse, with a RMSE of 23.334, and our decision tree fared the worst, with a RMSE of 24.315 AQI points.
+
+To investigate the biases of each of our models, we have plotted the residual errors below:
+
+![Figure 4: AQI model residual plots. A moving average of the mean error is plotted to display model biases](AQI_residuals.png)
+
+With these results in mind, we will briefly discuss each model's strengths and weaknesses.
+
+### Linear Model
+
+Our final linear model ended up slightly biased with its lowest predictions being under the true AQI, and its higher predictions tending to over-predict by about 10 points. After comparing several linear model specifications, we settled on this model which uses our predictors in both their original and squared forms to predict AQI. This allowed us to reduce the biases on the high and low somewhat, but some bias remained.
+
+Despite its biases and inaccuracies, the linear model is useful for its interpretability. We found three of our predictors to be far more important than the others by using LASSO regression, giving us a simple understanding of the basic associations at play. See the formula below:
+
+$$
+AQI = 58.68 + 12.43 * max\_no2 + 8.43 * max\_temperature - 6.36 * min\_humidity
+$$
+
+Note that in this formula, max_no2, max_temperature, and max_humidity are standardized, measured in standard deviations rather than typical units. This gives us a simple understanding that high no2 and temperature in a day indicate high AQI, while humidity indicates lower AQI. The association between no2 and ozone makes a lot of sense, as both are typically generated from fossil cars and industrial facilities, so we would expect them to be highly correlated. Despite being so simplified, this model still has a RMSE of only 26.169, and a R-squared of 0.484.
+
+### Decision Tree
+
+Our decision tree's predictions look far different than the others because they are made in discrete categories rather than in a more continuous manner. While this model has little bias, with only a slight overestimation bias on its highest predictions of 144, it has the largest overall errors, making it a worse predictor than other models. Neverhteless, this model may be very valuable, as we can directly see how it makes its decisions in the following decision tree flowchart:
+
+![Figure 5: Decision Tree Flowchart](AQI_decision_tree.png)
+
+At each step, this decision tree chooses one variable to best separate high-AQI days from low-AQI days. The first, largest, split separates based on no2: days with a very low no2, below 18 ppb, are directed to the left side of the tree, which tends to have lower AQI. This split makes sense because ozone and no2 tend to come from the same sources such as cars and industrial facilities, so a low no2 concentration correlate with low ozone. For low no2 days, the tree finds that high temperature is the best indicator of high AQI, with humidity distinguishing further days with a max temperature between 68 and 82 degrees Fahrenheit. For high no2 days, the tree uses air pressure and temperature to distinguish AQI further.
+
+### Random Forest
+
+Our final optimized random forest model averages the results of 500 decision trees, each of which is trained on a random subset of 6 of our predictors, a random subset of our data, and splits into many more AQI categories than the decision tree above. This leads each of the individual decision trees to over-fit to different small trends in our training data. By taking the average of so many over-fit trees, each of which recognizes different indicators of AQI, the random forest is very effective at predicting AQI, but does not lend itself to a more detailed human understanding.
 
 ## Walkability
 
-**you know what to put here :^)**
+**you know what to put here :\^)**
 
 # Discussion
 
-- The goal of this discussion is to make inferences from the model results and EDA in the previous sections
-- Touch on what we learned from each model building process for both questions
-- For the interpretable models, what factors were most important (already touched on this in the Model Results) and what can we conclude because of that?
-- Were we successfully able to predict each of the responses?
-- If so, what does that tell us about AQI/Walkability?
-- If not, what does that tell us AQI/Walkability?
+-   The goal of this discussion is to make inferences from the model results and EDA in the previous sections
+-   Touch on what we learned from each model building process for both questions
+-   For the interpretable models, what factors were most important (already touched on this in the Model Results) and what can we conclude because of that?
+-   Were we successfully able to predict each of the responses?
+-   If so, what does that tell us about AQI/Walkability?
+-   If not, what does that tell us AQI/Walkability?
+
+-   We don't necessarily need separate sections for AQI and walkability here, but only combine them if it seems natural to do so
+
 
 ## AQI
 
-- We don't necessarily need separate sections for AQI and walkability here, but only combine them if it seems natural to do so 
+Our model results demonstrate that we can forecast ozone-based AQI effectively without knowledge of ozone levels. On average, our random forest was only wrong by 20.953 AQI points, rarely predicting far from the actual AQI. As the estimates are in the same ballpark as the real AQI, they could potentially serve to give the public a general idea of how unsafe atmospheric ozone levels are in the absence of ozone measurements. We tuned several models for various parameters in order to arrive at this accurate of a random forest predictor. While our other models didn't prove to be as impactful, the linear model gives us an intuitive understanding that ozone is associated with high no2, high temperatures, and low humidity.
 
 ## Walkability
 
@@ -233,25 +269,24 @@ Although there are many appropriate uses of our work, we also want to forewarn y
 
 ## Bias
 
-
 We must acknowledge that our project is subject to biases - deliberate or otherwise. The primary bias in this analysis came from the data collection process. Our final data set consisted of atmospheric measurements from only 43 counties across 32 states, meaning that a substantial portion of the country is left unaccounted for by this analysis. Also, we did not investigate the geographic locations of the weather stations that were monitoring the atmospheric conditions; hence it is possible that these measurements are not representative of the general population of atmospheric conditions. Finally, the data we analyzed came only from the years 2021 and 2022 - meaning that insights and trends illuminated in this report may not reflect the historical patterns.
 
 **PLEASE ADD SECITON REGARDING BIAS FOR WALKABILITY DATASET**
 
 # Conclusion
 
-- Reiterate what we learned from the discussion and potentially from the EDA
-- How do these learnings relate to the questions we asked at the beginning?
-- Consider modifying the introduction as conclusions come naturally - the introduction should allude to what we talk about in this section, and vice versa
-- Make sure to tie these answers back to the original intent of this paper (recall that we are writing this report FOR the EPA.)
+-   Reiterate what we learned from the discussion and potentially from the EDA
+-   How do these learnings relate to the questions we asked at the beginning?
+-   Consider modifying the introduction as conclusions come naturally - the introduction should allude to what we talk about in this section, and vice versa
+-   Make sure to tie these answers back to the original intent of this paper (recall that we are writing this report FOR the EPA.)
 
 # Appendix
 
 ## Sources
 
-How Weather Affects Air Quality | Center for Science Education. (n.d.). UCAR. [https://scied.ucar.edu/learning-zone/air-quality/how-weather-affects-air-quality](https://scied.ucar.edu/learning-zone/air-quality/how-weather-affects-air-quality)
+How Weather Affects Air Quality \| Center for Science Education. (n.d.). UCAR. <https://scied.ucar.edu/learning-zone/air-quality/how-weather-affects-air-quality>
 
-- This is where sources we used should be linked. Please cite them in some proper format, not just hyperlinks (example above).
-- Any additional output from model summaries that did not fit earlier in the paper could go here as well
+-   This is where sources we used should be linked. Please cite them in some proper format, not just hyperlinks (example above).
+-   Any additional output from model summaries that did not fit earlier in the paper could go here as well
 
 ## Additional Output
