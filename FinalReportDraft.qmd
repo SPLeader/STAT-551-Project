@@ -1,6 +1,11 @@
 ---
 title: "Final Report Draft"
-author: "Sean Leader // William Medwid // Vanessa Veto // Jose Mierzejewski"
+title-block-banner: true
+author: 
+- Sean Leader
+- William Medwid
+- Vanessa Veto
+- Jose Mierzejewski
 format: 
   html:
     code-fold: true
@@ -8,6 +13,7 @@ format:
     code-tools: true
     self-contained: true
     theme: cosmo
+  
 editor: visual
 execute:
   message: false
@@ -32,19 +38,67 @@ aqi <- read_csv(here("Project Data",
 aqi
 ```
 
-
-
 # Introduction
 
-- Mention that we removed all ozone measurements and previous-day AQI from the dataset such that if for some reason ozone measurements were not taken, you could still predict the ozone AQI.
+- Feel free to rewrite this section as much as you'd like, I just put some general details in here based on phase 2 for the time being
+
+The EPA is an organization fundamentally invested securing and promoting the health and well-being of the environment. In this paper, we analyze two distinct but related environmental issues: air pollution and car dependency. For both issues, we used publicly available data sourced from the EPA to construct machine learning models to make predictions. For air pollution, we predicted a county's next-day Air Quality Index (AQI) from the previous day's atmospheric conditions to determine which factors contribute to AQI and how accurately we can determine tomorrow's AQI from today's conditions. For car dependency, we predicted the 'walkability' category of a localized area based on demographic information to deduce which demographic characteristics contribute most meaningfully to the 'walkability' of a location. 
+
+
+
+```{r}
+# Previous Work - should we include this??? If so, we need to update citations in appendix
+
+"Previous research has used similar methods to model AQI based on related conditions. One paper specifically models the AQI of Zhangdian District, China based on industrial waste gas emissions as well as general meteorological data. Their goals were to promote the optimization of polluting enterprises and to reduce the conflict between environmental protection and economic development. They compared results from a random forest, a back propagation neural network, a decision tree, and a least-squares SVM, ultimately preferring the Random Forest for its high accuracy, with an R-Squared value of 0.9. (Liu, Y. et al.) 
+
+One paper in the American Journal of Epidemiology used a linear regression approach to understand how income, education, racial/ethnic composition, age distribution, and sex were associated with indicators of neighborhood walkability. They found that neighborhoods with poorer residents tended to be more walkable, but with less open space. Similarly, children and the elderly tended to live in less walkable spaces, limiting their independence. (Katherine E. King et al.) Our work will be similar in that we are also trying to predict walkability and gain insight on what makes certain places more walkable than others. Our analysis will be different because we have many more variables to work with and we plan on taking a classification approach. 
+
+Another article with goals similar to goals of our project’s is this paper. These researchers also analyzed walkability, but viewed it only through the lens of the built environment, rather than including sociodemographic characteristics. Additionally, this paper specifically focused on a single metropolitan area whereas we will use data from all 50 U.S. states (and Washington D.C.). These researchers used PCA as their main analysis. (Denc, C. et al.) We plan on also using PCA, but only as a preprocessing step before fitting KNN models. Overall, this study uses very similar predictors and target variables to ours, and we hope to expand upon its findings."
+```
+
+
+
+
+# Data Collection & Description
+
+## AQI
+
+To collect information about atmospheric conditions and Air Quality Index, we downloaded two years (2021 & 2022) worth of atmospheric data from the EPA (source in the appendix). These data were collected by various monitoring stations across 43 counties in 32 states across the United States on a daily basis. In the final data set, one observation corresponded to one day of atmospheric measurements for a particular county, with multiple measurements from different weather stations. We had to omit some of the observations because predicting next-day AQI from current-day atmospheric conditions requires sequential days where all atmospheric measurements at that monitoring station are present. Sequential days that were missing any of the atmospheric measurements on either day were omitted from the data.
+
+**There are different AQIs for different atmospheric pollutants. For this project, we chose to predict the AQI based on ozone from atmospheric conditions (excluding ozone concentration) because the ozone AQI was the most frequent of the different AQIs after all data merging was complete.**
+
+**For each atmospheric measurement, we extracted the minimum, average, and maximum measurement at each weather station each day.** The following table details the atmospheric measurements we extracted.
+
+```{r, fig.cap = "Table 1. Variable summary for AQI dataset", include = TRUE}
+data.frame(`Variable Name` = c("no2", "co", "so2", 
+                               "no", "temp","wind", 
+                                   "pressure", "humid", "AQI"),
+           `Variable Description` = 
+             c("Atmospheric Concentration of Nitrogen Dioxide (ppb)",
+               "Atmospheric Concentration of Carbon Monoxide (ppm)",
+               "Atmospheric Concentration of Sulfur Dioxide (ppb)",
+               "Atmospheric Concentration of Nitrogen Monoxide (ppb)",
+               "Temperature (Celsius)",
+               "Wind Speed (knots)",
+               "Barometric Pressure (millibars)",
+               "Relative Humidity (% rh)",
+               "Next-day Air Quality Index, measured by Ozone")) %>%
+  rename(`Variable Name` = Variable.Name,
+         `Variable Description` = Variable.Description) %>%
+  kable()
+```
+
+
+## Walkability
+
+**PLEASE ADD SECTION ABOUT DATA COLLECTION AND DESCRIPTION FOR WALKABILITY DATA**
 
 # Exploratory Data Analysis
-
-- Insert graphs from phase 2 here
 
 ## AQI
 
 ### Overall distribution of AQI
+
 ```{r, fig.cap = "Figure 1. Overall distribution of AQI", include = TRUE, message = FALSE}
 ggplot(aqi, aes(AQI_next_day, fill = cut(AQI_next_day, 100))) +
   geom_histogram(show.legend = FALSE) +
@@ -54,7 +108,7 @@ ggplot(aqi, aes(AQI_next_day, fill = cut(AQI_next_day, 100))) +
        x = "AQI") 
 ```
 
-```{r, fig.cap = "Table 1. Summary statistics of AQI", include = TRUE}
+```{r, fig.cap = "Table 2. Summary statistics of AQI", include = TRUE}
 aqi %>% 
   summarise(Mean = round(mean(AQI_next_day), 2),
             SD = round(sd(AQI_next_day), 2),
@@ -63,13 +117,12 @@ aqi %>%
   kable()
 ```
 
+Overall, the distribution of AQI scores is single-peaked and right-skewed, with a median next-day AQI of 44 and an interquartile range of 30. The graph is likely right-skewed because AQI is bounded on the lower end by 0, but has no upper limit.
 
-Overall, the distribution of AQI scores is single-peaked and right-skewed, with a median next-day AQI of 44 and an interquartile range of 30. The graph is likely right-skewed because AQI is bounded on the lower end by 0, but has no upper limit. 
+<br /> <br />
 
-<br />
-<br />
+### Overall distribution of AQI by month
 
-### Overall distribution of AQI by month 
 ```{r, fig.cap = "Figure 2. Distribution of AQI by month", include = TRUE}
 aqi %>%
   mutate(Month = factor(month(Date, label = TRUE))) %>%
@@ -83,8 +136,20 @@ aqi %>%
                                           "#F1EEF6", "#D0D1E6", "#A6BDDB", "#74A9CF", "#3690C0", "#0570B0"))
 ```
 
+Figure 2 reveals the seasonal trend in AQI. AQI tends to be higher in the summer months and lower in the winter months for these data. The exact mechanism for this relationship is unknown, but some hypotheses include: 
 
-### Correlations with predictors
+(1) Extreme heat and stagnant air can lead to an increase in ground-level ozone concentrations 
+(2) Hot and dry weather results in forest fires that can increase atmospheric pollutants
+(3) Clouds are less common at higher temperatures but are important for preventing the production of ozone
+
+```{r}
+"https://scied.ucar.edu/learning-zone/air-quality/how-weather-affects-air-quality#:~:text=Heat%20waves%20often%20lead%20to,ozone%20pollution%20and%20particulate%20pollution."
+```
+<br /> 
+<br />
+
+### Correlations between predictors and AQI
+
 ```{r, fig.cap = "Figure 3. Predictor correlations with AQI, by min, mean, and max concentration", include = TRUE}
 aqi %>% select(-Date, -County, -State, 
                -AQI, -AQI_cat, -max_ozone, 
@@ -104,26 +169,89 @@ aqi %>% select(-Date, -County, -State,
   geom_col(position = "dodge", width = 0.75) +
   theme_bw() +
   scale_fill_manual(values = c("#88CCEE", "#CC6677", "#DDCC77")) +
-  labs(title = "Corrleation between predictors and AQI",
-       y = "",
+  labs(y = "Correlation",
        x = "Predictor",
-       fill = "")
+       fill = "") +
+  ylim(c(-0.6, 0.6))
+```
+
+Figure 3 shows how the different atmospheric measurements correlate with next-day AQI. For most atmospheric measurements, the correlation is in the same direction for the minimum, mean, and maximum. However, wind speed is a notable exception to this trend, where we can see that although the mean and minimum wind speed are negatively correlated with next-day AQI, the maximum wind speed has a slight positive correlation with next-day AQI. The single variable with the most positive correlation is maximum no2, with a correlation of ~0.59. The single variable with the most negative correlation is minimum humidity, with a correlation of ~-0.50. 
+
+<br />
+<br />
+
+```{r}
+aqi %>% select(-Date, -County, -State, 
+               -AQI, -AQI_cat, -max_ozone, 
+               -mean_ozone, -min_ozone) %>%
+  cor() %>% data.frame() %>% select(AQI_next_day) 
 ```
 
 
 ## Walkability
 
+**PLEASE ADD EDA FOR WALKABILITY HERE**
+
 # Model Results
+
+- This section is meant to detail empirical results from the model building process
+- What were the performance metrics for each of the models?
+- What variables were not
 
 ## AQI
 
+**you know what to put here :^)**
+
 ## Walkability
+
+**you know what to put here :^)**
 
 # Discussion
 
+- The goal of this discussion is to make inferences from the model results and EDA in the previous sections
+- Touch on what we learned from each model building process for both questions
+- For the interpretable models, what factors were most important (already touched on this in the Model Results) and what can we conclude because of that?
+- Were we successfully able to predict each of the responses?
+- If so, what does that tell us about AQI/Walkability?
+- If not, what does that tell us AQI/Walkability?
+
 ## AQI
+
+- We don't necessarily need separate sections for AQI and walkability here, but only combine them if it seems natural to do so 
 
 ## Walkability
 
+# Ethics
+
+## Good uses of our work
+
+It is important that as we give you these powerful machine learning model fits, you are aware of the importance of their proper usage. We hope that you will use the work detailed in this report to better understand the atmospheric factors that contribute to the future air quality of an area and the demographic characteristics that determine its walkability. For the AQI model in particular, we also expect that you can use this model to effectively predict the air quality based on ozone even when direct ozone measurements are unable to be taken, using other atmospheric conditions as a proxy measurement. For the walkability model, we would support the usage of our models to predict areas with poor walkability for areas where it is unknown, such that changes could be implemented to make it more pedestrian-friendly.
+
+## Misuses
+
+Although there are many appropriate uses of our work, we also want to forewarn you about the potential misuses to avoid. As the EPA, it is your responsibility to use the knowledge gained from this work and the corresponding machine learning models to help the environment, not to harm it. If these insights are given to those who do not have a vested interest in improving the environment, the consequences could be harmful. For example, we would not support the use of our machine learning models to identify areas with good enough air quality to handle additional factories, roads, or power plants, as this would lead to the degradation of the environment in those areas.
+
+## Bias
 
 
+We must acknowledge that our project is subject to biases - deliberate or otherwise. The primary bias in this analysis came from the data collection process. Our final data set consisted of atmospheric measurements from only 43 counties across 32 states, meaning that a substantial portion of the country is left unaccounted for by this analysis. Also, we did not investigate the geographic locations of the weather stations that were monitoring the atmospheric conditions; hence it is possible that these measurements are not representative of the general population of atmospheric conditions. Finally, the data we analyzed came only from the years 2021 and 2022 - meaning that insights and trends illuminated in this report may not reflect the historical patterns.
+
+**PLEASE ADD SECITON REGARDING BIAS FOR WALKABILITY DATASET**
+
+# Conclusion
+
+- Reiterate what we learned from the discussion and potentially from the EDA
+- How do these learnings relate to the questions we asked at the beginning?
+- Consider modifying the introduction as conclusions come naturally - the introduction should allude to what we talk about in this section, and vice versa
+- Make sure to tie these answers back to the original intent of this paper (recall that we are writing this report FOR the EPA.)
+
+# Appendix
+
+## Sources
+
+How Weather Affects Air Quality | Center for Science Education. (n.d.). UCAR. [https://scied.ucar.edu/learning-zone/air-quality/how-weather-affects-air-quality](https://scied.ucar.edu/learning-zone/air-quality/how-weather-affects-air-quality)
+
+- This is where sources we used should be linked. Please cite them in some proper format, not just hyperlinks (example above).
+- Any additional output from model summaries that did not fit earlier in the paper could go here as well
+
+## Additional Output
