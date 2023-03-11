@@ -86,13 +86,10 @@ data.frame(`Variable Name` = c("no2", "co", "so2",
 ## Walkability
 
 Data about walkability was accessed from the U.S. Government's open data catalog, data.gov. The data was collected by the Environmental Protection Agency (EPA) and contains demographic information, built environment characteristics, and transportation infrastructure data from 2021 for each Census block group. These inputs are used to calculate the National Walkability Index as defined by the EPA. This index can be expressed either numerically or translated into qualitative categories (see Table 2 below)
-![](https://lh3.googleusercontent.com/PPRZPwjdJWPESTa_-PvParr2-EMmkwzUbJtHxYxZw4lOK4UwIsY-RjMn_Y3b5mWdoQudNV8CP11Eaa-05V2EFyUjETxaA_yDwJJTcHDS6jhw11TkgN-Iv9Xem9Z51CPWsaf5yx5E7jS-o6gpnqcB8jE)
+![](images/walkability%20categories-02.png)
 
 In total, there are 220,740 observations for 117 variables in this dataset. Since there were so many predictors to choose from, we narrowed it down to those in the table below (more details on variable selection in the Exploratory Data Analysis section). 
-
-![](https://lh5.googleusercontent.com/O8UIYh5G_9eG0Yp4SxxvLA_6n6F1fbsaoy-NcnxJkJiwX49xFpnk9vZLKlecDOUnr3_dvXxwJ2VQy9FydRIPc0gZt1xELhqqnlcsiTWqpduc-Ia6pAmyY7LLd9FIGL8ZdNTXDFyauClh2IMbMnwepFk)
-
-\
+![](images/walkability%20variables-02.png)
 
 # Exploratory Data Analysis
 
@@ -192,8 +189,7 @@ aqi %>% select(-Date, -County, -State,
 
 Overall distribution of Walkability Index
 
-
-![](https://lh6.googleusercontent.com/bnYEpgwqeRVgTqmxO39tovF7dnrnPHdm_NKVOVVgwBDNGlKW_MNKtU3M6U0o0Nhx0oADk09lMjz_l-V3L6SBDykEywWVh51M6-4eR8i2HqL-wlzLIj-bbt07DCytZmRb_K4eLgvbCchqXSXUO660gLY)
+![](images/NWI_histogram.png)
 
 
 
@@ -201,7 +197,7 @@ The histogram of Walkability Index appears quite bell-shaped and symmetric. The 
 
 ### Relationship between Population and Walkability Index Category
 
-![](https://lh5.googleusercontent.com/D6lzYhjh22qlPJUZwirp_QdVxs_g8X29EgmJYxQrALghUiNP8QmmmQCZoCY4RU6oH61Wl_dlmSmI57xxrIG3jdkcpJeQZ2Kx52lXSb_JhwZPTrpf2e7v961XuPZKkC4RrJ_owEOfEEFooBbMo595xiM)
+![](images/walk%20pop%20boxplot-01.png)
 
 Further exploration was done to examine if population may have a relationship with the Walkability Index Category. The Least Walkable category seemed to have the highest population, with the Below Average and Above Average Walkable categories having the lowest populations. These areas had a tighter interquartile range although there were some outliers having much higher populations. The places that were Most Walkable had a large variation in population.
 
@@ -209,37 +205,27 @@ Further exploration was done to examine if population may have a relationship wi
 
 Lastly, some preliminary investigation was conducted to look at the relationship between employment mix and walkability. Figure \# below shows a clear upward trend in walkability as the employment mix increases.The employment mix variable is a proportion between 0 and 1 that shows how diverse jobs are in a given area (categories of jobs are retail, office, industrial, service, and entertainment). Higher values indicate greater diversity of jobs and according to the EPA, this is correlated with more walk trips. 
 
-### 
+![](images/walk%20mix%20scatterplot-01.png)
 
-![](https://lh5.googleusercontent.com/SGx0_xJ3uUzkC3nO-HgDB7hpTs1FCXCla34_gYrhhC81vB4wN9LE6UXqrKkidh2I-4truJtg7t1ZMcZ9N3TurWwtlUTEKGGVDEaN3QJZCi0jOE40O3dubvsg-rjbRC4aJiDRIB3vT4XoYORiiHDIclY)
+\
 
- 
 
-Variable Selection 
+Variable Selection
 
 To help determine which of the 100+ predictors to use, we used both regression with a LASSO penalty and a Decision Tree. The most important variables were consistent between these two model specifications. Out of the 117 variables, only 6 actually made a significant contribution to reducing impurity in the decision tree, so these were the variables we used when fitting our models. All six of these variables also had nonzero coefficients even with the LASSO penalty. A bar plot of the LASSO-selected variables and the upper part of the decision tree are shown below. 
 
-![](https://lh3.googleusercontent.com/7nWiQtvTJZoW-smi03gFvMdSFmOfQVatzsSiXlEQi0hhZ9dP74z4ipNCyttfIw543lESkWJHZ1bUEl9GqvxuOFSbV-FwRmROq1RxP-oBZAvrYpNLEo4TKmlBcyrDX4-rUaX1oxRlK60UEHYmRWlRxh8)
+![](images/lasso_coefficients.png)
 
 
 Figure #: Bar plot of top six most important variables; selected as predictors for final models
 
-
-
-
-
-![](https://lh4.googleusercontent.com/qs3IsYd7wl_esEhgob-UZXlFOLLMnPOVyEil9n7hi8hkalRu4NH3ecZCElSy4CYpzH_yTYP3NyDIw3qYh19LzCVoOVbOAeQ9SfbFYbPkg2N7B3Hs20RSZD6MpJZ6UkMsDH8M3cmOFmUJMe-kyUdj-5A)
-
+![](images/decision_tree_feature_selection%20(1).png)
 
 Figure #: Decision tree showing the uppermost splits (most important variables)
 
 # Model Results
 
--   This section is meant to detail empirical results from the model building process
--   What were the performance metrics for each of the models?
--   What variables were not
-
-## AQI
+# AQI
 
 We used three different types of models to predict AQI: linear models, decision trees, and random forests. Each model predicts the next day's AQI based on the min, mean, and max values of our 8 predictor measurements. Notably, this does not include any measurements of the day's Ozone or AQI. We measured each model's performance by cross-validating on data the model had not been trained on. The R-Squared and Root Mean Squared Error metrics are displayed below:
 
@@ -273,7 +259,7 @@ Note that in this formula, max_no2, max_temperature, and max_humidity are standa
 
 ### Decision Tree
 
-Our decision tree's predictions look far different than the others because they are made in discrete categories rather than in a more continuous manner. While this model has little bias, with only a slight overestimation bias on its highest predictions of 144, it has the largest overall errors, making it a worse predictor than other models. Neverhteless, this model may be very valuable, as we can directly see how it makes its decisions in the following decision tree flowchart:
+Our decision tree's predictions look far different than the others because they are made in discrete categories rather than in a more continuous manner. While this model has little bias, with only a slight overestimation bias on its highest predictions of 144, it has the largest overall errors, making it a worse predictor than other models. Nevertheless, this model may be very valuable, as we can directly see how it makes its decisions in the following decision tree flowchart:
 
 ![Figure 5: Decision Tree Flowchart](AQI_decision_tree.png)
 
@@ -287,9 +273,7 @@ Our final optimized random forest model averages the results of 500 decision tre
 
 For the Walkability dataset, we used both regression (predicting the numeric Walkability Index) and classification (predicting the Walkability Index category) methods. For both approaches, 10-fold cross-validation was used to get a better sense of how these models would perform when predicting on unseen data. 
 
-![](https://lh6.googleusercontent.com/XSU9sQalj1b2SillG7Djb5_B39T9zHyYJbvA-AFIBrAdzmbD7oR1FGAr7NpwEkZV_Qqd1WhePC0EfjUXEzOqpiFpYcaPfbNVuMcMV4dvRqcCgmenU2bXo_BdupCBEEBbDyDqhy8WdSndYLQqoRcx3Zo)
-
-\
+![](images/walk%20mod%20performance-01.png)
 
 ### Linear Regression
 
@@ -297,13 +281,13 @@ Due to the vaguely linear trend from the Figure \# in the Exploratory Data Analy
 
 Each variable is numeric, meaning that the coefficients can be interpreted as a one unit increase in that variable leads to an increase (on average) in Walkability Index equivalent to its coefficient value (after adjusting for all other variables in the model). For example, the coefficient for D3B is 0.98. This means that on average, the Walkability Index increases by 0.98 points for every additional unit of weighted street intersection density after accounting for the other variables in the model. It makes sense that increasing D3B has a positive impact on walkability as it measures street intersection density and is weighted to emphasize pedestrian and bicycle connectivity. More dense intersections indicate a more connected place with shorter block lengths thereby making the place more walkable.
 
-![](https://lh5.googleusercontent.com/EhdNiyTTL8pQ5wrwWlI_nsXc_l0YKOAErwoR4-ub_RBmwgWcjgZ6DIHjdKgZHXfyOK1so5qJCuGW_I72Z8DuVLgDRuU5Ag5tCepTqtHsHh2YsUiyQIHlUJ0YpoScDxf_WDi2GoBek__AK8yGh7MMkTk)
+![](images/LR_coefficients.png)
 
 ### Decision Tree Regression
 
 A decision tree regressor, much like linear regression gives us the benefit of being highly interpretable. We can create the model and interpret the top of the resulting tree similarly to how we did when performing feature selection. Tuning became necessary as initial tree models were drastically overfitting. The most effective hyperparameter to stop this turned out to be limiting the maximum tree depth, which we settled on 9, which seemed to be a sweet spot between overfitting and underfitting the data.
 
-![](https://lh5.googleusercontent.com/sr9GYSrgwgDNwNA_9CySsZ4wstK5OxE-2SViNL5aMjbxsO4YLZ-2IoxZtMHEhE3lFUnPLIoitvxsUOO9pSOaQWVEMRhkOKMdlYtMdkqhyunMwH67lt0_1Wlh8Z3v13btWSKPfx7QLkPQ5yRLyVZzfmE)
+![](images/decision_tree.png)
 
 
 Figure #: Decision tree fit on most important 6 features
@@ -320,7 +304,8 @@ The final random forest model achieved a high R2 score of .8929 and an MSE of .5
 
 Though usually performed in classification problems, KNN was a powerful regression tool in our analysis. Fit with the top 6 predictors according to our feature selection (See Table 2), the final model achieved mean squared error .5960 and R2 of .8895. 
 
-![](https://lh5.googleusercontent.com/xyJ9D0gb8l28OPCFwOMYtJm8CxZGzpZOGb0SFJP1Mpi8dJ4ISjHT2CMbr6SvoyQowgO3zg1-ZRo3xjlrekNdE_cyXciTCpatLyB9xdubSPEQspqZ2El11LS6lmifxeESBaWJif9DdEI8O8JCWnO30As)
+![](images/KNN_n_scores.png)
+
 
 Figure #: Tuning number of neighbors for KNN regression
 
@@ -386,3 +371,11 @@ Smart Location Database Technical Documentation and User Guide (Version 3.0)
 National Walkability Index Methodology and User Guide
 
 ## Additional Output
+
+Residual Plots:
+
+![](images/multi_residuals.png)
+
+![](images/RF_residuals.png)
+
+![](images/DT_residuals.png)
