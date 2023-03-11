@@ -265,7 +265,9 @@ It is important that as we give you these powerful machine learning model fits, 
 
 ## Misuses
 
-Although there are many appropriate uses of our work, we also want to forewarn you about the potential misuses to avoid. As the EPA, it is your responsibility to use the knowledge gained from this work and the corresponding machine learning models to help the environment, not to harm it. If these insights are given to those who do not have a vested interest in improving the environment, the consequences could be harmful. For example, we would not support the use of our machine learning models to identify areas with good enough air quality to handle additional factories, roads, or power plants, as this would lead to the degradation of the environment in those areas.
+Although there are many appropriate uses of our work, we also want to forewarn you about the potential misuses to avoid. Primarily, though our models predict ozone-based AQI, it should not be used as a proxy for AQI when proper measurements are available, as it could miss some important and dangerous fluctuations. The model's intended use is as an emergency measure, when ozone measurements are not available.
+
+As the EPA, it is your responsibility to use the knowledge gained from this work and the corresponding machine learning models to help the environment, not to harm it. If large polluters use these models to find ways to disguise their harmful ozone production, this could ultimately do more harm than good. For example, if they learn that cold, humid days see low ozone, they may choose emit more fumes during those times and harm the larger environment. 
 
 ## Bias
 
