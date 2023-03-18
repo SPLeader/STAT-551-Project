@@ -127,7 +127,7 @@ plt.figure().set_figwidth(20)
 sns.barplot(x=features[:6], y=np.abs(coefficients[:6]))
 plt.title('Top Lasso Coefficients')
 plt.ylabel('Coefficient')
-plt.savefig('test.png')
+plt.savefig('lasso_coefficients.png')
 plt.show()
 ```
 
@@ -189,9 +189,9 @@ plt.figure().set_figheight(7)
 
 plot_tree(dt, proportion=True, max_depth=1, feature_names=dt_best_features[:n_features], 
         class_names=list(y.unique()), filled=True)
-plt.title('Decision Tree on all predictors')
+plt.title('Decision Tree on top 6 predictors')
 
-plt.savefig('decision_tree_feature_selection.png')
+plt.savefig('decision_tree.png')
 plt.show()
 ```
 
@@ -228,6 +228,8 @@ plt.show()
 ### Grid Search
 
 ```{python}
+
+"""
 ct = make_column_transformer(
   (StandardScaler(), dt_best_features[:10]),
   remainder = 'drop'
@@ -242,6 +244,8 @@ param_grid = {'kneighborsregressor__n_neighbors' : list(np.linspace(0, 200, num=
 
 grid_search = GridSearchCV(knn_pipeline, param_grid, verbose=1)
 grid_search.fit(X, y)
+
+"""
 ```
 
 ```{python}
@@ -257,19 +261,6 @@ knn_pipeline = make_pipeline(
 
 knn_pipeline.fit(X_train, y_train)
 #cross_val_score(knn_pipeline, X, y, cv=10, scoring='neg_mean_squared_error').mean()
-```
-
-```{python}
-n = 1000
-plt.clf()
-
-preds = lr_pipeline.predict(X_test[:n])
-
-plt.scatter(X_test['D2A_EPHHM'][:n], preds[:n], s=1)
-plt.scatter(X_test['D2A_EPHHM'][:n], y_test[:n], s=1)
-
-plt.show()
-
 ```
 
 ```{python}
@@ -335,6 +326,8 @@ plt.show()
 ### Grid search
 
 ```{python}
+"""
+
 ct = make_column_transformer(
   (StandardScaler(), dt_best_features[:10]),
   remainder = 'drop'
@@ -349,6 +342,9 @@ param_grid = {'randomforestregressor__n_estimators' : list(np.linspace(20, 200, 
 
 grid_search = GridSearchCV(forest_pipeline, param_grid, verbose=1)
 grid_search.fit(X, y)
+
+"""
+
 ```
 
 ```{python}
@@ -461,6 +457,18 @@ lr_pipeline = make_pipeline(
 cross_val_score(lr_pipeline,X, y, cv=10, scoring='neg_mean_squared_error').mean()
 
 lr_pipeline.fit(X_train, y_train)
+```
+
+```{python}
+n = 1000
+plt.clf()
+
+preds = lr_pipeline.predict(X_test[:n])
+
+plt.scatter(X_test['D2A_EPHHM'][:n], preds[:n], s=1)
+plt.scatter(X_test['D2A_EPHHM'][:n], y_test[:n], s=1)
+
+plt.show()
 ```
 
 ```{python}
