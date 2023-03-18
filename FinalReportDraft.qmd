@@ -273,7 +273,7 @@ Our final optimized random forest model averages the results of 500 decision tre
 
 For the Walkability dataset, we used both regression (predicting the numeric Walkability Index) and classification (predicting the Walkability Index category) methods. For both approaches, 10-fold cross-validation was used to get a better sense of how these models would perform when predicting on unseen data. 
 
-![](images/walk%20mod%20performance-01.png)
+![](WalkabilityImages/walk%20mod%20performance-01.png)
 
 ### Linear Regression
 
@@ -281,13 +281,13 @@ Due to the vaguely linear trend from the Figure \# in the Exploratory Data Analy
 
 Each variable is numeric, meaning that the coefficients can be interpreted as a one unit increase in that variable leads to an increase (on average) in Walkability Index equivalent to its coefficient value (after adjusting for all other variables in the model). For example, the coefficient for D3B is 0.98. This means that on average, the Walkability Index increases by 0.98 points for every additional unit of weighted street intersection density after accounting for the other variables in the model. It makes sense that increasing D3B has a positive impact on walkability as it measures street intersection density and is weighted to emphasize pedestrian and bicycle connectivity. More dense intersections indicate a more connected place with shorter block lengths thereby making the place more walkable.
 
-![](images/LR_coefficients.png)
+![](WalkabilityImages/LR_coefficients.png)
 
 ### Decision Tree Regression
 
 A decision tree regressor, much like linear regression gives us the benefit of being highly interpretable. We can create the model and interpret the top of the resulting tree similarly to how we did when performing feature selection. Tuning became necessary as initial tree models were drastically overfitting. The most effective hyperparameter to stop this turned out to be limiting the maximum tree depth, which we settled on 9, which seemed to be a sweet spot between overfitting and underfitting the data.
 
-![](images/decision_tree.png)
+![](WalkabilityImages/decision_tree.png)
 
 
 Figure #: Decision tree fit on most important 6 features

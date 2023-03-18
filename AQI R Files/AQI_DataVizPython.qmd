@@ -21,6 +21,7 @@ import seaborn as sns
 import matplotlib.pyplot as plt
 import os
 ```
+
 ```{python}
 os.chdir('../')
 print(os.getcwd())
