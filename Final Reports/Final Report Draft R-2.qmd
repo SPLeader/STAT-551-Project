@@ -42,8 +42,6 @@ aqi
 
 # Introduction
 
--   Feel free to rewrite this section as much as you'd like, I just put some general details in here based on phase 2 for the time being
-
 The EPA is an organization fundamentally invested securing and promoting the health and well-being of the environment. In this paper, we analyze two distinct but related environmental issues: air pollution and car dependency. For both issues, we used publicly available data sourced from the EPA to construct machine learning models to make predictions. For air pollution, we predicted a county's next-day Air Quality Index (AQI) from the previous day's atmospheric conditions to determine which factors contribute to AQI and how accurately we can determine tomorrow's AQI from today's conditions. For car dependency, we predicted the 'walkability' category of a localized area based on demographic information to deduce which demographic characteristics contribute most meaningfully to the 'walkability' of a location.
 
 ```{r}
@@ -227,8 +225,6 @@ ggplot(nwi, aes(NatWalkInd, fill = cut(NatWalkInd, 100))) +
        x = "Walkability Index") 
 ```
 
-![](images/NWI_histogram.png)
-
 The histogram of Walkability Index appears relatively bell-shaped and symmetric. The median Walkability Index is 13.83 and the interquartile range is 3.33. The range for the Walkability Index is 1 to 20.
 
 ```{r, fig.cap = "Table 5. Summary statistics of Walkability Index", include = TRUE}
@@ -243,6 +239,8 @@ nwi %>%
 ### Relationship between Population and Walkability Index Category
 
 ```{r, fig.cap = "Figure 5. Distribution of Walkability Index by Population", include = TRUE}
+nwi$cat <- factor(nwi$cat , levels=c("Least walkable", "Below average walkable", "Above average walkable", "Most walkable"))
+
 ggplot(nwi, 
        aes(x = cat, 
            y = CBSA_POP, fill = cat)) +
@@ -252,10 +250,8 @@ ggplot(nwi,
   theme(legend.position = "None") + 
         #axis.title.y = element_text(angle = 0, vjust = 0.5)) +
   labs(y = "") +
-  scale_fill_manual(values = c("#74A9CF", "#A6BDDB", "#034E7B", "#0570B0"))
+  scale_fill_manual(values = c("#A6BDDB", "#74A9CF", "#0570B0", "#034E7B"))
 ```
-
-![](images/walk%20pop%20boxplot-01.png)
 
 Further exploration was done to examine if population may have a relationship with the Walkability Index Category. The Least Walkable category seemed to have the highest population, with the Below Average and Above Average Walkable categories having the lowest populations. These areas had a tighter interquartile range although there were some outliers having much higher populations. The places that were Most Walkable had a large variation in population.
 
@@ -268,13 +264,10 @@ ggplot(nwi,
        aes(x = D2B_E8MIXA, 
            y = NatWalkInd, color = cat)) +
     geom_point() + 
-     xlab("Employment Mix") + 
-    ylab("Walkability Index") + 
+     labs(x="Employment Mix", y="Walkability Index", color = "Category") +
    theme_bw() + 
     scale_color_manual(values = c("gold", "darkred", "chocolate", "limegreen", "blue"))
 ```
-
-![](images/walk%20mix%20scatterplot-01.png)
 
 \
 
@@ -359,7 +352,7 @@ data.frame(`Model Specification` = c("Linear Regression", "K-Neighbors Regressio
 
 ### Linear Regression
 
-Due to the vaguely linear trend from the Figure \# in the Exploratory Data Analysis section, a simple linear regression model was fit. The R-squared value was 0.75, meaning that 75% of the variability in Walkability Index was explained by the eight variables shown in the bar plot below. The Shape Length (length of the area, a proxy for area) and D3bmm4 (another measure of intersection density in terms of multi-modal intersections) variables were added. The MSE for this model was 1.36, meaning that on average, prediction errors were 1.36 Walkability Index points. See Appendix for plot of residuals (confirmed they were randomly scattered and showed approximately equal variability). 
+Due to the vaguely linear trend from the Figure \# in the Exploratory Data Analysis section, a simple linear regression model was fit. The R-squared value was 0.75, meaning that 75% of the variability in Walkability Index was explained by the eight variables shown in the bar plot below. The Shape Length (length of the area, a proxy for area) and D3bmm4 (another measure of intersection density in terms of multi-modal intersections) variables were added. See Appendix for plot of residuals (confirmed they were randomly scattered and showed approximately equal variability). 
 
 Each variable is numeric, meaning that the coefficients can be interpreted as a one unit increase in that variable leads to an increase (on average) in Walkability Index equivalent to its coefficient value (after adjusting for all other variables in the model). For example, the coefficient for D3B is 0.98. This means that on average, the Walkability Index increases by 0.98 points for every additional unit of weighted street intersection density after accounting for the other variables in the model. It makes sense that increasing D3B has a positive impact on walkability as it measures street intersection density and is weighted to emphasize pedestrian and bicycle connectivity. More dense intersections indicate a more connected place with shorter block lengths thereby making the place more walkable.
 
@@ -425,30 +418,23 @@ For the walkability dataset, we have very serious concerns about bias. Many vari
 
 # Conclusion
 
-The decision tree model seems to be the most useful in regards to the walkability dataset. The random forest regressor was expected to outcompete the other models in terms of predicting power, but the improvement was so marginal that it is far from being worth the lack of interpretability that comes with the decision tree model. 
+Our goal was to leverage machine learning to assist the EPA with their mission of furthering environmental protection, advancing environmental justice, and safeguarding communities. We specifically created tools to help the EPA improve air quality by drawing inferences from models that predict the AQI and Walkability Index of a given place. This can help the EPA inform the public of danger and lobby for projects to improve places with low walkability to reduce car dependency.
 
--   Make better overarching claims as to which models we would choose for purposes, which factors contribute to walkability
+For AQI, there are two models to highlight. The first is the one with the best predictive performance, a random forest. It is able to predict a county's next-day AQI without using ozone measurements with an average error of 21 AQI points. Given that AQI is on a scale of 0-500, our model is able to give the EPA and the public a decent idea of the next day's Air Quality Index. The other model to draw attention to is the linear regression model which has less predictive power but does provide insight on which measurements matter most when predicting the next day's AQI. From this model, we can conclude that Nitrogen Dioxide levels contribute the most to predicting AQI, followed by the maximum temperature and minimum humidity levels. The EPA can use this knowledge to target their data collection to reduce bias in the data. In places where they currently don't have data, the EPA can begin by only measuring these three characteristics which lessens the burden of setting up complex weather stations. AQI prediction could be used to target communities experiencing hazardous air quality in order to distribute resources such as masks that filter harmful particles.
 
-    -   D3B negative correlation according to decision tree
-
-    -   The mix of employment type and occupied housing, according to linear regression
-
-    -   Shape length has negative correlation, according to linear regression
+In terms of predicting Walkability Index, the highest-performing model was also a random forest. It was able to explain 89.34% of the variability in Walkability Index. Unfortunately, however, this model does not allow for much meaningful interpretation. The linear regression model does provide insights on characteristics of a place that matter most in determining its walkability. It was also fairly effective at making predictions with an average error of only 1.36 Walkability Index points. The information gained from this model is that street intersection density matters most, places that have a greater mix of employment opportunities and occupied housing units tend to be more walkable, and places that are larger in area are typically less walkable. Actions that could be taken based off of this are to focus on infrastructure projects that add dedicated infrastructure for pedestrians and cyclists, build denser neighborhoods with shorter block lengths and a mix of housing units alongside businesses and shops, and to ensure that if a metro area is quite large, that it is well-connected by public transit.
 
 # Appendix
 
 ## Sources
 
-How Weather Affects Air Quality \| Center for Science Education. (n.d.). UCAR. <https://scied.ucar.edu/learning-zone/air-quality/how-weather-affects-air-quality>
+\"Center for Science Education.\" *How Weather Affects Air Quality \| Center for Science Education*, https://scied.ucar.edu/learning-zone/air-quality/how-weather-affects-air-quality.
 
--   This is where sources we used should be linked. Please cite them in some proper format, not just hyperlinks (example above).
--   Any additional output from model summaries that did not fit earlier in the paper could go here as well
+Champan, Jim, et al. *EPA*, Environmental Protection Agency, June 2021, https://www.epa.gov/smartgrowth/smart-location-database-technical-documentation-and-user-guide.
 
-Smart Location Database Technical Documentation and User Guide (Version 3.0)
+Thomas, John, et al. \"National Walkability Index Methodology and User Guide.\" *EPA*, Environmental Protection Agency, June 2021, https://www.epa.gov/smartgrowth/national-walkability-index-user-guide-and-methodology.
 
-<https://www.epa.gov/sites/default/files/2021-06/documents/epa_sld_3.0_technicaldocumentationuserguide_may2021.pdf>
-
-National Walkability Index Methodology and User Guide
+\"Walkability Index.\" *Catalog*, Responsible Party U.S. Environmental Protection Agency, Office of Sustainable Communities (Point of Contact), 3 July 2021, https://catalog.data.gov/dataset/walkability-index.
 
 ## Additional Output
 
