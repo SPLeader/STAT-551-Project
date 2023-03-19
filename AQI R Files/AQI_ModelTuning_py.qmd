@@ -1,0 +1,39 @@
+---
+title: "AQI_ModelTuning_py"
+author: "Sean Leader // William Medwid // Vanessa Veto // Jose Mierzejewski"
+format: 
+  html:
+    code-fold: true
+    code-line-numbers: true
+    code-tools: true
+    self-contained: true
+editor: visual
+execute:
+  message: false
+---
+
+```{python}
+import sys
+import subprocess
+
+# implement pip as a subprocess:
+subprocess.check_call([sys.executable, '-m', 'pip', 'install', 
+'seaborn'])
+```
+
+
+```{python}
+import pandas as pd
+import numpy as np
+
+import seaborn as sns
+import matplotlib.pyplot as plt
+import os
+```
+
+```{python}
+os.chdir('../')
+print(os.getcwd())
+
+aqi_ozone = pd.read_csv("Project Data/Combined/aqi_ozone_all_years_prediction.csv")
+```
