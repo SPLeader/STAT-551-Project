@@ -13,27 +13,178 @@ execute:
 ---
 
 ```{python}
-import sys
-import subprocess
-
-# implement pip as a subprocess:
-subprocess.check_call([sys.executable, '-m', 'pip', 'install', 
-'seaborn'])
-```
-
-
-```{python}
 import pandas as pd
 import numpy as np
 
+from sklearn.preprocessing import OneHotEncoder, StandardScaler, LabelEncoder, PolynomialFeatures
+from sklearn.pipeline import Pipeline, make_pipeline
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LinearRegression, ElasticNet
+from sklearn.model_selection import GridSearchCV
+from sklearn.model_selection import RepeatedKFold
 import seaborn as sns
 import matplotlib.pyplot as plt
 import os
 ```
 
 ```{python}
+import warnings
+warnings.filterwarnings('ignore')
+```
+
+
+```{python}
 os.chdir('../')
 print(os.getcwd())
 
 aqi_ozone = pd.read_csv("Project Data/Combined/aqi_ozone_all_years_prediction.csv")
+
+aqi_ozone = aqi_ozone.drop(["Date", "State", "County", "AQI_cat", 'AQI', 'max_ozone', 'mean_ozone', 'min_ozone'], axis = 1)
 ```
+
+```{python}
+X = aqi_ozone.drop(columns=['AQI_next_day'])
+y = aqi_ozone['AQI_next_day']
+all_features = list(X.columns)
+```
+
+```{python}
+# Creating k fold cv's
+
+cv = RepeatedKFold(n_splits=5, n_repeats=1, random_state=13)
+```
+
+
+```{python}
+# Training and validation sets for single trained models (not cross-val)
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=.10)
+```
+
+
+
+
+## Linear models
+
+```{python}
+#Tuning different mixture models
+
+scaler = StandardScaler()
+model = ElasticNet()
+
+
+pipe = Pipeline(steps=[("scaler", scaler), ("model", model)])
+# define model evaluation method
+cv = RepeatedKFold(n_splits=5, n_repeats=1, random_state=1)
+# define grid
+grid = dict()
+grid['model__alpha'] = [1e-10, 1e-5, 1.0]
+grid['model__l1_ratio'] = [0, 0.5, 1.0] #np.arange(0, 1, 0.5)
+# define search
+search = GridSearchCV(pipe, grid, scoring='neg_root_mean_squared_error', cv=cv, n_jobs=1)
+# perform the search
+results = search.fit(X, y)
+# summarize
+print('RMSE: %.3f' % -results.best_score_)
+print('Config: %s' % results.best_params_)
+```
+
+**Best model: second lowest alpha, 
+
+```{python}
+model_fit.predict(X_test)
+```
+
+## Polynomial linear model
+
+```{python}
+#Tuning different mixture models with poly degree = 2
+
+poly = PolynomialFeatures(2)
+scaler = StandardScaler()
+model = ElasticNet()
+
+
+pipe = Pipeline(steps=[("poly", poly), ("scaler", scaler), ("model", model)])
+# define model evaluation method
+cv = RepeatedKFold(n_splits=5, n_repeats=1, random_state=1)
+# define grid
+grid = dict()
+grid['model__alpha'] = [1e-10, 1e-5, 1.0]
+grid['model__l1_ratio'] = [0, 0.5, 1.0] #np.arange(0, 1, 0.5)
+# define search
+search = GridSearchCV(pipe, grid, scoring='neg_root_mean_squared_error', cv=cv, n_jobs=1)
+# perform the search
+results = search.fit(X, y)
+# summarize
+print('RMSE: %.3f' % -results.best_score_)
+print('Config: %s' % results.best_params_)
+```
+
+**Best model: Polynomial 2, alpha 1e-05, ridge**
+
+```{python}
+#Tuning different mixture models with poly degree = 2
+
+poly = PolynomialFeatures(2)
+scaler = StandardScaler()
+model = ElasticNet(alpha = 1e-5, l1_ratio = 0)
+
+
+pipe = Pipeline(steps=[("poly", poly), ("scaler", scaler), ("model", model)])
+# define model evaluation method
+
+search = GridSearchCV(pipe, grid, scoring='neg_root_mean_squared_error', cv=cv, n_jobs=1)
+# perform the search
+fitted_model = pipe.fit(X_train, y_train)
+
+results = fitted_model.predict(X_test)
+
+plt.scatter(x = results, y = results - y_test, c = "Black")
+plt.xlabel("Linear Model Preds")
+plt.ylabel("Ozone AQI")
+
+plt.savefig("AQI_linear_residuals.png")
+plt.show()
+plt.close()
+```
+```{python}
+import seaborn as sns
+
+
+d = {'preds' : results, 'residuals' : results - y_test}
+result_df = pd.DataFrame(data = d)
+
+sns.lmplot(x='preds',
+    y='residuals',  
+    data = result_df, lowess = True)
+    
+plt.show()
+plt.close()
+```
+
+
+```{python}
+import plotly.graph_objects as go
+
+go.Scatter(
+    x=results,
+    y=results - y_test,
+    mode='lines+markers',
+    name="'spline'",
+    text=["tweak line smoothness<br>with 'smoothing' in line object"],
+    hoverinfo='text+name',
+    line=dict(
+        shape='spline'
+    )
+)
+
+plt.show()
+plt.close()
+```
+
+
+```{python}
+
+```
+
+
