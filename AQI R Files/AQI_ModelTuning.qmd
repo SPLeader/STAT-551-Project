@@ -51,6 +51,8 @@ aqi_test   <- aqi_ozone[!sample, ]
 
 ## Linear models
 
+### Tuning basic linear model
+
 ```{r}
 #Tuning different mixture models
 
@@ -92,7 +94,7 @@ Out of many penalty and mixture parameters, we found a mixture of 1/2 to work be
 
 
 
-## Polynomial linear model
+### Tuning polynomial linear model
 
 ```{r}
 poly_reg_tune <- linear_reg(penalty = tune(), mixture = tune()) %>%
@@ -124,7 +126,7 @@ grid_results %>%
   arrange(mean)
 ```
 
-## Simplified LASSO model.
+### Single linear model residuals
 
 ```{r}
 lm_best_spec <- linear_reg(penalty = 0, mixture = 1) %>%
@@ -160,7 +162,7 @@ lm_preds %>%
 
 When our linear model predicts low o-zone values, it is consistently biased towards under-prediction.
 
-## Interpretable linear model coef
+### Interpretable linear model coef
 
 ```{r}
 lm_best_spec <- linear_reg(penalty = 3.5, mixture = 1) %>%
@@ -212,11 +214,12 @@ grid_results %>%
   arrange(mean)
 ```
 
+The best RMSE with just 3 best variables was 26.16919, not too much worse than the best models using all variables.
 
 # Random Forest 
 
 ```{r}
-rf_mod <- rand_forest(mtry = tune(), min_n = tune(), trees = 500) %>%
+rf_mod <- rand_forest(mtry = tune(), min_n = tune(), trees = 100) %>%
   set_engine("ranger") %>%
   set_mode("regression")
 
@@ -231,8 +234,8 @@ rf_wf <- workflow() %>%
   add_recipe(no_ozone_recipe)
 
 
-rf_grid <- grid_regular(min_n(c(100, 200)),
-                        mtry(c(4, 6)),
+rf_grid <- grid_regular(min_n(c(1, 2)),
+                        mtry(c(4, 8)),
                         levels = 2)
 
 rf_grid_result <- rf_wf %>% 
@@ -278,10 +281,6 @@ rf_pred_plot <- rf_preds %>%
   ylab("Error")
 ```
 
-
-```{r}
-
-```
 
 Compared to our linear model, a random forest is much less biased. For its predictions between 0 and 100,the random forest isn't perfect, but isn't biased high or low. Above 100 predicted AQI, the random forest develops a tendency to under-predict, however.
 
@@ -361,35 +360,4 @@ all_preds %>%
 ```
 
 
-# PCA (interpretation)
-
-```{r}
-pc <- prcomp(aqi_ozone %>% select(-AQI_next_day), center = TRUE, scale = TRUE) 
-
-rotation <- pc$rotation %>% 
-  data.frame()
-```
-
-```{r}
-rotation %>% 
-  select(PC1) %>% 
-  arrange(desc(abs(PC1)))
-```
-
-The first loading seems to describe generally poor air quality. High NO2, Ozone, CO, and high temperature contribute to this loading, as well as a consistently low humidity.
-
-```{r}
-rotation %>% 
-  select(PC2) %>% 
-  arrange(desc(abs(PC2)))
-```
-
-The second loading is more complex, describing dry, windy days with high ozone, low carbon monoxide., and low NO2. Usually, carbon monoxide and Ozone are correlated, as they are often produced in tandem, but this loading indicates that there may be a prominent effect creating days where ozone is high while carbon monoxide.
-
-```{r}
-total_var <- sum(pc$sdev^2)
-
-(pc$sdev^2/total_var) %>% cumsum()
-
-```
 

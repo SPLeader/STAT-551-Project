@@ -22,6 +22,9 @@ from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LinearRegression, ElasticNet
 from sklearn.model_selection import GridSearchCV
 from sklearn.model_selection import RepeatedKFold
+from sklearn.tree import DecisionTreeRegressor, plot_tree
+from sklearn.ensemble import RandomForestRegressor
+
 import seaborn as sns
 import matplotlib.pyplot as plt
 import os
@@ -65,6 +68,8 @@ X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=.10)
 
 ## Linear models
 
+### Tuning basic linear model
+
 ```{python}
 #Tuning different mixture models
 
@@ -94,7 +99,7 @@ print('Config: %s' % results.best_params_)
 model_fit.predict(X_test)
 ```
 
-## Polynomial linear model
+### Tuning polynomial linear model
 
 ```{python}
 #Tuning different mixture models with poly degree = 2
@@ -106,7 +111,7 @@ model = ElasticNet()
 
 pipe = Pipeline(steps=[("poly", poly), ("scaler", scaler), ("model", model)])
 # define model evaluation method
-cv = RepeatedKFold(n_splits=5, n_repeats=1, random_state=1)
+cv = RepeatedKFold(n_splits=5, n_repeats=1, random_state=13)
 # define grid
 grid = dict()
 grid['model__alpha'] = [1e-10, 1e-5, 1.0]
@@ -122,8 +127,10 @@ print('Config: %s' % results.best_params_)
 
 **Best model: Polynomial 2, alpha 1e-05, ridge**
 
+### Single linear model residuals
+
 ```{python}
-#Tuning different mixture models with poly degree = 2
+# Fitting a mixture model to plot residuals
 
 poly = PolynomialFeatures(2)
 scaler = StandardScaler()
@@ -133,50 +140,236 @@ model = ElasticNet(alpha = 1e-5, l1_ratio = 0)
 pipe = Pipeline(steps=[("poly", poly), ("scaler", scaler), ("model", model)])
 # define model evaluation method
 
-search = GridSearchCV(pipe, grid, scoring='neg_root_mean_squared_error', cv=cv, n_jobs=1)
-# perform the search
+# fit the model
 fitted_model = pipe.fit(X_train, y_train)
 
-results = fitted_model.predict(X_test)
+lm_preds = fitted_model.predict(X_test)
 
-plt.scatter(x = results, y = results - y_test, c = "Black")
-plt.xlabel("Linear Model Preds")
-plt.ylabel("Ozone AQI")
-
-plt.savefig("AQI_linear_residuals.png")
-plt.show()
-plt.close()
+df_lm_preds = pd.DataFrame(data = {
+  'preds' : lm_preds, 
+  'residuals' : lm_preds - y_test,
+  'model' : "Linear Model"
+  })
 ```
+
+
 ```{python}
-import seaborn as sns
-
-
-d = {'preds' : results, 'residuals' : results - y_test}
-result_df = pd.DataFrame(data = d)
-
 sns.lmplot(x='preds',
     y='residuals',  
-    data = result_df, lowess = True)
+    data = df_lm_preds, lowess = True)
     
 plt.show()
 plt.close()
 ```
 
+### Interpretable linear model coef
 
 ```{python}
-import plotly.graph_objects as go
+# Fitting a mixture model to plot residuals
 
-go.Scatter(
-    x=results,
-    y=results - y_test,
-    mode='lines+markers',
-    name="'spline'",
-    text=["tweak line smoothness<br>with 'smoothing' in line object"],
-    hoverinfo='text+name',
-    line=dict(
-        shape='spline'
-    )
+scaler = StandardScaler()
+model = ElasticNet(alpha = 3.5, l1_ratio = 1)
+
+
+pipe = Pipeline(steps=[("scaler", scaler), ("model", model)])
+# define model evaluation method
+
+search = GridSearchCV(pipe, grid, scoring='neg_root_mean_squared_error', cv=cv, n_jobs=1)
+# perform the search
+fitted_model = pipe.fit(X_train, y_train)
+
+
+fitted_model[1].coef_
+coef_df = pd.DataFrame(
+  data = {"coef" : fitted_model[1].coef_,
+  "abs_coef" : abs(fitted_model[1].coef_)},
+  index = X.columns
 )
+
+coef_df.sort_values(by = "abs_coef", ascending = False)
+```
+
+```{python}
+# Finding the best performance we can get with just the best 3 predictors.
+X_subset = X[["max_no2", "max_temp", "max_humid"]]
+
+#Tuning different mixture models
+
+scaler = StandardScaler()
+model = ElasticNet()
+
+
+pipe = Pipeline(steps=[("scaler", scaler), ("model", model)])
+
+# Define model evaluation method
+cv = RepeatedKFold(n_splits=5, n_repeats=1, random_state=13)
+
+# Define grid
+grid = dict()
+grid['model__alpha'] = [1e-10, 1e-5, 1.0]
+grid['model__l1_ratio'] = [0, 0.5, 1.0]
+# define search
+search = GridSearchCV(pipe, grid, scoring='neg_root_mean_squared_error', cv=cv, n_jobs=1)
+
+# Perform the search
+results = search.fit(X_subset, y)
+
+# Summarize best model
+print('RMSE: %.3f' % -results.best_score_)
+print('Config: %s' % results.best_params_)
+```
+
+The best RMSE with just 3 best variables was 26.818, not too much worse than the best models using all variables.
+
+# Random Forest
+
+### Tuning
+
+```{python}
+# Tuning Random Forest
+model = RandomForestRegressor(n_estimators = 100, random_state = 13)
+
+# Define model evaluation method
+cv = RepeatedKFold(n_splits=5, n_repeats=1, random_state=13)
+
+grid = dict()
+grid['min_samples_leaf'] = [1, 2]
+grid['max_features'] = [4, 6, 8] #np.arange(0, 1, 0.5)
+
+search = GridSearchCV(model, grid, scoring='neg_root_mean_squared_error', cv=cv, n_jobs=1)
+# Perform the search
+results = search.fit(X, y)
+
+# Summarize best model
+print('RMSE: %.3f' % -results.best_score_)
+print('Config: %s' % results.best_params_)
+```
+
+### Single Random Forest Restiduals
+
+```{python}
+# fit the model
+best_rf_model = RandomForestRegressor(min_samples_leaf = 1, max_features = 8, n_estimators = 100, random_state = 13)
+
+fitted_model = best_rf_model.fit(X_train, y_train)
+
+rf_preds = fitted_model.predict(X_test)
+
+df_rf_preds = pd.DataFrame(data = {
+  'preds' : rf_preds, 
+  'residuals' : rf_preds - y_test,
+  'model' : "Random Forest"
+  })
+```
+
+
+```{python}
+sns.lmplot(x='preds',
+    y='residuals',  
+    data = df_rf_preds, lowess = True)
+    
+plt.show()
+plt.close()
+```
+
+Compared to our linear model, a random forest is much less biased. For its predictions between 0 and 100,the random forest isn't perfect, but isn't biased high or low. Above 100 predicted AQI, the random forest develops a tendency to under-predict, however.
+
+# Decision Tree
+
+```{python}
+# Tuning Decision Tree
+model = DecisionTreeRegressor(random_state = 13)
+
+# define model evaluation method
+cv = RepeatedKFold(n_splits=5, n_repeats=1, random_state=13)
+
+grid = dict()
+grid['max_depth'] = [2, 4, 6, 8, 10]
+grid['min_impurity_decrease'] = [1, 2, 5]
+
+search = GridSearchCV(model, grid, scoring='neg_root_mean_squared_error', cv=cv, n_jobs=1)
+# perform the search
+results = search.fit(X, y)
+# summarize
+print('RMSE: %.3f' % -results.best_score_)
+print('Config: %s' % results.best_params_)
+```
+
+
+
+### Single Random Forest for residuals
+
+```{python}
+tree = DecisionTreeRegressor(max_depth = 6, 
+  min_impurity_decrease = 2)
+
+tree_fit = tree.fit(X_train, y_train)
+
+dt_preds = tree_fit.predict(X_test)
+
+df_dt_preds = pd.DataFrame(data = {
+  'preds' : dt_preds, 
+  'residuals' : dt_preds - y_test,
+  'model' : "Decision Tree"
+  })
+```
+
+```{python}
+sns.lmplot(x='preds',
+    y='residuals',  
+    data = df_dt_preds, lowess = True)
+    
+plt.show()
+plt.close()
+```
+
+### Single Random Forest to plot
+
+```{python}
+tree = DecisionTreeRegressor(max_depth=2)
+
+tree_fit = tree.fit(X_train, y_train)
+
+
+plot_tree(tree_fit, 
+  proportion=True, 
+  max_depth=2, 
+  feature_names=X.columns,
+  filled=True)
+        
+    
+plt.show()
+
+plt.savefig("AQI_decision_tree_py.png")
+plt.close()
+```
+
+# Combined Results Plot
+
+```{python}
+#all_preds = df_lm_preds.append(df_rf_preds).append(df_dt_preds)
+
+df_lm_preds.to_csv("AQI_data_output/AQI_df_lm_preds_py.csv")
+df_dt_preds.to_csv("AQI_data_output/AQI_df_dt_preds_py.csv")
+df_rf_preds.to_csv("AQI_data_output/AQI_df_rf_preds_py.csv")
+```
+
+```{python}
+sns.set_theme()
+plt.figure().set_figwidth(20)
+plt.figure().set_figheight(1)
+
+fig, axs = plt.subplots(3, 1, sharex=True, sharey = True)
+axs[0].scatter(df_lm_preds["preds"], df_lm_preds["residuals"], s=.3)
+axs[0].axhline(y = 0, color = 'k', linestyle = '--', linewidth=.5)
+axs[0].set_title('LM', fontdict={'fontsize' : 8})
+axs[1].scatter(df_dt_preds["preds"], df_dt_preds["residuals"], s=.3)
+axs[1].axhline(y = 0, color = 'k', linestyle = '--', linewidth=.5)
+axs[1].set_title('DT', fontdict={'fontsize' : 8})
+axs[2].scatter(df_rf_preds["preds"], df_rf_preds["residuals"], s=.3)
+axs[2].axhline(y = 0, color = 'k', linestyle = '--', linewidth=.5)
+axs[2].set_title('RF', fontdict={'fontsize' : 8})
+
 
 plt.show()
 plt.close()
@@ -185,6 +378,21 @@ plt.close()
 
 ```{python}
 
-```
+fig, axs = plt.subplots(3, 1, sharex=True, sharey = True)
 
+axs[0] = sns.lmplot(x='preds',
+    y='residuals',  
+    data = df_lm_preds, lowess = True, ax = axs[0])
+
+axs[1] =sns.lmplot(x='preds',
+    y='residuals',  
+    data = df_rf_preds, lowess = True, ax = axs[1])
+    
+axs[2] = sns.lmplot(x='preds',
+    y='residuals',  
+    data = df_dt_preds, lowess = True, ax = axs[2])
+
+plt.show()
+plt.close()
+```
 
