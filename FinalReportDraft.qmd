@@ -47,7 +47,6 @@ aqi_model_scores <- read_csv(here("AQI Outputs",
                                   "AQI_model_metrics_r.csv"))
 ```
 
-
 # Introduction
 
 The EPA is an organization fundamentally invested securing and promoting the health and well-being of the environment. In this paper, we analyze two distinct but related environmental issues: air pollution and car dependency. For both issues, we used publicly available data sourced from the EPA to construct machine learning models to make predictions. For air pollution, we predicted a county's next-day Air Quality Index (AQI) from the previous day's atmospheric conditions to determine which factors contribute to AQI and how accurately we can determine tomorrow's AQI from today's conditions. For car dependency, we predicted the 'walkability' category of a localized area based on demographic information to deduce which demographic characteristics contribute most meaningfully to the 'walkability' of a location.
@@ -93,11 +92,9 @@ data.frame(`Variable Name` = c("no2", "co", "so2",
 
 ## Walkability
 
-Data about walkability was accessed from the U.S. Government's open data catalog, data.gov. The data was collected by the Environmental Protection Agency (EPA) and contains demographic information, built environment characteristics, and transportation infrastructure data from 2021 for each Census block group. These inputs are used to calculate the National Walkability Index as defined by the EPA. This index can be expressed either numerically or translated into qualitative categories (see Table 2 below)
-![](images/walkability%20categories-02.png)
+Data about walkability was accessed from the U.S. Government's open data catalog, data.gov. The data was collected by the Environmental Protection Agency (EPA) and contains demographic information, built environment characteristics, and transportation infrastructure data from 2021 for each Census block group. These inputs are used to calculate the National Walkability Index as defined by the EPA. This index can be expressed either numerically or translated into qualitative categories (see Table 2 below) ![](images/walkability%20categories-02.png)
 
-In total, there are 220,740 observations for 117 variables in this dataset. Since there were so many predictors to choose from, we narrowed it down to those in the table below (more details on variable selection in the Exploratory Data Analysis section). 
-![](images/walkability%20variables-02.png)
+In total, there are 220,740 observations for 117 variables in this dataset. Since there were so many predictors to choose from, we narrowed it down to those in the table below (more details on variable selection in the Exploratory Data Analysis section).  ![](images/walkability%20variables-02.png)
 
 # Exploratory Data Analysis
 
@@ -199,8 +196,6 @@ Overall distribution of Walkability Index
 
 ![](images/NWI_histogram.png)
 
-
-
 The histogram of Walkability Index appears quite bell-shaped and symmetric. The median Walkability Index is 13.83 and the interquartile range is 3.33. The range for the Walkability Index is 1 to 20.
 
 ### Relationship between Population and Walkability Index Category
@@ -217,13 +212,11 @@ Lastly, some preliminary investigation was conducted to look at the relationship
 
 \
 
-
 Variable Selection
 
 To help determine which of the 100+ predictors to use, we used both regression with a LASSO penalty and a Decision Tree. The most important variables were consistent between these two model specifications. Out of the 117 variables, only 6 actually made a significant contribution to reducing impurity in the decision tree, so these were the variables we used when fitting our models. All six of these variables also had nonzero coefficients even with the LASSO penalty. A bar plot of the LASSO-selected variables and the upper part of the decision tree are shown below. 
 
 ![](images/lasso_coefficients.png)
-
 
 Figure #: Bar plot of top six most important variables; selected as predictors for final models
 
@@ -245,7 +238,6 @@ aqi_model_scores %>%
 These metrics indicate that the Random Forest is our overall most effective model, with an R-Squared value of 0.676 and a RMSE of 20.953. This indicates that the random forest could successfully predict 67.6% of the variability in AQI, only being wrong by an average of about 20.953 AQI points. Our linear model was markedly worse, with a RMSE of 23.334, and our decision tree fared the worst, with a RMSE of 24.315 AQI points.
 
 To investigate the biases of each of our models, we have plotted the residual errors below:
-
 
 ```{r, fig.cap = "Figure 4: AQI model residual plots. A moving average of the mean error is plotted to display model biases", include = TRUE}
 aqi_df_all_preds %>% 
@@ -278,7 +270,7 @@ Note that in this formula, max_no2, max_temperature, and max_humidity are standa
 
 Our decision tree's predictions look far different than the others because they are made in discrete categories rather than in a more continuous manner. While this model has little bias, with only a slight overestimation bias on its highest predictions of 144, it has the largest overall errors, making it a worse predictor than other models. Nevertheless, this model may be very valuable, as we can directly see how it makes its decisions in the following decision tree flowchart:
 
-![Figure 5: Decision Tree Flowchart](AQI Outputs/AQI_decision_tree_r.png)
+![Figure 5: Decision Tree Flowchart](AQI%20Outputs/AQI_decision_tree_r.png)
 
 At each step, this decision tree chooses one variable to best separate high-AQI days from low-AQI days. The first, largest, split separates based on no2: days with a very low no2, below 18 ppb, are directed to the left side of the tree, which tends to have lower AQI. This split makes sense because ozone and no2 tend to come from the same sources such as cars and industrial facilities, so a low no2 concentration correlate with low ozone. For low no2 days, the tree finds that high temperature is the best indicator of high AQI, with humidity distinguishing further days with a max temperature between 68 and 82 degrees Fahrenheit. For high no2 days, the tree uses air pressure and temperature to distinguish AQI further.
 
@@ -306,7 +298,6 @@ A decision tree regressor, much like linear regression gives us the benefit of b
 
 ![](WalkabilityImages/decision_tree.png)
 
-
 Figure #: Decision tree fit on most important 6 features
 
 At the top of the tree, as expected, is the variable pertaining to intersection density, with a mean of 107 and a median of 123. Because the splitting at the first node uses the threshold of 103, it tells us that we can expect a pretty significant drop in walkability depending on whether the intersection density is above or below average. 
@@ -323,7 +314,6 @@ Though usually performed in classification problems, KNN was a powerful regressi
 
 ![](images/KNN_n_scores.png)
 
-
 Figure #: Tuning number of neighbors for KNN regression
 
 # Discussion
@@ -334,7 +324,7 @@ Our model results demonstrate that we can forecast ozone-based AQI effectively w
 
 ## Walkability
 
-Overall, our models had good performance when predicting a location\'s Walkability Index. The best model in terms of predictive performance (using R-Squared as the metric of choice) was the Random Forest Regression. It was able to explain 89.34% of the variability in Walkability Index. It had similar performance to the Decision Tree and KNN models. The Random Forest model should be used if the EPA\'s goal is to get the best predictions, however it has the downside of not being very interpretable. If the primary goal is interpretation, then either the Decision Tree or Linear Regression models should be used (KNN is nonparametric). 
+Overall, our models had good performance when predicting a location's Walkability Index. The best model in terms of predictive performance (using R-Squared as the metric of choice) was the Random Forest Regression. It was able to explain 89.34% of the variability in Walkability Index. It had similar performance to the Decision Tree and KNN models. The Random Forest model should be used if the EPA's goal is to get the best predictions, however it has the downside of not being very interpretable. If the primary goal is interpretation, then either the Decision Tree or Linear Regression models should be used (KNN is nonparametric). 
 
 Interpreting the Decision Tree, the most important variables in terms of reducing node impurity are D3B, D2b_E8MixA, and D2c_TrpMx1. As discussed previously, D3B measures street intersection density and is weighted to favor pedestrian and bicycle connectivity. Therefore, it follows that places should prioritize improving pedestrian and bicycle infrastructure such as dedicated paths or protected lanes to help enhance walkability. D2b_E8MixA measures job diversity (it is similar to the 5-tier variable, however this one also includes education, health care, and public administration jobs). Increasing job diversity will not magically make a place more walkable, however it may indicate greater socioeconomic diversity and as such, varying reliance on personal cars compared to public transit or walking. Lastly, D2c_TrpMx1 indicates how mixed employment categories and households are based on vehicle trips.
 
@@ -352,13 +342,13 @@ Although there are many appropriate uses of our work, we also want to forewarn y
 
 As the EPA, it is your responsibility to use the knowledge gained from this work and the corresponding machine learning models to help the environment, not to harm it. If large polluters use these models to find ways to disguise their harmful ozone production, this could ultimately do more harm than good. For example, if they learn that cold, humid days see low ozone, they may choose emit more fumes during those times and harm the larger environment.
 
-Care should be taken to protect public transportation services even if the area would be \"walkable enough\" without having such high service levels. It would also not be appropriate to target low-income housing developments to places that are less walkable simply because these areas tend to have a higher percentage of low-wage workers.
+Care should be taken to protect public transportation services even if the area would be "walkable enough" without having such high service levels. It would also not be appropriate to target low-income housing developments to places that are less walkable simply because these areas tend to have a higher percentage of low-wage workers.
 
 ## Bias
 
 We must acknowledge that our project is subject to biases - deliberate or otherwise. The primary bias in this analysis came from the data collection process. Our final data set consisted of atmospheric measurements from only 43 counties across 32 states, meaning that a substantial portion of the country is left unaccounted for by this analysis. Also, we did not investigate the geographic locations of the weather stations that were monitoring the atmospheric conditions; hence it is possible that these measurements are not representative of the general population of atmospheric conditions. Finally, the data we analyzed came only from the years 2021 and 2022 - meaning that insights and trends illuminated in this report may not reflect the historical patterns.
 
-For the walkability dataset, we have very serious concerns about bias. Many variables in the dataset required information about public transit services. Local transit agencies should use a General Transit Feed Specification (GTFS) to share transit information in a standardized format. Although 95% of total transit ridership in the US is covered by the GTFS, not all places develop GTFS data for their systems or share it, particularly smaller transit agencies. Since many variables depended on this information, observations without it were removed. Unfortunately, this had a severely disproportionate impact on the less walkable places. Prior to removal, 43,250 places were designated as \"Least walkable\" and 68,640 places were \"Below average walkable.\" After removal, there were only 10 least walkable places and 7,583 below average walkable places remained. Most walkable and above average walkable places only lost 4% and 15% of their locations respectively. Since the classes are so unbalanced, our models will likely (and unrealistically) predict areas will be more walkable than they are.
+For the walkability dataset, we have very serious concerns about bias. Many variables in the dataset required information about public transit services. Local transit agencies should use a General Transit Feed Specification (GTFS) to share transit information in a standardized format. Although 95% of total transit ridership in the US is covered by the GTFS, not all places develop GTFS data for their systems or share it, particularly smaller transit agencies. Since many variables depended on this information, observations without it were removed. Unfortunately, this had a severely disproportionate impact on the less walkable places. Prior to removal, 43,250 places were designated as "Least walkable" and 68,640 places were "Below average walkable." After removal, there were only 10 least walkable places and 7,583 below average walkable places remained. Most walkable and above average walkable places only lost 4% and 15% of their locations respectively. Since the classes are so unbalanced, our models will likely (and unrealistically) predict areas will be more walkable than they are.
 
 # Conclusion
 
