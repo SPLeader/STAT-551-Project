@@ -55,14 +55,14 @@ aqi_model_metrics = pd.read_csv("AQI Outputs/AQI_model_metrics_py.csv")
 
 The EPA is an organization fundamentally invested securing and promoting the health and well-being of the environment. In this paper, we analyze two distinct but related environmental issues: air pollution and car dependency. For both issues, we used publicly available data sourced from the EPA to construct machine learning models to make predictions. For air pollution, we predicted a county's next-day Air Quality Index (AQI) from the previous day's atmospheric conditions to determine which factors contribute to AQI and how accurately we can determine tomorrow's AQI from today's conditions. For car dependency, we predicted the 'walkability' category of a localized area based on demographic information to deduce which demographic characteristics contribute most meaningfully to the 'walkability' of a location.
 
-```{r}
+```{python}
 # Previous Work - should we include this??? If so, we need to update citations in appendix
 
-"Previous research has used similar methods to model AQI based on related conditions. One paper specifically models the AQI of Zhangdian District, China based on industrial waste gas emissions as well as general meteorological data. Their goals were to promote the optimization of polluting enterprises and to reduce the conflict between environmental protection and economic development. They compared results from a random forest, a back propagation neural network, a decision tree, and a least-squares SVM, ultimately preferring the Random Forest for its high accuracy, with an R-Squared value of 0.9. (Liu, Y. et al.) 
+# Previous research has used similar methods to model AQI based on related conditions. One paper specifically models the AQI of Zhangdian District, China based on industrial waste gas emissions as well as general meteorological data. Their goals were to promote the optimization of polluting enterprises and to reduce the conflict between environmental protection and economic development. They compared results from a random forest, a back propagation neural network, a decision tree, and a least-squares SVM, ultimately preferring the Random Forest for its high accuracy, with an R-Squared value of 0.9. (Liu, Y. et al.) 
 
-One paper in the American Journal of Epidemiology used a linear regression approach to understand how income, education, racial/ethnic composition, age distribution, and sex were associated with indicators of neighborhood walkability. They found that neighborhoods with poorer residents tended to be more walkable, but with less open space. Similarly, children and the elderly tended to live in less walkable spaces, limiting their independence. (Katherine E. King et al.) Our work will be similar in that we are also trying to predict walkability and gain insight on what makes certain places more walkable than others. Our analysis will be different because we have many more variables to work with and we plan on taking a classification approach. 
+# One paper in the American Journal of Epidemiology used a linear regression approach to understand how income, education, racial/ethnic composition, age distribution, and sex were associated with indicators of neighborhood walkability. They found that neighborhoods with poorer residents tended to be more walkable, but with less open space. Similarly, children and the elderly tended to live in less walkable spaces, limiting their independence. (Katherine E. King et al.) Our work will be similar in that we are also trying to predict walkability and gain insight on what makes certain places more walkable than others. Our analysis will be different because we have many more variables to work with and we plan on taking a classification approach. 
 
-Another article with goals similar to goals of our project’s is this paper. These researchers also analyzed walkability, but viewed it only through the lens of the built environment, rather than including sociodemographic characteristics. Additionally, this paper specifically focused on a single metropolitan area whereas we will use data from all 50 U.S. states (and Washington D.C.). These researchers used PCA as their main analysis. (Denc, C. et al.) We plan on also using PCA, but only as a preprocessing step before fitting KNN models. Overall, this study uses very similar predictors and target variables to ours, and we hope to expand upon its findings."
+# Another article with goals similar to goals of our project’s is this paper. These researchers also analyzed walkability, but viewed it only through the lens of the built environment, rather than including sociodemographic characteristics. Additionally, this paper specifically focused on a single metropolitan area whereas we will use data from all 50 U.S. states (and Washington D.C.). These researchers used PCA as their main analysis. (Denc, C. et al.) We plan on also using PCA, but only as a preprocessing step before fitting KNN models. Overall, this study uses very similar predictors and target variables to ours, and we hope to expand upon its findings."
 ```
 
 # Data Collection & Description
@@ -177,8 +177,8 @@ Figure 2 reveals the seasonal trend in AQI. AQI tends to be higher in the summer
 (2) Hot and dry weather results in forest fires that can increase atmospheric pollutants
 (3) Clouds are less common at higher temperatures but are important for preventing the production of ozone
 
-```{r}
-"https://scied.ucar.edu/learning-zone/air-quality/how-weather-affects-air-quality#:~:text=Heat%20waves%20often%20lead%20to,ozone%20pollution%20and%20particulate%20pollution."
+```{python}
+# https://scied.ucar.edu/learning-zone/air-quality/how-weather-affects-air-quality#:~:text=Heat%20waves%20often%20lead%20to,ozone%20pollution%20and%20particulate%20pollution.
 ```
 
 <br /> <br />
@@ -255,14 +255,6 @@ We used three different types of models to predict AQI: linear models, decision 
 ```{python}
 Markdown(tabulate(aqi_model_metrics, headers = ['Model','R-Squared', 'Root Mean Squared Error'], showindex = "never"))
 ```
-
-
-# Conversion has only gone this far
-# Conversion has only gone this far
-# Conversion has only gone this far
-# Conversion has only gone this far
-# Conversion has only gone this far
-# Conversion has only gone this far
 
 These metrics indicate that the Random Forest is our overall most effective model, with an R-Squared value of 0.676 and a RMSE of 20.953. This indicates that the random forest could successfully predict 67.6% of the variability in AQI, only being wrong by an average of about 20.953 AQI points. Our linear model was markedly worse, with a RMSE of 23.334, and our decision tree fared the worst, with a RMSE of 24.315 AQI points.
 

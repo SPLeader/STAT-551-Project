@@ -43,6 +43,8 @@ aqi
 ```{r}
 aqi_df_all_preds <- read_csv(here("AQI Outputs",
                                   "AQI_df_all_preds_r.csv"))
+aqi_model_scores <- read_csv(here("AQI Outputs",
+                                  "AQI_model_metrics_r.csv"))
 ```
 
 
@@ -236,10 +238,7 @@ Figure #: Decision tree showing the uppermost splits (most important variables)
 We used three different types of models to predict AQI: linear models, decision trees, and random forests. Each model predicts the next day's AQI based on the min, mean, and max values of our 8 predictor measurements. Notably, this does not include any measurements of the day's Ozone or AQI. We measured each model's performance by cross-validating on data the model had not been trained on. The R-Squared and Root Mean Squared Error metrics are displayed below:
 
 ```{r, fig.cap = "Table 2. Accuracy metrics for our four model varieties", include = TRUE}
-tibble(
-  "Model" = c("Linear Regression", "Decision Tree", "Random Forest"),
-  "R-Squared" = c(0.5901049, 0.5552405, 0.6756383),
-  "Root Mean Squared Error" = c(23.33427, 24.3146, 20.95272)) %>% 
+aqi_model_scores %>% 
   kable(digits = 3)
 ```
 

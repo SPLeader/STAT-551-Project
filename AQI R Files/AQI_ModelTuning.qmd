@@ -50,9 +50,9 @@ aqi_train  <- aqi_ozone[sample, ]
 aqi_test   <- aqi_ozone[!sample, ]
 ```
 
-
-
-
+```{r}
+model_scores <- data.frame(colnames = c("Model", "R-Squared", "Root Mean Squared Error"))
+```
 
 # Linear models
 
@@ -96,6 +96,18 @@ lm_wf <- workflow() %>%
 grid_results <- lm_wf %>% 
   tune_grid(resamples = aqi_ozone_cvs, grid = lam_grid)
 
+
+model_title = "Linear Model"
+model_rsq = grid_results %>% 
+  collect_metrics() %>% 
+  filter(.metric == "rsq") %>% pull(mean) %>% max()
+model_rmse = grid_results %>% 
+  collect_metrics() %>% 
+  filter(.metric == "rmse") %>% pull(mean) %>% max()
+
+# Not included because polynomial is better
+# model_scores <- model_scores %>% rbind(c(model_title, model_rsq, model_rmse))
+
 grid_results %>% 
   collect_metrics() %>% 
   filter(.metric == "rsq") %>% 
@@ -129,6 +141,20 @@ lm_wf <- workflow() %>%
 
 grid_results <- lm_wf %>% 
   tune_grid(resamples = aqi_ozone_cvs, grid = lam_grid)
+
+# Save metrics
+
+model_title = "Linear Model"
+model_rsq = grid_results %>% 
+  collect_metrics() %>% 
+  filter(.metric == "rsq") %>% pull(mean) %>% max()
+model_rmse = grid_results %>% 
+  collect_metrics() %>% 
+  filter(.metric == "rmse") %>% pull(mean) %>% max()
+
+model_scores <- model_scores %>% rbind(c(model_title, model_rsq, model_rmse))
+
+# Display results
 
 grid_results %>% 
   collect_metrics() %>% 
@@ -264,6 +290,20 @@ rf_grid_result <- rf_wf %>%
   tune_grid(resamples = aqi_ozone_cvs,
             grid = rf_grid)
 
+# Save metrics
+
+model_title = "Random Forest"
+model_rsq = grid_results %>% 
+  collect_metrics() %>% 
+  filter(.metric == "rsq") %>% pull(mean) %>% max()
+model_rmse = grid_results %>% 
+  collect_metrics() %>% 
+  filter(.metric == "rmse") %>% pull(mean) %>% max()
+
+model_scores <- model_scores %>% rbind(c(model_title, model_rsq, model_rmse))
+
+# Print results
+
 rf_grid_result %>% 
   collect_metrics() %>% 
   filter(.metric == "rsq") %>% 
@@ -331,6 +371,20 @@ dt_grid <- grid_regular(tree_depth(),
 dt_grid_result <- dt_wf %>% 
   tune_grid(resamples = aqi_ozone_cvs,
             grid = dt_grid)
+
+# Save metrics
+
+model_title = "Decision Tree"
+model_rsq = dt_grid_result %>% 
+  collect_metrics() %>% 
+  filter(.metric == "rsq") %>% pull(mean) %>% max()
+model_rmse = grid_results %>% 
+  collect_metrics() %>% 
+  filter(.metric == "rmse") %>% pull(mean) %>% max()
+
+model_scores <- model_scores %>% rbind(c(model_title, model_rsq, model_rmse))
+
+# Print results
 
 dt_grid_result %>% 
   collect_metrics() %>% 
@@ -436,4 +490,11 @@ all_preds %>%
   theme(strip.text.y.right = element_text(angle = 0))
 ```
 
+
+```{r}
+# Saving model performaces
+
+model_scores %>% 
+  write.csv(here("AQI Outputs","AQI_model_metrics_r.csv"), row.names = FALSE)
+```
 
