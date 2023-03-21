@@ -34,6 +34,8 @@ import calendar
 
 ```{python}
 # Data
+os.chdir('../')
+
 aqi = pd.read_csv("Project Data/Combined/aqi_ozone_all_years_prediction.csv")
 ```
 
@@ -51,6 +53,8 @@ aqi_model_metrics = pd.read_csv("AQI Outputs/AQI_model_metrics_py.csv")
 
 ```{python}
 # NWI Data
+os.chdir('../')
+
 nwi = pd.read_csv('cleaned_nwi.csv')
 
 print([i for i in nwi.columns])
@@ -58,11 +62,11 @@ print([i for i in nwi.columns])
 
 ```{python}
 # NWI Outputs
+os.chdir('../')
+
 df_nwi_lasso_features.to_csv = pd.read_csv("NWI Outputs/NWI_lasso_features_py.csv")
 
 ```
-
-
 
 # Introduction
 
@@ -161,7 +165,6 @@ plt.show()
 plt.close()
 ```
 
-
 ```{python, fig.cap = "Table 2. Summary statistics of AQI", include = TRUE}
 def iqr(x):
     return x.quantile(0.75) - x.quantile(0.25)
@@ -201,7 +204,6 @@ plt.show()
 plt.close()
 ```
 
-
 Figure 2 reveals the seasonal trend in AQI. AQI tends to be higher in the summer months and lower in the winter months for these data. The exact mechanism for this relationship is unknown, but some hypotheses include:
 
 (1) Extreme heat and stagnant air can lead to an increase in ground-level ozone concentrations
@@ -235,6 +237,7 @@ aqi_seg["variable_type"] = aqi_seg["variable"].apply(lambda x : get_var_type(x))
 aqi_seg.pivot(index = "variable_category", columns = "variable_type", values = "Correlation").plot.bar(color = {"max" : "#88CCEE", "mean" : "#CC6677", "min" : "#DDCC77"}, ylim = (-0.6, 0.6))
 
 ```
+
 Figure 3 shows how the different atmospheric measurements correlate with next-day AQI. For most atmospheric measurements, the correlation is in the same direction for the minimum, mean, and maximum. However, wind speed is a notable exception to this trend, where we can see that although the mean and minimum wind speed are negatively correlated with next-day AQI, the maximum wind speed has a slight positive correlation with next-day AQI. The single variable with the most positive correlation is maximum no2, with a correlation of \~0.59. The single variable with the most negative correlation is minimum humidity, with a correlation of \~-0.50.
 
 <br /> <br />
@@ -265,7 +268,9 @@ The histogram of Walkability Index appears quite bell-shaped and symmetric. The 
 ### Relationship between Population and Walkability Index Category
 
 # WIP
+
 # Work in progress
+
 # WIP on this graph
 
 ```{python}
@@ -286,14 +291,13 @@ plt.show()
 plt.close()
 ```
 
-
 ![](images/walk%20pop%20boxplot-01.png)
 
 Further exploration was done to examine if population may have a relationship with the Walkability Index Category. The Least Walkable category seemed to have the highest population, with the Below Average and Above Average Walkable categories having the lowest populations. These areas had a tighter interquartile range although there were some outliers having much higher populations. The places that were Most Walkable had a large variation in population.
 
 ### Relationship between Employment Mix and Walkability Index Category
 
-Lastly, some preliminary investigation was conducted to look at the relationship between employment mix and walkability. Figure \# below shows a clear upward trend in walkability as the employment mix increases.The employment mix variable is a proportion between 0 and 1 that shows how diverse jobs are in a given area (categories of jobs are retail, office, industrial, service, and entertainment). Higher values indicate greater diversity of jobs and according to the EPA, this is correlated with more walk trips. 
+Lastly, some preliminary investigation was conducted to look at the relationship between employment mix and walkability. Figure \# below shows a clear upward trend in walkability as the employment mix increases.The employment mix variable is a proportion between 0 and 1 that shows how diverse jobs are in a given area (categories of jobs are retail, office, industrial, service, and entertainment). Higher values indicate greater diversity of jobs and according to the EPA, this is correlated with more walk trips.
 
 ![](images/walk%20mix%20scatterplot-01.png)
 
@@ -301,10 +305,9 @@ Lastly, some preliminary investigation was conducted to look at the relationship
 
 Variable Selection
 
-To help determine which of the 100+ predictors to use, we used both regression with a LASSO penalty and a Decision Tree. The most important variables were consistent between these two model specifications. Out of the 117 variables, only 6 actually made a significant contribution to reducing impurity in the decision tree, so these were the variables we used when fitting our models. All six of these variables also had nonzero coefficients even with the LASSO penalty. A bar plot of the LASSO-selected variables and the upper part of the decision tree are shown below. 
+To help determine which of the 100+ predictors to use, we used both regression with a LASSO penalty and a Decision Tree. The most important variables were consistent between these two model specifications. Out of the 117 variables, only 6 actually made a significant contribution to reducing impurity in the decision tree, so these were the variables we used when fitting our models. All six of these variables also had nonzero coefficients even with the LASSO penalty. A bar plot of the LASSO-selected variables and the upper part of the decision tree are shown below.
 
 ![](images/lasso_coefficients.png)
-
 
 ```{python, fig.cap = 'Figure #: Bar plot of top six most important variables; selected as predictors for final models'}
 plt.clf()
@@ -317,10 +320,7 @@ plt.show()
 plt.close()
 ```
 
-
-
-
-![Figure 5: Decision tree showing the uppermost splits (most important variables)](NWI Outputs/decision_tree_feature_selection.png)
+![Figure 5: Decision tree showing the uppermost splits (most important variables)](NWI%20Outputs/decision_tree_feature_selection.png)
 
 # Model Results
 
@@ -377,7 +377,7 @@ Note that in this formula, max_no2, max_temperature, and max_humidity are standa
 
 Our decision tree's predictions look far different than the others because they are made in discrete categories rather than in a more continuous manner. While this model has little bias, with only a slight overestimation bias on its highest predictions of 144, it has the largest overall errors, making it a worse predictor than other models. Nevertheless, this model may be very valuable, as we can directly see how it makes its decisions in the following decision tree flowchart:
 
-![Figure 5: Decision Tree Flowchart](AQI Outputs/AQI_decision_tree_py.png)
+![Figure 5: Decision Tree Flowchart](../AQI Outputs/AQI_decision_tree_py.png)
 
 At each step, this decision tree chooses one variable to best separate high-AQI days from low-AQI days. The first, largest, split separates based on no2: days with a very low no2, below 18 ppb, are directed to the left side of the tree, which tends to have lower AQI. This split makes sense because ozone and no2 tend to come from the same sources such as cars and industrial facilities, so a low no2 concentration correlate with low ozone. For low no2 days, the tree finds that high temperature is the best indicator of high AQI, with humidity distinguishing further days with a max temperature between 68 and 82 degrees Fahrenheit. For high no2 days, the tree uses air pressure and temperature to distinguish AQI further.
 
@@ -387,44 +387,43 @@ Our final optimized random forest model averages the results of 500 decision tre
 
 ## Walkability
 
-For the Walkability dataset, we used both regression (predicting the numeric Walkability Index) and classification (predicting the Walkability Index category) methods. For both approaches, 10-fold cross-validation was used to get a better sense of how these models would perform when predicting on unseen data. 
+For the Walkability dataset, we used both regression (predicting the numeric Walkability Index) and classification (predicting the Walkability Index category) methods. For both approaches, 10-fold cross-validation was used to get a better sense of how these models would perform when predicting on unseen data.
 
 ```{python}
 
 ```
 
-
-![](WalkabilityImages/walk%20mod%20performance-01.png)
+![](../WalkabilityImages/walk%20mod%20performance-01.png)
 
 ### Linear Regression
 
-Due to the vaguely linear trend from the Figure \# in the Exploratory Data Analysis section, a simple linear regression model was fit. The R-squared value was 0.75, meaning that 75% of the variability in Walkability Index was explained by the eight variables shown in the bar plot below. The Shape Length (length of the area, a proxy for area) and D3bmm4 (another measure of intersection density in terms of multi-modal intersections) variables were added. The MSE for this model was 1.36, meaning that on average, prediction errors were 1.36 Walkability Index points. See Appendix for plot of residuals (confirmed they were randomly scattered and showed approximately equal variability). 
+Due to the vaguely linear trend from the Figure \# in the Exploratory Data Analysis section, a simple linear regression model was fit. The R-squared value was 0.75, meaning that 75% of the variability in Walkability Index was explained by the eight variables shown in the bar plot below. The Shape Length (length of the area, a proxy for area) and D3bmm4 (another measure of intersection density in terms of multi-modal intersections) variables were added. The MSE for this model was 1.36, meaning that on average, prediction errors were 1.36 Walkability Index points. See Appendix for plot of residuals (confirmed they were randomly scattered and showed approximately equal variability).
 
 Each variable is numeric, meaning that the coefficients can be interpreted as a one unit increase in that variable leads to an increase (on average) in Walkability Index equivalent to its coefficient value (after adjusting for all other variables in the model). For example, the coefficient for D3B is 0.98. This means that on average, the Walkability Index increases by 0.98 points for every additional unit of weighted street intersection density after accounting for the other variables in the model. It makes sense that increasing D3B has a positive impact on walkability as it measures street intersection density and is weighted to emphasize pedestrian and bicycle connectivity. More dense intersections indicate a more connected place with shorter block lengths thereby making the place more walkable.
 
-![](WalkabilityImages/LR_coefficients.png)
+![](../WalkabilityImages/LR_coefficients.png)
 
 ### Decision Tree Regression
 
 A decision tree regressor, much like linear regression gives us the benefit of being highly interpretable. We can create the model and interpret the top of the resulting tree similarly to how we did when performing feature selection. Tuning became necessary as initial tree models were drastically overfitting. The most effective hyperparameter to stop this turned out to be limiting the maximum tree depth, which we settled on 9, which seemed to be a sweet spot between overfitting and underfitting the data.
 
-![](WalkabilityImages/decision_tree.png)
+![](../WalkabilityImages/decision_tree.png)
 
 Figure #: Decision tree fit on most important 6 features
 
-At the top of the tree, as expected, is the variable pertaining to intersection density, with a mean of 107 and a median of 123. Because the splitting at the first node uses the threshold of 103, it tells us that we can expect a pretty significant drop in walkability depending on whether the intersection density is above or below average. 
+At the top of the tree, as expected, is the variable pertaining to intersection density, with a mean of 107 and a median of 123. Because the splitting at the first node uses the threshold of 103, it tells us that we can expect a pretty significant drop in walkability depending on whether the intersection density is above or below average.
 
 ### Random Forest Regression
 
-With such a large dataset, a random forest algorithm was far from the fastest option. Regardless, it has the potential to improve upon predicting power of the other models, especially in regards to overfitting. The tuning of hyperparameters was limited simply because each fitting took a substantial amount of time. Regardless, various options for the number of total estimators in the forest were attempted, with 100 being a good balance of powerful and feasible to run in a reasonable amount of time. 
+With such a large dataset, a random forest algorithm was far from the fastest option. Regardless, it has the potential to improve upon predicting power of the other models, especially in regards to overfitting. The tuning of hyperparameters was limited simply because each fitting took a substantial amount of time. Regardless, various options for the number of total estimators in the forest were attempted, with 100 being a good balance of powerful and feasible to run in a reasonable amount of time.
 
-The final random forest model achieved a high R2 score of .8929 and an MSE of .5794. 
+The final random forest model achieved a high R2 score of .8929 and an MSE of .5794.
 
 ### K-Neighbors Regression
 
-Though usually performed in classification problems, KNN was a powerful regression tool in our analysis. Fit with the top 6 predictors according to our feature selection (See Table 2), the final model achieved mean squared error .5960 and R2 of .8895. 
+Though usually performed in classification problems, KNN was a powerful regression tool in our analysis. Fit with the top 6 predictors according to our feature selection (See Table 2), the final model achieved mean squared error .5960 and R2 of .8895.
 
-![](images/KNN_n_scores.png)
+![](../NWI Outputs/KNN_n_scores.png)
 
 Figure #: Tuning number of neighbors for KNN regression
 
@@ -436,7 +435,7 @@ Our model results demonstrate that we can forecast ozone-based AQI effectively w
 
 ## Walkability
 
-Overall, our models had good performance when predicting a location's Walkability Index. The best model in terms of predictive performance (using R-Squared as the metric of choice) was the Random Forest Regression. It was able to explain 89.34% of the variability in Walkability Index. It had similar performance to the Decision Tree and KNN models. The Random Forest model should be used if the EPA's goal is to get the best predictions, however it has the downside of not being very interpretable. If the primary goal is interpretation, then either the Decision Tree or Linear Regression models should be used (KNN is nonparametric). 
+Overall, our models had good performance when predicting a location's Walkability Index. The best model in terms of predictive performance (using R-Squared as the metric of choice) was the Random Forest Regression. It was able to explain 89.34% of the variability in Walkability Index. It had similar performance to the Decision Tree and KNN models. The Random Forest model should be used if the EPA's goal is to get the best predictions, however it has the downside of not being very interpretable. If the primary goal is interpretation, then either the Decision Tree or Linear Regression models should be used (KNN is nonparametric).
 
 Interpreting the Decision Tree, the most important variables in terms of reducing node impurity are D3B, D2b_E8MixA, and D2c_TrpMx1. As discussed previously, D3B measures street intersection density and is weighted to favor pedestrian and bicycle connectivity. Therefore, it follows that places should prioritize improving pedestrian and bicycle infrastructure such as dedicated paths or protected lanes to help enhance walkability. D2b_E8MixA measures job diversity (it is similar to the 5-tier variable, however this one also includes education, health care, and public administration jobs). Increasing job diversity will not magically make a place more walkable, however it may indicate greater socioeconomic diversity and as such, varying reliance on personal cars compared to public transit or walking. Lastly, D2c_TrpMx1 indicates how mixed employment categories and households are based on vehicle trips.
 
@@ -444,9 +443,9 @@ Interpreting the Decision Tree, the most important variables in terms of reducin
 
 ## Good uses of our work
 
-It is important that as we give you these powerful machine learning model fits, you are aware of the importance of their proper usage. We hope that you will use the work detailed in this report to better understand the atmospheric factors that contribute to the future air quality of an area and its characteristics that determine its walkability. For the AQI model in particular, we also expect that you can use this model to effectively predict the air quality based on ozone even when direct ozone measurements are unable to be taken, using other atmospheric conditions as a proxy measurement. 
+It is important that as we give you these powerful machine learning model fits, you are aware of the importance of their proper usage. We hope that you will use the work detailed in this report to better understand the atmospheric factors that contribute to the future air quality of an area and its characteristics that determine its walkability. For the AQI model in particular, we also expect that you can use this model to effectively predict the air quality based on ozone even when direct ozone measurements are unable to be taken, using other atmospheric conditions as a proxy measurement.
 
-For the walkability model, we would support the usage of our models to predict areas with poor walkability for areas where it is unknown, such that changes could be implemented to make it more pedestrian-friendly. The goal of these models is to highlight a small number of factors that have a large impact on how walkable a place is. By identifying these characteristics, it is our hope that civil projects can be undertaken and that public policy changes can be implemented to improve walkability for all communities, but especially those that need it most. For example, there could be changes to the local codes that require a certain intersection density or federal incentives to having high public transportation service levels. Walkability is very strongly linked to physical health and quality of life metrics, so it is of the utmost importance to ensure all communities are walkable. 
+For the walkability model, we would support the usage of our models to predict areas with poor walkability for areas where it is unknown, such that changes could be implemented to make it more pedestrian-friendly. The goal of these models is to highlight a small number of factors that have a large impact on how walkable a place is. By identifying these characteristics, it is our hope that civil projects can be undertaken and that public policy changes can be implemented to improve walkability for all communities, but especially those that need it most. For example, there could be changes to the local codes that require a certain intersection density or federal incentives to having high public transportation service levels. Walkability is very strongly linked to physical health and quality of life metrics, so it is of the utmost importance to ensure all communities are walkable.
 
 ## Misuses
 
@@ -464,7 +463,7 @@ For the walkability dataset, we have very serious concerns about bias. Many vari
 
 # Conclusion
 
-The decision tree model seems to be the most useful in regards to the walkability dataset. The random forest regressor was expected to outcompete the other models in terms of predicting power, but the improvement was so marginal that it is far from being worth the lack of interpretability that comes with the decision tree model. 
+The decision tree model seems to be the most useful in regards to the walkability dataset. The random forest regressor was expected to outcompete the other models in terms of predicting power, but the improvement was so marginal that it is far from being worth the lack of interpretability that comes with the decision tree model.
 
 -   Make better overarching claims as to which models we would choose for purposes, which factors contribute to walkability
 
