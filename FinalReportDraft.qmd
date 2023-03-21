@@ -34,17 +34,35 @@ library(knitr)
 aqi <- read_csv(here("Project Data",
                      "Combined",
                      "aqi_ozone_all_years_prediction.csv"))
-```
 
-```{r}
-aqi
+nwi <- read_csv(here("NWI R Files",
+                     "cleaned_nwi.csv"))
 ```
 
 ```{r}
 aqi_df_all_preds <- read_csv(here("AQI Outputs",
                                   "AQI_df_all_preds_r.csv"))
+
 aqi_model_scores <- read_csv(here("AQI Outputs",
                                   "AQI_model_metrics_r.csv"))
+
+walk_knn <- read_csv(here("Walkability Outputs",
+                          "knn_grid_results.csv"))
+
+walk_linear <- read_csv(here("Walkability Outputs",
+                          "linear_cv_results.csv"))
+
+walk_rf <- read_csv(here("Walkability Outputs",
+                          "rf_grid_results.csv"))
+
+walk_tree <- read_csv(here("Walkability Outputs",
+                          "tree_grid_results.csv"))
+
+walk_lasso_coef <- read_csv(here("Walkability Outputs",
+                          "lasso_coef.csv"))
+
+walk_knn_r2 <- read_csv(here("Walkability Outputs",
+                          "knn_validation_r2.csv"))
 ```
 
 # Introduction
@@ -194,13 +212,44 @@ aqi %>% select(-Date, -County, -State,
 
 Overall distribution of Walkability Index
 
-![](images/NWI_histogram.png)
+```{r}
+ggplot(nwi, aes(NatWalkInd, fill = cut(NatWalkInd, 100))) +
+  geom_histogram(show.legend = FALSE) +
+  theme_bw() + 
+  labs(y = "",
+       x = "Walkability Index") 
+```
+
 
 The histogram of Walkability Index appears quite bell-shaped and symmetric. The median Walkability Index is 13.83 and the interquartile range is 3.33. The range for the Walkability Index is 1 to 20.
 
+```{r}
+nwi %>% 
+  summarise(Mean = round(mean(NatWalkInd), 2),
+            SD = round(sd(NatWalkInd), 2),
+            Median = median(NatWalkInd),
+            IQR = IQR(NatWalkInd)) %>%
+  knitr::kable()
+```
+
+
 ### Relationship between Population and Walkability Index Category
 
-![](images/walk%20pop%20boxplot-01.png)
+```{r}
+nwi$cat <- factor(nwi$cat , levels=c("Least walkable", "Below average walkable", "Above average walkable", "Most walkable"))
+
+ggplot(nwi, 
+       aes(x = cat, 
+           y = CBSA_POP, fill = cat)) +
+  geom_boxplot() +
+    xlab("Walkability Index Category") + 
+   theme_bw() + 
+  theme(legend.position = "None") + 
+        #axis.title.y = element_text(angle = 0, vjust = 0.5)) +
+  labs(y = "") +
+  scale_fill_manual(values = c("#A6BDDB", "#74A9CF", "#0570B0", "#034E7B"))
+```
+
 
 Further exploration was done to examine if population may have a relationship with the Walkability Index Category. The Least Walkable category seemed to have the highest population, with the Below Average and Above Average Walkable categories having the lowest populations. These areas had a tighter interquartile range although there were some outliers having much higher populations. The places that were Most Walkable had a large variation in population.
 
@@ -208,9 +257,16 @@ Further exploration was done to examine if population may have a relationship wi
 
 Lastly, some preliminary investigation was conducted to look at the relationship between employment mix and walkability. Figure \# below shows a clear upward trend in walkability as the employment mix increases.The employment mix variable is a proportion between 0 and 1 that shows how diverse jobs are in a given area (categories of jobs are retail, office, industrial, service, and entertainment). Higher values indicate greater diversity of jobs and according to the EPA, this is correlated with more walk trips. 
 
-![](images/walk%20mix%20scatterplot-01.png)
+```{r}
+ggplot(nwi, 
+       aes(x = D2B_E8MIXA, 
+           y = NatWalkInd, color = cat)) +
+    geom_point() + 
+     labs(x="Employment Mix", y="Walkability Index", color = "Category") +
+   theme_bw() + 
+    scale_color_manual(values = c("darkred", "chocolate", "gold", "limegreen"))
+```
 
-\
 
 Variable Selection
 
