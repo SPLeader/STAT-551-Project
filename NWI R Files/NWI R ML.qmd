@@ -15,6 +15,7 @@ library(rpart.plot)
 ```{r}
 nwi <- read_csv(here("NWI R Files", "cleaned_nwi.csv"))
 ```
+
 ```{r}
 nwi_clean <-
   nwi %>%
@@ -22,8 +23,6 @@ nwi_clean <-
             'CBSA_POP', 'CBSA_EMP', 'CBSA_WRK', 'Ac_Total', 'Shape_Area')) %>%
   drop_na()
 ```
-
-
 
 ```{r}
 lasso_spec <- linear_reg(penalty = 0.1,
@@ -51,24 +50,12 @@ lasso_fit <- lasso_wf %>% fit(nwi_clean) %>% extract_fit_parsnip()
 ```{r}
 lasso_fit$fit$coefficients %>%
   data.frame() %>%
+  rename("coefficient" = ".") %>%
+  mutate(variable = rownames(.)) %>%
   write_csv("lasso_coef.csv")
 ```
 
 
-```{r}
-lasso_fit$fit$coefficients %>% 
-  data.frame() %>% 
-  rename("Coefficient" = ".") %>%
-  arrange(desc(abs(Coefficient))) %>% 
-  mutate("Variable" = rownames(.)) %>%
-  filter(Variable != "(Intercept)") %>%
-  head(7) %>%
-  ggplot(aes(x = fct_reorder(Variable, desc(abs(Coefficient))), y = abs(Coefficient), fill = Variable)) +
-  geom_col() +
-  labs(x = "Variable",
-       y = "|Coefficient|") + 
-  theme(legend.position = "none")
-```
 
 
 ```{r}
@@ -80,7 +67,6 @@ tree_spec <- decision_tree(tree_depth = 2) %>%
 ```{r}
 nwi_recipe_tree <- recipe(NatWalkInd ~ ., data = nwi_clean) 
 ```
-
 
 ```{r}
 tree_wf <- workflow() %>%
@@ -96,11 +82,9 @@ tree_fit <- tree_wf %>% fit(nwi_clean) %>% extract_fit_parsnip()
 tree_fit$fit
 ```
 
-
 ```{r}
 rpart.plot(tree_fit$fit, roundint = FALSE)
 ```
-
 
 # Cross Validation
 
@@ -174,7 +158,6 @@ knn_grid_search <-
 knn_grid_search %>% collect_metrics()# %>% write_csv("knn_grid_results.csv")
 ```
 
-
 ```{r}
 nwi_recipe_reduced <- recipe(NatWalkInd ~ D2B_E8MIXA + D3A + D2A_EPHHM + D3AMM + D3AAO + D2C_TRPMX1 + D3B, data = nwi_clean) %>%
 step_dummy(all_nominal_predictors()) %>%
@@ -205,11 +188,10 @@ for (k in seq(length(validation_r2))) {
 }
 validation_r2
 ```
+
 ```{r}
 data.frame(k = seq(length(validation_r2)), "rsq" = validation_r2) %>% write_csv("knn_validation_r2.csv")
 ```
-
-
 
 ```{r}
 tree_spec <- decision_tree(tree_depth = tune()) %>%
@@ -235,7 +217,6 @@ tree_grid_search <-
 tree_grid_search %>% collect_metrics()# %>% write_csv("tree_grid_results.csv")
 ```
 
-
 ```{r}
 linear_spec <- linear_reg(mixture = 1) %>%
   set_engine("lm") %>%
@@ -251,6 +232,27 @@ linear_cv_fit <- linear_wf %>% fit_resamples(nwi_cv)
 
 ```{r}
 linear_cv_fit %>% collect_metrics() #%>% write_csv("linear_cv_results.csv")
+```
+
+```{r}
+linear_spec <- linear_reg() %>%
+  set_engine("lm") %>%
+  set_mode("regression")
+
+linear_wf <- workflow() %>%
+  add_model(linear_spec) %>%
+  add_recipe(nwi_recipe) 
+
+
+linear_fit <- linear_wf %>% fit(nwi_clean) %>% extract_fit_parsnip()
+```
+
+```{r}
+linear_fit$fit$coefficients %>%
+  data.frame() %>%
+  rename("Coefficient" = ".") %>%
+  mutate("Variable" = rownames(.)) %>%
+  write_csv("walk_linear_coef.csv")
 ```
 
 
