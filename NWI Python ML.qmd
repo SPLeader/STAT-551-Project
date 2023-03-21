@@ -54,7 +54,7 @@ def get_best_features_pairs(features, coef):
 ```
 
 ```{python}
-df = pd.read_csv('nwi.csv')
+nwi = pd.read_csv('cleaned_nwi.csv')
 ```
 
 # Exploratory
@@ -62,22 +62,22 @@ df = pd.read_csv('nwi.csv')
 ```{python}
 plt.clf()
 sns.set_theme()
-df['NatWalkInd'].hist()
+nwi['NatWalkInd'].hist()
 plt.title('Walkability occurrences')
 plt.xlabel('Walkability Index')
 plt.ylabel('Occurrences')
-plt.savefig('NWI_histogram.png')
+plt.savefig('NWI Outputs/NWI_histogram.png')
 plt.show()
 ```
 
 ```{python}
-df['D3B'].mean()
-df['D3B'].median()
+nwi['D3B'].mean()
+nwi['D3B'].median()
 ```
 
 ```{python}
-X = df.drop(columns=['D1C8_OFF', 'CSA', 'OBJECTID', 'GEOID10', 'GEOID20', 'STATEFP', 'COUNTYFP', 'CSA_Name', 'CBSA_Name', 'cat', 'CBG', 'D4A', 'D4D', 'CBG', 'NatWalkInd', 'D2A_Ranked', 'D2B_Ranked', 'D3B_Ranked', 'D4A_Ranked'])
-y = df['NatWalkInd']
+X = nwi.drop(columns=['D1C8_OFF', 'CSA', 'OBJECTID', 'GEOID10', 'GEOID20', 'STATEFP', 'COUNTYFP', 'CSA_Name', 'CBSA_Name', 'cat', 'CBG', 'D4A', 'D4D', 'CBG', 'D2A_Ranked', 'D2B_Ranked', 'D3B_Ranked', 'D4A_Ranked', 'State', 'NatWalkInd'])
+y = nwi['NatWalkInd']
 all_features = list(X.columns)
 ```
 
@@ -101,13 +101,23 @@ lasso_best_features_pairs = get_best_features_pairs(all_features, lasso_pipeline
 ```{python}
 features = [pair[0] for pair in lasso_best_features_pairs]
 coefficients = [pair[1] for pair in lasso_best_features_pairs]
+
+df_nwi_lasso_features = pd.DataFrame(data = {
+  'features': features,
+  'coefficients': coefficients
+})
+
+# Save outputs as csv to recreate plot in final report
+df_nwi_lasso_features.to_csv("NWI Outputs/NWI_lasso_features_py.csv")
+
 plt.clf()
 plt.figure().set_figwidth(20)
-sns.barplot(x=features[:6], y=np.abs(coefficients[:6]))
+sns.barplot(x=df_nwi_lasso_features["features"][:6], y=np.abs(df_nwi_lasso_features["coefficients"][:6]))
 plt.title('Top Lasso Coefficients')
 plt.ylabel('Coefficient')
-plt.savefig('lasso_coefficients.png')
+plt.savefig('NWI Outputs/lasso_coefficients.png')
 plt.show()
+plt.close()
 ```
 
 Best features according to LASSO: 'D2A_EPHHM', 'D2B_E8MIXA', 'D3APO', 'D3B', 'D3BMM4', 'D3A', 'D3BMM3', 'Shape_Length', 'Pct_AO2p', 'D5DRI', 'D5DEI', 'Pct_AO1'
@@ -130,7 +140,7 @@ plt.figure().set_figheight(7)
 plot_tree(dt, proportion=True, max_depth=1, feature_names=all_features, 
         class_names=list(y.unique()), filled=True)
 plt.title('Decision Tree on all predictors')
-plt.savefig('decision_tree_feature_selection.png')
+plt.savefig('NWI Outputs/decision_tree_feature_selection.png')
 plt.show()
 ```
 
@@ -402,7 +412,7 @@ plt.show()
 # Preliminary Stuff:
 
 ```{python}
-data = df[['cat', 'D3B', 'D2B_E8MIXA', 'D2A_EPHHM']]
+data = nwi[['cat', 'D3B', 'D2B_E8MIXA', 'D2A_EPHHM']]
 ```
 
 ```{python}

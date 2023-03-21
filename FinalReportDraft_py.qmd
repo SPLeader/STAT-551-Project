@@ -34,7 +34,6 @@ import calendar
 
 ```{python}
 # Data
-
 aqi = pd.read_csv("Project Data/Combined/aqi_ozone_all_years_prediction.csv")
 ```
 
@@ -49,6 +48,20 @@ aqi_df_lm_preds = pd.read_csv("AQI Outputs/AQI_df_lm_preds_py.csv")
 aqi_df_rf_preds = pd.read_csv("AQI Outputs/AQI_df_rf_preds_py.csv")
 aqi_model_metrics = pd.read_csv("AQI Outputs/AQI_model_metrics_py.csv")
 ```
+
+```{python}
+# NWI Data
+nwi = pd.read_csv('cleaned_nwi.csv')
+
+print([i for i in nwi.columns])
+```
+
+```{python}
+# NWI Outputs
+df_nwi_lasso_features.to_csv = pd.read_csv("NWI Outputs/NWI_lasso_features_py.csv")
+
+```
+
 
 
 # Introduction
@@ -96,10 +109,28 @@ Markdown(tabulate(var_summary_table, headers = ['Variable Name','Variable Descri
 ## Walkability
 
 Data about walkability was accessed from the U.S. Government's open data catalog, data.gov. The data was collected by the Environmental Protection Agency (EPA) and contains demographic information, built environment characteristics, and transportation infrastructure data from 2021 for each Census block group. These inputs are used to calculate the National Walkability Index as defined by the EPA. This index can be expressed either numerically or translated into qualitative categories (see Table 2 below)
-![](images/walkability%20categories-02.png)
 
-In total, there are 220,740 observations for 117 variables in this dataset. Since there were so many predictors to choose from, we narrowed it down to those in the table below (more details on variable selection in the Exploratory Data Analysis section). 
-![](images/walkability%20variables-02.png)
+```{python, fig.cap = "Talbe 2: NWI Walkability Categories", include = TRUE}
+df_walkability_categories = pd.DataFrame(
+  data = {
+    'Walkability Index' : ['1 - 5.75', '5.76 - 10.5', '10.51 - 15.25', '15.26 - 20'],
+    'Category' : ['Least Walkable', 'Below Average Walkable', 'Above Average Walkable', 'Most Walkable']
+})
+
+Markdown(tabulate(df_walkability_categories, headers = ['Walkability Index','Category'], showindex = "never"))
+```
+
+In total, there are 220,740 observations for 117 variables in this dataset. Since there were so many predictors to choose from, we narrowed it down to those in the table below (more details on variable selection in the Exploratory Data Analysis section).
+
+```{python, fig.cap = "Talbe 3: Variable Summary for Walkability Dataset", include = TRUE}
+df_walkability_categories = pd.DataFrame(
+  data = {
+    'Variable Name' : ['D2a_EpHHm', 'D2b_E5MixA', 'D3apo', 'D3b', 'D3bmm4', 'D3a'],
+    'Description' : ['The mix of employment types and occupied housing', '5-tier employment mix (retail, office, industrial, service, and entertainment jobs)', 'Network density in terms of pedestrian-oriented paths per square mile', 'Street intersection density (weighted, auto-oriented intersections eliminated)', 'Intersection density in terms of multi-modal intersections', 'Total road network density']
+})
+
+Markdown(tabulate(df_walkability_categories, headers = ['Variable Name','Description'], showindex = "never"))
+```
 
 # Exploratory Data Analysis
 
@@ -216,11 +247,45 @@ aqi.drop(["Date", "County", "State", "AQI", "AQI_cat", "max_ozone", "mean_ozone"
 
 Overall distribution of Walkability Index
 
-![](images/NWI_histogram.png)
+```{python}
+# ![](images/NWI_histogram.png)
+
+plt.clf()
+sns.set_theme()
+nwi['NatWalkInd'].hist()
+plt.title('Walkability occurrences')
+plt.xlabel('Walkability Index')
+plt.ylabel('Occurrences')
+plt.show()
+plt.close()
+```
 
 The histogram of Walkability Index appears quite bell-shaped and symmetric. The median Walkability Index is 13.83 and the interquartile range is 3.33. The range for the Walkability Index is 1 to 20.
 
 ### Relationship between Population and Walkability Index Category
+
+# WIP
+# Work in progress
+# WIP on this graph
+
+```{python}
+bp_dict = nwi[["CBSA_POP", "cat"]].boxplot(by ='cat', column =['CBSA_POP'], return_type='both', grid = False, patch_artist = True)
+
+colors = ["#034E7B", "#0570B0", "#3690C0", "#74A9CF", "#A6BDDB", "#D0D1E6",
+                                          "#F1EEF6", "#D0D1E6", "#A6BDDB", "#74A9CF", "#3690C0", "#0570B0"]
+for row_key, (ax,row) in bp_dict.iteritems():
+    ax.set_xlabel('')
+    for i,box in enumerate(row['boxes']):
+        box.set_facecolor(colors[i])
+        
+# Plot shows in next chunk to avoid prints
+```
+
+```{python}
+plt.show()
+plt.close()
+```
+
 
 ![](images/walk%20pop%20boxplot-01.png)
 
@@ -240,11 +305,22 @@ To help determine which of the 100+ predictors to use, we used both regression w
 
 ![](images/lasso_coefficients.png)
 
-Figure #: Bar plot of top six most important variables; selected as predictors for final models
 
-![](images/decision_tree_feature_selection%20(1).png)
+```{python, fig.cap = 'Figure #: Bar plot of top six most important variables; selected as predictors for final models'}
+plt.clf()
+plt.figure().set_figwidth(20)
+sns.barplot(x=df_nwi_lasso_features["features"][:6], y=np.abs(df_nwi_lasso_features["coefficients"][:6]))
+plt.title('Top Lasso Coefficients')
+plt.ylabel('Coefficient')
+plt.savefig('NWI Outputs/lasso_coefficients.png')
+plt.show()
+plt.close()
+```
 
-Figure #: Decision tree showing the uppermost splits (most important variables)
+
+
+
+![Figure 5: Decision tree showing the uppermost splits (most important variables)](NWI Outputs/decision_tree_feature_selection.png)
 
 # Model Results
 
@@ -312,6 +388,11 @@ Our final optimized random forest model averages the results of 500 decision tre
 ## Walkability
 
 For the Walkability dataset, we used both regression (predicting the numeric Walkability Index) and classification (predicting the Walkability Index category) methods. For both approaches, 10-fold cross-validation was used to get a better sense of how these models would perform when predicting on unseen data. 
+
+```{python}
+
+```
+
 
 ![](WalkabilityImages/walk%20mod%20performance-01.png)
 
