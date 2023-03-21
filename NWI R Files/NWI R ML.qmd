@@ -1,0 +1,256 @@
+---
+title: "NWI R ML"
+format: html
+editor: visual
+---
+
+```{r}
+library(tidyverse)
+library(here)
+library(tidymodels)
+library(rpart)
+library(rpart.plot)
+```
+
+```{r}
+nwi <- read_csv(here("NWI R Files", "cleaned_nwi.csv"))
+```
+```{r}
+nwi_clean <-
+  nwi %>%
+  select(-c('D1C8_OFF', 'CSA', 'OBJECTID', 'GEOID10', 'GEOID20', 'STATEFP', 'COUNTYFP', 'CSA_Name', 'CBSA_Name', 'cat', 'CBG', 'D4A', 'D4D', 'CBG', 'D2A_Ranked', 'D2B_Ranked', 'D3B_Ranked', 'D4A_Ranked', 'Ind_D4A', 'CBSA',
+            'CBSA_POP', 'CBSA_EMP', 'CBSA_WRK', 'Ac_Total', 'Shape_Area')) %>%
+  drop_na()
+```
+
+
+
+```{r}
+lasso_spec <- linear_reg(penalty = 0.1,
+                             mixture = 1) %>%
+  set_engine("lm") %>%
+  set_mode("regression")
+```
+
+```{r}
+nwi_recipe <- recipe(NatWalkInd ~ ., data = nwi_clean) %>%
+  step_dummy(all_nominal_predictors()) %>%
+  step_normalize(all_numeric_predictors())
+```
+
+```{r}
+lasso_wf <- workflow() %>%
+  add_model(lasso_spec) %>%
+  add_recipe(nwi_recipe) 
+```
+
+```{r}
+lasso_fit <- lasso_wf %>% fit(nwi_clean) %>% extract_fit_parsnip()
+```
+
+```{r}
+lasso_fit$fit$coefficients %>%
+  data.frame() %>%
+  write_csv("lasso_coef.csv")
+```
+
+
+```{r}
+lasso_fit$fit$coefficients %>% 
+  data.frame() %>% 
+  rename("Coefficient" = ".") %>%
+  arrange(desc(abs(Coefficient))) %>% 
+  mutate("Variable" = rownames(.)) %>%
+  filter(Variable != "(Intercept)") %>%
+  head(7) %>%
+  ggplot(aes(x = fct_reorder(Variable, desc(abs(Coefficient))), y = abs(Coefficient), fill = Variable)) +
+  geom_col() +
+  labs(x = "Variable",
+       y = "|Coefficient|") + 
+  theme(legend.position = "none")
+```
+
+
+```{r}
+tree_spec <- decision_tree(tree_depth = 2) %>%
+  set_engine("rpart") %>%
+  set_mode("regression")
+```
+
+```{r}
+nwi_recipe_tree <- recipe(NatWalkInd ~ ., data = nwi_clean) 
+```
+
+
+```{r}
+tree_wf <- workflow() %>%
+  add_model(tree_spec) %>%
+  add_recipe(nwi_recipe_tree) 
+```
+
+```{r}
+tree_fit <- tree_wf %>% fit(nwi_clean) %>% extract_fit_parsnip()
+```
+
+```{r}
+tree_fit$fit
+```
+
+
+```{r}
+rpart.plot(tree_fit$fit, roundint = FALSE)
+```
+
+
+# Cross Validation
+
+```{r}
+sample <- sample(c(TRUE, FALSE), nrow(nwi_clean), replace=TRUE, prob=c(0.9,0.1))
+nwi_train  <- nwi_clean[sample, ]
+nwi_test   <- nwi_clean[!sample, ]
+
+sample <- sample(c(TRUE, FALSE), nrow(nwi_train), replace=TRUE, prob=c(0.05,0.95))
+nwi_subset  <- nwi_train[sample, ]
+```
+
+```{r}
+num_folds <- 10
+nwi_cv <- vfold_cv(nwi_subset, v = num_folds)
+```
+
+```{r}
+rf_spec <- rand_forest(mtry = tune(), # Number of vars to randomly select for each tree
+                      min_n = 1, # Min. data points in node to split further
+                      trees = 200 # Number of trees in the forest
+                      ) %>%
+  set_engine("ranger") %>%
+  set_mode("regression")
+
+rf_wf <- workflow() %>%
+  add_model(rf_spec) %>%
+  add_recipe(nwi_recipe_tree) 
+
+rf_grid <- grid_regular(mtry(c(25, 50)),
+                       levels = 2)
+
+rf_grid_search <-
+  tune_grid(
+    rf_wf,
+    resamples = nwi_cv,
+    grid = rf_grid
+  )
+```
+
+```{r}
+rf_grid_search %>% collect_metrics()# %>% write_csv("rf_grid_results.csv")
+```
+
+```{r}
+nwi_recipe_reduced <- recipe(NatWalkInd ~ D2B_E8MIXA + D3A + D2A_EPHHM + D3AMM + D3AAO + D2C_TRPMX1 + D3B, data = nwi_clean) %>%
+  step_dummy(all_nominal_predictors()) %>%
+  step_normalize(all_numeric_predictors())
+
+
+knn_regression_spec <- nearest_neighbor(neighbors = tune()) %>%
+  set_engine("kknn") %>%
+  set_mode("regression")
+
+knn_wf <- workflow() %>%
+  add_model(knn_regression_spec) %>%
+  add_recipe(nwi_recipe_reduced) 
+
+knn_grid <- grid_regular(neighbors(c(1, 50)),
+                       levels = 30)
+
+knn_grid_search <-
+  tune_grid(
+    knn_wf,
+    resamples = nwi_cv,
+    grid = knn_grid
+  )
+```
+
+```{r}
+knn_grid_search %>% collect_metrics()# %>% write_csv("knn_grid_results.csv")
+```
+
+
+```{r}
+nwi_recipe_reduced <- recipe(NatWalkInd ~ D2B_E8MIXA + D3A + D2A_EPHHM + D3AMM + D3AAO + D2C_TRPMX1 + D3B, data = nwi_clean) %>%
+step_dummy(all_nominal_predictors()) %>%
+step_normalize(all_numeric_predictors())
+
+validation_r2 <- numeric(50)
+for (k in seq(length(validation_r2))) {
+
+
+  
+  knn_regression_spec <- nearest_neighbor(neighbors = k) %>%
+  set_engine("kknn") %>%
+  set_mode("regression")
+  
+  knn_wf <- workflow() %>%
+  add_model(knn_regression_spec) %>%
+  add_recipe(nwi_recipe_reduced) 
+  
+  knn_fit <- knn_wf %>% fit(nwi_test)
+  
+  validation_r2[k] = knn_fit %>% 
+    predict(nwi_subset) %>%
+    mutate(actual = nwi_subset$NatWalkInd) %>%
+    rsq(truth = actual, estimate = .pred) %>% 
+    pull(.estimate)
+    
+
+}
+validation_r2
+```
+```{r}
+data.frame(k = seq(length(validation_r2)), "rsq" = validation_r2) %>% write_csv("knn_validation_r2.csv")
+```
+
+
+
+```{r}
+tree_spec <- decision_tree(tree_depth = tune()) %>%
+  set_engine("rpart") %>%
+  set_mode("regression")
+
+tree_wf <- workflow() %>%
+  add_model(tree_spec) %>%
+  add_recipe(nwi_recipe) 
+
+tree_grid <- grid_regular(tree_depth(c(2, 15)),
+                       levels = 14)
+
+tree_grid_search <-
+  tune_grid(
+    tree_wf,
+    resamples = nwi_cv,
+    grid = tree_grid
+  )
+```
+
+```{r}
+tree_grid_search %>% collect_metrics()# %>% write_csv("tree_grid_results.csv")
+```
+
+
+```{r}
+linear_spec <- linear_reg(mixture = 1) %>%
+  set_engine("lm") %>%
+  set_mode("regression")
+
+linear_wf <- workflow() %>%
+  add_model(linear_spec) %>%
+  add_recipe(nwi_recipe) 
+
+
+linear_cv_fit <- linear_wf %>% fit_resamples(nwi_cv)
+```
+
+```{r}
+linear_cv_fit %>% collect_metrics() #%>% write_csv("linear_cv_results.csv")
+```
+
+
