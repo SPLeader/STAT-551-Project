@@ -16,9 +16,10 @@ execute:
 import pandas as pd
 import numpy as np
 
+from sklearn.dummy import DummyRegressor
 from sklearn.preprocessing import OneHotEncoder, StandardScaler, LabelEncoder, PolynomialFeatures
 from sklearn.pipeline import Pipeline, make_pipeline
-from sklearn.model_selection import train_test_split
+from sklearn.model_selection import train_test_split, cross_val_score
 from sklearn.linear_model import LinearRegression, ElasticNet
 from sklearn.model_selection import GridSearchCV
 from sklearn.model_selection import RepeatedKFold
@@ -35,6 +36,8 @@ import warnings
 warnings.filterwarnings('ignore')
 ```
 
+
+# Data Preparation
 
 ```{python}
 os.chdir('../')
@@ -53,10 +56,8 @@ all_features = list(X.columns)
 
 ```{python}
 # Creating k fold cv's
-
 cv = RepeatedKFold(n_splits=5, n_repeats=1, random_state=13)
 ```
-
 
 ```{python}
 # Training and validation sets for single trained models (not cross-val)
@@ -64,6 +65,22 @@ X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=.10)
 ```
 
 
+
+
+```{python}
+# Getting the SSE so that we can calculate r2 values later
+dummy_regr = DummyRegressor(strategy="mean")
+
+scores = cross_val_score(dummy_regr, X, y, cv = cv, scoring = 'neg_mean_squared_error')
+SSE = -scores.sum()/len(scores)
+
+# SSE value confirmed to be the same as with GridSearchCV
+SSE
+```
+
+```{python}
+model_scores = pd.DataFrame(columns = ["Model", "R-Squared", "Root Mean Squared Error"])
+```
 
 
 ## Linear models
@@ -76,10 +93,8 @@ X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=.10)
 scaler = StandardScaler()
 model = ElasticNet()
 
-
 pipe = Pipeline(steps=[("scaler", scaler), ("model", model)])
-# define model evaluation method
-cv = RepeatedKFold(n_splits=5, n_repeats=1, random_state=1)
+
 # define grid
 grid = dict()
 grid['model__alpha'] = [1e-10, 1e-5, 1.0]
@@ -88,16 +103,19 @@ grid['model__l1_ratio'] = [0, 0.5, 1.0] #np.arange(0, 1, 0.5)
 search = GridSearchCV(pipe, grid, scoring='neg_root_mean_squared_error', cv=cv, n_jobs=1)
 # perform the search
 results = search.fit(X, y)
+
 # summarize
-print('RMSE: %.3f' % -results.best_score_)
+rmse = -results.best_score_
+r2 = ((-results.best_score_)**2) / SSE
+
+# scores not recorded because polynomial is better.
+#model_scores.loc[len(model_scores)] = ["Linear Model", r2, rmse]
+
+print('RMSE: %.3f' % )
 print('Config: %s' % results.best_params_)
 ```
 
-**Best model: second lowest alpha, 
-
-```{python}
-model_fit.predict(X_test)
-```
+**Best model: second lowest alpha, ridge**
 
 ### Tuning polynomial linear model
 
@@ -108,10 +126,8 @@ poly = PolynomialFeatures(2)
 scaler = StandardScaler()
 model = ElasticNet()
 
-
 pipe = Pipeline(steps=[("poly", poly), ("scaler", scaler), ("model", model)])
-# define model evaluation method
-cv = RepeatedKFold(n_splits=5, n_repeats=1, random_state=13)
+
 # define grid
 grid = dict()
 grid['model__alpha'] = [1e-10, 1e-5, 1.0]
@@ -120,8 +136,14 @@ grid['model__l1_ratio'] = [0, 0.5, 1.0] #np.arange(0, 1, 0.5)
 search = GridSearchCV(pipe, grid, scoring='neg_root_mean_squared_error', cv=cv, n_jobs=1)
 # perform the search
 results = search.fit(X, y)
+
+
 # summarize
-print('RMSE: %.3f' % -results.best_score_)
+rmse = -results.best_score_
+r2 = ((-results.best_score_)**2) / SSE
+model_scores.loc[len(model_scores)] = ["Linear Model", r2, rmse]
+
+print('RMSE: %.3f' % rmse)
 print('Config: %s' % results.best_params_)
 ```
 
@@ -186,6 +208,8 @@ coef_df = pd.DataFrame(
   index = X.columns
 )
 
+print("Intercept: %f" %fitted_model[1].intercept_)
+
 coef_df.sort_values(by = "abs_coef", ascending = False)
 ```
 
@@ -234,14 +258,18 @@ cv = RepeatedKFold(n_splits=5, n_repeats=1, random_state=13)
 
 grid = dict()
 grid['min_samples_leaf'] = [1, 2]
-grid['max_features'] = [4, 6, 8] #np.arange(0, 1, 0.5)
+grid['max_features'] = [4, 6, 8]
 
 search = GridSearchCV(model, grid, scoring='neg_root_mean_squared_error', cv=cv, n_jobs=1)
 # Perform the search
 results = search.fit(X, y)
 
-# Summarize best model
-print('RMSE: %.3f' % -results.best_score_)
+# summarize
+rmse = -results.best_score_
+r2 = ((-results.best_score_)**2) / SSE
+model_scores.loc[len(model_scores)] = ["Random Forest", r2, rmse]
+
+print('RMSE: %.3f' % rmse)
 print('Config: %s' % results.best_params_)
 ```
 
@@ -276,6 +304,8 @@ Compared to our linear model, a random forest is much less biased. For its predi
 
 # Decision Tree
 
+### Tuning
+
 ```{python}
 # Tuning Decision Tree
 model = DecisionTreeRegressor(random_state = 13)
@@ -290,14 +320,17 @@ grid['min_impurity_decrease'] = [1, 2, 5]
 search = GridSearchCV(model, grid, scoring='neg_root_mean_squared_error', cv=cv, n_jobs=1)
 # perform the search
 results = search.fit(X, y)
+
 # summarize
-print('RMSE: %.3f' % -results.best_score_)
+rmse = -results.best_score_
+r2 = ((-results.best_score_)**2) / SSE
+model_scores.loc[len(model_scores)] = ["Decision Tree", r2, rmse]
+
+print('RMSE: %.3f' % rmse)
 print('Config: %s' % results.best_params_)
 ```
 
-
-
-### Single Random Forest for residuals
+### Single Decision Tree for residuals
 
 ```{python}
 tree = DecisionTreeRegressor(max_depth = 6, 
@@ -340,18 +373,23 @@ plot_tree(tree_fit,
     
 plt.show()
 
-plt.savefig("AQI_decision_tree_py.png")
+
+os.chdir('../')
+
+plt.savefig("AQI Outputs/AQI_decision_tree_py.png")
 plt.close()
 ```
 
 # Combined Results Plot
 
 ```{python}
+# Output predictions as CSVs
+os.chdir('../')
 #all_preds = df_lm_preds.append(df_rf_preds).append(df_dt_preds)
 
-df_lm_preds.to_csv("AQI_data_output/AQI_df_lm_preds_py.csv")
-df_dt_preds.to_csv("AQI_data_output/AQI_df_dt_preds_py.csv")
-df_rf_preds.to_csv("AQI_data_output/AQI_df_rf_preds_py.csv")
+df_lm_preds.to_csv("AQI Outputs/AQI_df_lm_preds_py.csv")
+df_dt_preds.to_csv("AQI Outputs/AQI_df_dt_preds_py.csv")
+df_rf_preds.to_csv("AQI Outputs/AQI_df_rf_preds_py.csv")
 ```
 
 ```{python}
@@ -375,24 +413,10 @@ plt.show()
 plt.close()
 ```
 
-
 ```{python}
+# Outputting model metrics
+os.chdir('../')
 
-fig, axs = plt.subplots(3, 1, sharex=True, sharey = True)
-
-axs[0] = sns.lmplot(x='preds',
-    y='residuals',  
-    data = df_lm_preds, lowess = True, ax = axs[0])
-
-axs[1] =sns.lmplot(x='preds',
-    y='residuals',  
-    data = df_rf_preds, lowess = True, ax = axs[1])
-    
-axs[2] = sns.lmplot(x='preds',
-    y='residuals',  
-    data = df_dt_preds, lowess = True, ax = axs[2])
-
-plt.show()
-plt.close()
+model_scores.to_csv("AQI Outputs/AQI_model_metrics_py.csv")
 ```
 

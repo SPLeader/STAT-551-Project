@@ -29,7 +29,6 @@ print(os.getcwd())
 aqi_ozone = pd.read_csv("Project Data/Combined/aqi_ozone_all_years.csv")
 ```
 
-
 ```{python}
 aqi_ozone["Date"] = pd.to_datetime(aqi_ozone["Date"])
 aqi_ozone["Month"] = aqi_ozone["Date"].dt.month
@@ -92,7 +91,6 @@ plt.show()
 plt.close()
 ```
 
-
 ```{python}
 aqi_ozone["mean_humid"].plot.hist(color = "Gray")
 plt.xlabel("Mean Daily Humidity")
@@ -100,8 +98,6 @@ plt.xlabel("Mean Daily Humidity")
 plt.show()
 plt.close()
 ```
-
-
 
 ## Other variables vs AQI scatterplots
 
@@ -132,9 +128,6 @@ plt.show()
 plt.close()
 ```
 
-
 ```{python}
 aqi_ozone.columns
 ```
-
-

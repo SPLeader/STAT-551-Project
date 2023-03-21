@@ -22,6 +22,8 @@ execute:
 ---
 
 ```{r}
+# Imports
+
 library(tidyverse)
 library(here)
 library(lubridate)
@@ -38,9 +40,13 @@ aqi <- read_csv(here("Project Data",
 aqi
 ```
 
-# Introduction
+```{r}
+aqi_df_all_preds <- read_csv(here("AQI Outputs",
+                                  "AQI_df_all_preds_r.csv"))
+```
 
--   Feel free to rewrite this section as much as you'd like, I just put some general details in here based on phase 2 for the time being
+
+# Introduction
 
 The EPA is an organization fundamentally invested securing and promoting the health and well-being of the environment. In this paper, we analyze two distinct but related environmental issues: air pollution and car dependency. For both issues, we used publicly available data sourced from the EPA to construct machine learning models to make predictions. For air pollution, we predicted a county's next-day Air Quality Index (AQI) from the previous day's atmospheric conditions to determine which factors contribute to AQI and how accurately we can determine tomorrow's AQI from today's conditions. For car dependency, we predicted the 'walkability' category of a localized area based on demographic information to deduce which demographic characteristics contribute most meaningfully to the 'walkability' of a location.
 
@@ -225,7 +231,7 @@ Figure #: Decision tree showing the uppermost splits (most important variables)
 
 # Model Results
 
-# AQI
+## AQI
 
 We used three different types of models to predict AQI: linear models, decision trees, and random forests. Each model predicts the next day's AQI based on the min, mean, and max values of our 8 predictor measurements. Notably, this does not include any measurements of the day's Ozone or AQI. We measured each model's performance by cross-validating on data the model had not been trained on. The R-Squared and Root Mean Squared Error metrics are displayed below:
 
@@ -241,7 +247,19 @@ These metrics indicate that the Random Forest is our overall most effective mode
 
 To investigate the biases of each of our models, we have plotted the residual errors below:
 
-![Figure 4: AQI model residual plots. A moving average of the mean error is plotted to display model biases](AQI_residuals.png)
+
+```{r, fig.cap = "Figure 4: AQI model residual plots. A moving average of the mean error is plotted to display model biases", include = TRUE}
+aqi_df_all_preds %>% 
+  ggplot(aes(x = .pred, y = err)) +
+  geom_point() +
+  geom_hline(yintercept = 0) + 
+  geom_smooth(se = FALSE, color = "red") +
+  facet_grid(rows = vars(model)) +
+  xlab("Prediction") +
+  ylab("Error") +
+  theme_bw() +
+  theme(strip.text.y.right = element_text(angle = 0))
+```
 
 With these results in mind, we will briefly discuss each model's strengths and weaknesses.
 
@@ -261,7 +279,7 @@ Note that in this formula, max_no2, max_temperature, and max_humidity are standa
 
 Our decision tree's predictions look far different than the others because they are made in discrete categories rather than in a more continuous manner. While this model has little bias, with only a slight overestimation bias on its highest predictions of 144, it has the largest overall errors, making it a worse predictor than other models. Nevertheless, this model may be very valuable, as we can directly see how it makes its decisions in the following decision tree flowchart:
 
-![Figure 5: Decision Tree Flowchart](AQI_decision_tree.png)
+![Figure 5: Decision Tree Flowchart](AQI Outputs/AQI_decision_tree_r.png)
 
 At each step, this decision tree chooses one variable to best separate high-AQI days from low-AQI days. The first, largest, split separates based on no2: days with a very low no2, below 18 ppb, are directed to the left side of the tree, which tends to have lower AQI. This split makes sense because ozone and no2 tend to come from the same sources such as cars and industrial facilities, so a low no2 concentration correlate with low ozone. For low no2 days, the tree finds that high temperature is the best indicator of high AQI, with humidity distinguishing further days with a max temperature between 68 and 82 degrees Fahrenheit. For high no2 days, the tree uses air pressure and temperature to distinguish AQI further.
 

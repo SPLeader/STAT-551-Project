@@ -23,6 +23,9 @@ library(rpart)
 library(rpart.plot)
 ```
 
+
+# Data Preparation
+
 ```{r}
 aqi_ozone <- read_csv(here("Project Data", "Combined", "aqi_ozone_all_years_prediction.csv"))
 
@@ -49,26 +52,40 @@ aqi_test   <- aqi_ozone[!sample, ]
 
 
 
-## Linear models
+
+
+# Linear models
 
 ### Tuning basic linear model
 
 ```{r}
-#Tuning different mixture models
-
-lin_reg_tune <- linear_reg(penalty = tune(), mixture = tune()) %>%
-  set_engine("glmnet") %>%
-  set_mode("regression")
-
-no_ozone_recipe_normalized <- recipe(AQI_next_day ~ min_humid + max_temp + max_no2, data = aqi_ozone) %>% 
-  #step_rm(c("AQI", "max_ozone", "mean_ozone", "min_ozone")) %>% 
+# Recipes
+no_ozone_recipe_normalized <- recipe(AQI_next_day ~ ., data = aqi_ozone) %>% 
+  step_rm(c("AQI", "max_ozone", "mean_ozone", "min_ozone")) %>% 
   step_normalize(all_predictors())
 
 no_ozone_recipe <- recipe(AQI_next_day ~ ., data = aqi_ozone) %>% 
   step_rm(c("AQI", "max_ozone", "mean_ozone", "min_ozone"))
 
+no_ozone_recipe_poly_normalized <- recipe(AQI_next_day ~ ., data = aqi_ozone) %>% 
+  step_rm(c("AQI", "max_ozone", "mean_ozone", "min_ozone")) %>% 
+  step_poly(all_predictors(), degree = 2) %>% 
+  step_normalize(all_predictors())
+
 full_recipe <- recipe(AQI_next_day ~ ., data = aqi_ozone) %>% 
-  step_normalize(all_predictors()) # %>%  step_interact(terms = ~max_wind:mean_ozone + max_wind : max_ozone)
+  step_normalize(all_predictors())
+```
+
+
+```{r}
+#Tuning different mixture models
+lin_reg_tune <- linear_reg(penalty = tune(), mixture = tune()) %>%
+  set_engine("glmnet") %>%
+  set_mode("regression")
+
+no_ozone_recipe_normalized <- recipe(AQI_next_day ~ ., data = aqi_ozone) %>% 
+  step_rm(c("AQI", "max_ozone", "mean_ozone", "min_ozone")) %>% 
+  step_normalize(all_predictors())
 
 lam_grid = grid_regular(penalty(), mixture(c(0,1)), levels = 3)
 
@@ -91,8 +108,6 @@ grid_results %>%
 ```
 
 Out of many penalty and mixture parameters, we found a mixture of 1/2 to work best.
-
-
 
 ### Tuning polynomial linear model
 
@@ -129,11 +144,15 @@ grid_results %>%
 ### Single linear model residuals
 
 ```{r}
+#Using same recipe as above
 lm_best_spec <- linear_reg(penalty = 0, mixture = 1) %>%
   set_engine("glmnet") %>%
   set_mode("regression")
 
-#Using same recipe as aboev
+no_ozone_recipe_poly_normalized <- recipe(AQI_next_day ~ ., data = aqi_ozone) %>% 
+  step_rm(c("AQI", "max_ozone", "mean_ozone", "min_ozone")) %>% 
+  step_poly(all_predictors(), degree = 2) %>% 
+  step_normalize(all_predictors())
 
 lm_best_wf <- workflow() %>% 
   add_model(lm_best_spec) %>% 
@@ -169,7 +188,7 @@ lm_best_spec <- linear_reg(penalty = 3.5, mixture = 1) %>%
   set_engine("glmnet") %>%
   set_mode("regression")
 
-#Using same recipe as aboev
+#Using same recipe as above
 
 lm_best_wf <- workflow() %>% 
   add_model(lm_best_spec) %>% 
@@ -189,6 +208,7 @@ lm_best_fit_interpretable %>%
   arrange(desc(abs(estimate)))
 ```
 
+### Interpretable linear model efficacy
 
 ```{r}
 no_ozone_recipe_simplified_normalized <- recipe(AQI_next_day ~ min_humid + max_temp + max_no2, data = aqi_ozone) %>% 
@@ -217,6 +237,8 @@ grid_results %>%
 The best RMSE with just 3 best variables was 26.16919, not too much worse than the best models using all variables.
 
 # Random Forest 
+
+### Tuning
 
 ```{r}
 rf_mod <- rand_forest(mtry = tune(), min_n = tune(), trees = 100) %>%
@@ -253,6 +275,7 @@ rf_grid_result %>%
   arrange(mean)
 ```
 
+### Single Random Forest Restiduals
 
 ```{r}
 rf_best_spec <- rand_forest(mtry = 6, min_n = 100) %>%
@@ -286,8 +309,45 @@ Compared to our linear model, a random forest is much less biased. For its predi
 
 # Decision Tree
 
+### Tuning
+
 ```{r}
-tree_mod <- decision_tree() %>%
+tree_mod <- decision_tree(tree_depth = tune(), cost_complexity = tune()) %>%
+  set_engine("rpart") %>%
+  set_mode("regression")
+
+no_ozone_recipe <- recipe(AQI_next_day ~ ., data = aqi_ozone) %>% 
+  step_rm(c("AQI", "max_ozone", "mean_ozone", "min_ozone"))
+
+dt_wf <- workflow() %>%
+  add_recipe(no_ozone_recipe) %>%
+  add_model(tree_mod)
+
+dt_grid <- grid_regular(tree_depth(),
+                        cost_complexity(),
+                        levels = 3
+                        )
+
+dt_grid_result <- dt_wf %>% 
+  tune_grid(resamples = aqi_ozone_cvs,
+            grid = dt_grid)
+
+dt_grid_result %>% 
+  collect_metrics() %>% 
+  filter(.metric == "rsq") %>% 
+  arrange(desc(mean))
+
+dt_grid_result %>% 
+  collect_metrics() %>% 
+  filter(.metric == "rmse") %>% 
+  arrange(mean)
+```
+
+
+### Single Decision Tree for residuals
+
+```{r}
+tree_mod <- decision_tree(cost_complexity = 1.000000e-10, tree_depth = 8) %>%
   set_engine("rpart") %>%
   set_mode("regression")
 
@@ -309,23 +369,10 @@ tree_results %>%
   filter(.metric == "rmse")
 ```
 
-### Tree plotted
-
 ```{r}
 tree_fit_1 <- tree_wflow %>%
   fit(aqi_train)
 
-tree_fit_1$fit
-```
-
-```{r}
-tree_fitted <- tree_fit_1 %>% 
-  pull_workflow_fit()
-
-rpart.plot(tree_fitted$fit)
-```
-
-```{r}
 tree_preds <- tree_fit_1 %>% 
   predict(aqi_test) %>% 
   mutate(truth = aqi_test$AQI_next_day,
@@ -339,6 +386,27 @@ tree_pred_plot <- tree_preds %>%
   ylab("Error")
 ```
 
+### Tree plotted
+
+```{r}
+tree_mod <- decision_tree() %>%
+  set_engine("rpart") %>%
+  set_mode("regression")
+
+tree_wflow <- workflow() %>%
+  add_recipe(no_ozone_recipe) %>%
+  add_model(tree_mod)
+
+tree_fit_1 <- tree_wflow %>%
+  fit(aqi_train)
+
+tree_fitted <- tree_fit_1 %>% 
+  pull_workflow_fit()
+
+# Save this output as "AQI Outputs/AQI_decision_tree_r.png"
+rpart.plot(tree_fitted$fit)
+```
+
 # Combined Results Plot
 
 ```{r}
@@ -346,7 +414,16 @@ all_preds <- lm_preds %>% mutate(model = "Linear\nModel") %>%
   rbind(tree_preds %>% mutate(model = "Decision\nTree")) %>%
   rbind(rf_preds %>% mutate(model = "Random\nForest")) %>% 
   mutate(model = factor(model, levels = c("Linear\nModel", "Decision\nTree", "Random\nForest")))
+```
 
+```{r}
+# Saving residuals to reproduce the below plot in final document
+all_preds %>% 
+  write.csv(here("AQI Outputs","AQI_df_all_preds_r.csv"), row.names = FALSE)
+```
+
+
+```{r}
 all_preds %>% 
   ggplot(aes(x = .pred, y = err)) +
   geom_point() +
@@ -358,6 +435,5 @@ all_preds %>%
   theme_bw() +
   theme(strip.text.y.right = element_text(angle = 0))
 ```
-
 
 
