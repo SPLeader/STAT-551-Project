@@ -223,7 +223,6 @@ ggplot(nwi, aes(NatWalkInd, fill = cut(NatWalkInd, 100))) +
        x = "Walkability Index") 
 ```
 
-
 The histogram of Walkability Index appears quite bell-shaped and symmetric. The median Walkability Index is 13.83 and the interquartile range is 3.33. The range for the Walkability Index is 1 to 20.
 
 ```{r, include = TRUE}
@@ -234,7 +233,6 @@ nwi %>%
             IQR = IQR(NatWalkInd)) %>%
   knitr::kable()
 ```
-
 
 ### Relationship between Population and Walkability Index Category
 
@@ -253,7 +251,6 @@ ggplot(nwi,
   scale_fill_manual(values = c("#A6BDDB", "#74A9CF", "#0570B0", "#034E7B"))
 ```
 
-
 Further exploration was done to examine if population may have a relationship with the Walkability Index Category. The Least Walkable category seemed to have the highest population, with the Below Average and Above Average Walkable categories having the lowest populations. These areas had a tighter interquartile range although there were some outliers having much higher populations. The places that were Most Walkable had a large variation in population.
 
 ### Relationship between Employment Mix and Walkability Index Category
@@ -269,9 +266,6 @@ ggplot(nwi,
    theme_bw() + 
     scale_color_manual(values = c("darkred", "chocolate", "gold", "limegreen"))
 ```
-
-
-
 
 # Model Results
 
@@ -348,9 +342,7 @@ walk_lasso_coef %>%
   theme(legend.position = "none") 
 ```
 
-
 Figure #: Bar plot of top six most important variables; selected as predictors for final models
-
 
 For the Walkability dataset, we used both regression (predicting the numeric Walkability Index) and classification (predicting the Walkability Index category) methods. For both approaches, 10-fold cross-validation was used to get a better sense of how these models would perform when predicting on unseen data. 
 
@@ -380,7 +372,6 @@ best_models %>%
   knitr::kable(digits = 3)
 ```
 
-
 ### Linear Regression
 
 Due to the vaguely linear trend from the Figure \# in the Exploratory Data Analysis section, a simple linear regression model was fit. The R-squared value was 0.75, meaning that 75% of the variability in Walkability Index was explained by the eight variables shown in the bar plot below. The Shape Length (length of the area, a proxy for area) and D3bmm4 (another measure of intersection density in terms of multi-modal intersections) variables were added. The MSE for this model was 1.36, meaning that on average, prediction errors were 1.36 Walkability Index points. See Appendix for plot of residuals (confirmed they were randomly scattered and showed approximately equal variability). 
@@ -400,12 +391,11 @@ walk_linear_coef %>%
   labs(x = "Variable")
 ```
 
-
 ### Decision Tree Regression
 
 A decision tree regressor, much like linear regression gives us the benefit of being highly interpretable. We can create the model and interpret the top of the resulting tree similarly to how we did when performing feature selection. Tuning became necessary as initial tree models were drastically overfitting. The most effective hyperparameter to stop this turned out to be limiting the maximum tree depth, which we settled on 9, which seemed to be a sweet spot between overfitting and underfitting the data.
 
-![](Walkability Outputs/walkability_decision_tree.png)
+![](Walkability%20Outputs/walkability_decision_tree.png)
 
 Figure #: Decision tree showing the uppermost splits (most important variables)
 
@@ -428,7 +418,6 @@ walk_knn_r2 %>%
   theme_bw() +
   labs(y = "R-squared")
 ```
-
 
 Figure #: Tuning number of neighbors for KNN regression
 
@@ -496,4 +485,3 @@ National Walkability Index Methodology and User Guide
 ## Additional Output
 
 Residual Plots:
-
