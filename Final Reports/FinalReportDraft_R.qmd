@@ -476,6 +476,8 @@ The single model we would recommend to you for predicting the walkability index 
 
 ## Sources
 
+“AirData Website File Download Page.” EPA, Environmental Protection Agency, 1 Jan. 2023, [https://aqs.epa.gov/aqsweb/airdata/download_files.html](https://aqs.epa.gov/aqsweb/airdata/download_files.html). 
+
 "Center for Science Education." How Weather Affects Air Quality | Center for Science Education, [https://scied.ucar.edu/learning-zone/air-quality/how-weather-affects-air-quality](https://scied.ucar.edu/learning-zone/air-quality/how-weather-affects-air-quality).
 
 Champan, Jim, et al. EPA, Environmental Protection Agency, June 2021, [https://www.epa.gov/smartgrowth/smart-location-database-technical-documentation-and-user-guide](https://www.epa.gov/smartgrowth/smart-location-database-technical-documentation-and-user-guide).
@@ -483,4 +485,5 @@ Champan, Jim, et al. EPA, Environmental Protection Agency, June 2021, [https://w
 Thomas, John, et al. "National Walkability Index Methodology and User Guide." EPA, Environmental Protection Agency, June 2021, [https://www.epa.gov/smartgrowth/national-walkability-index-user-guide-and-methodology](https://www.epa.gov/smartgrowth/national-walkability-index-user-guide-and-methodology).
 
 "Walkability Index." Catalog, Responsible Party U.S. Environmental Protection Agency, Office of Sustainable Communities (Point of Contact), 3 July 2021, [https://catalog.data.gov/dataset/walkability-index](https://catalog.data.gov/dataset/walkability-index).
+
 
