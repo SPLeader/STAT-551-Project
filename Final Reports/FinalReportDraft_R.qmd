@@ -427,7 +427,7 @@ KNN is a computationally expensive algorithm due to both the breadth and depth o
 
 # Discussion
 
-# AQI
+## AQI
 
 Our model results demonstrate that we can forecast ozone-based AQI effectively without knowledge of ozone levels. On average, our random forest was only wrong by 20.953 AQI points, rarely predicting far from the actual AQI. As the estimates are in the same ballpark as the real AQI, they could potentially serve to give the public a general idea of how unsafe atmospheric ozone levels are in the absence of ozone measurements. We tuned several models for various parameters in order to arrive at this accurate of a random forest predictor. While our other models didn't prove to be as impactful, the linear model gives us an intuitive understanding that ozone is associated with high no2, high temperatures, and low humidity.
 
