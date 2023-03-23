@@ -70,7 +70,7 @@ walk_knn_r2 <- read_csv(here("Walkability Outputs",
 
 # Introduction
 
-The EPA is an organization fundamentally invested securing and promoting the health and well-being of the environment. In this paper, we analyze two distinct but related environmental issues: air pollution and car dependency. For both issues, we used publicly available data sourced from the EPA to construct machine learning models to make predictions. For air pollution, we predicted a county's next-day Air Quality Index (AQI) from the previous day's atmospheric conditions to determine which factors contribute to AQI and how accurately we can determine tomorrow's AQI from today's conditions. For car dependency, we predicted the 'walkability' category of a localized area based on demographic information to deduce which demographic characteristics contribute most meaningfully to the 'walkability' of a location.
+The EPA is an organization fundamentally invested in securing and promoting the health and well-being of the environment. In this paper, we analyze two distinct but related environmental issues: air pollution and car dependency. For both issues, we used publicly available data sourced from the EPA to construct machine learning models to make predictions. For air pollution, we predicted a county's next-day Air Quality Index (AQI) from the previous day's atmospheric conditions to determine which factors contribute to AQI and how accurately we can determine tomorrow's AQI from today's conditions. For car dependency, we predicted the walkability index of a localized area based on demographic information to deduce which demographic characteristics contribute most meaningfully to the walkability of a location.
 
 ```{r}
 # Previous Work - should we include this??? If so, we need to update citations in appendix
@@ -86,11 +86,11 @@ Another article with goals similar to goals of our project’s is this paper. Th
 
 ## AQI
 
-To collect information about atmospheric conditions and Air Quality Index, we downloaded two years (2021 & 2022) worth of atmospheric data from the EPA (source in the appendix). These data were collected by various monitoring stations across 43 counties in 32 states across the United States on a daily basis. In the final data set, one observation corresponded to one day of atmospheric measurements for a particular county, with multiple measurements from different weather stations. We had to omit some of the observations because predicting next-day AQI from current-day atmospheric conditions requires sequential days where all atmospheric measurements at that monitoring station are present. Sequential days that were missing any of the atmospheric measurements on either day were omitted from the data.
+To collect information about atmospheric conditions and Air Quality Index, we downloaded two years (2021 & 2022) worth of atmospheric data from the EPA (source in the appendix). These data were collected by various monitoring stations across 43 counties in 32 states across the United States on a daily basis. In the final data set, one observation corresponded to one day of atmospheric measurements for a particular county, with combined measurements from different weather stations across that county. We had to omit some of the observations because predicting next-day AQI from current-day atmospheric conditions requires sequential days where all atmospheric measurements at that monitoring station are present. Sequential days that were missing any of the atmospheric measurements on either day were omitted from the data.
 
 **There are different AQIs for different atmospheric pollutants. For this project, we chose to predict the AQI based on ozone from atmospheric conditions (excluding ozone concentration) because the ozone AQI was the most frequent of the different AQIs after all data merging was complete.**
 
-**For each atmospheric measurement, we extracted the minimum, average, and maximum measurement at each weather station each day.** The following table details the atmospheric measurements we extracted.
+**For each atmospheric measurement, we extracted the minimum, average, and maximum measurement across all weather stations for a given county each day.** The following table details the atmospheric measurements we extracted.
 
 ```{r, fig.cap = "Table 1. Variable summary for AQI dataset", include = TRUE}
 data.frame(`Variable Name` = c("no2", "co", "so2", 
