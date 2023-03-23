@@ -72,16 +72,6 @@ walk_knn_r2 <- read_csv(here("Walkability Outputs",
 
 The EPA is an organization fundamentally invested in securing and promoting the health and well-being of the environment. In this paper, we analyze two distinct but related environmental issues: air pollution and car dependency. For both issues, we used publicly available data sourced from the EPA to construct machine learning models to make predictions. For air pollution, we predicted a county's next-day Air Quality Index (AQI) from the previous day's atmospheric conditions to determine which factors contribute to AQI and how accurately we can determine tomorrow's AQI from today's conditions. For car dependency, we predicted the walkability index of a localized area based on demographic information to deduce which demographic characteristics contribute most meaningfully to the walkability of a location.
 
-```{r}
-# Previous Work - should we include this??? If so, we need to update citations in appendix
-
-"Previous research has used similar methods to model AQI based on related conditions. One paper specifically models the AQI of Zhangdian District, China based on industrial waste gas emissions as well as general meteorological data. Their goals were to promote the optimization of polluting enterprises and to reduce the conflict between environmental protection and economic development. They compared results from a random forest, a back propagation neural network, a decision tree, and a least-squares SVM, ultimately preferring the Random Forest for its high accuracy, with an R-Squared value of 0.9. (Liu, Y. et al.) 
-
-One paper in the American Journal of Epidemiology used a linear regression approach to understand how income, education, racial/ethnic composition, age distribution, and sex were associated with indicators of neighborhood walkability. They found that neighborhoods with poorer residents tended to be more walkable, but with less open space. Similarly, children and the elderly tended to live in less walkable spaces, limiting their independence. (Katherine E. King et al.) Our work will be similar in that we are also trying to predict walkability and gain insight on what makes certain places more walkable than others. Our analysis will be different because we have many more variables to work with and we plan on taking a classification approach. 
-
-Another article with goals similar to goals of our project’s is this paper. These researchers also analyzed walkability, but viewed it only through the lens of the built environment, rather than including sociodemographic characteristics. Additionally, this paper specifically focused on a single metropolitan area whereas we will use data from all 50 U.S. states (and Washington D.C.). These researchers used PCA as their main analysis. (Denc, C. et al.) We plan on also using PCA, but only as a preprocessing step before fitting KNN models. Overall, this study uses very similar predictors and target variables to ours, and we hope to expand upon its findings."
-```
-
 # Data Collection & Description
 
 ## AQI
@@ -130,7 +120,7 @@ data.frame(`Walkability Index` = c("1 - 5.75", "5.76 - 10.5", "10.51 - 15.25", "
 In total, there are 220,740 observations for 117 variables in this dataset. Since there were so many predictors to choose from, we narrowed it down to those in the table below (more details on variable selection in the Exploratory Data Analysis section).
 
 ```{r, fig.cap = "Table 3. Variable summary for NWI data", include = TRUE}
-data.frame(`Variable Name` = c("D2B_E8MIXa", "D3A", "D2A_EPHHM", "D3AMM", "D3AAO", "D2C_TRPMX1"),
+data.frame(`Variable Name` = c("D2B_E8MIXA", "D3A", "D2A_EPHHM", "D3AMM", "D3AAO", "D2C_TRPMX1"),
            `Variable Description` = 
              c("8-tier employment mix (retail, office, industrial, service, entertainment, education, healthcare, and public admin jobs)",
                "Total road network density",
@@ -297,10 +287,11 @@ We used three different types of models to predict AQI: linear models, decision 
 
 ```{r, fig.cap = "Table 6. Best performance metrics of our three models for AQI", include = TRUE}
 aqi_model_scores %>% 
+  arrange(desc(`Root Mean Squared Error`)) %>%
   kable(digits = 3)
 ```
 
-These metrics indicate that the Random Forest is our overall most effective model, with an R-Squared value of 0.676 and a RMSE of 20.953. This indicates that the random forest could successfully predict 67.6% of the variability in AQI, only being wrong by an average of about 20.953 AQI points. Our linear model was markedly worse, with a RMSE of 23.334, and our decision tree fared the worst, with a RMSE of 24.315 AQI points.
+These metrics indicate that the Random Forest is our overall most effective model, with an R-Squared value of 0.717 and an RMSE of 19.501. This indicates that the random forest accounts for 71.7% of the variability in AQI, only being wrong by an average of about 19.5 AQI points. Our decision tree was markedly worse, with an RMSE of 23.214, and our linear model fared the worst, with an RMSE of 24.441.
 
 To investigate the biases of each of our models, we have plotted the residual errors below:
 
@@ -462,7 +453,7 @@ It is important that as we give you these powerful machine learning model fits, 
 
 For the walkability model, we would support the usage of our models to predict areas with poor walkability for areas where it is unknown, such that changes could be implemented to make it more pedestrian-friendly. The goal of these models is to highlight a small number of factors that have a large impact on how walkable a place is. By identifying these characteristics, it is our hope that civil projects can be undertaken and that public policy changes can be implemented to improve walkability for all communities, but especially those that need it most. For example, there could be changes to the local codes that require a certain intersection density or federal incentives to having high public transportation service levels. Walkability is very strongly linked to physical health and quality of life metrics, so it is of the utmost importance to ensure all communities are walkable.
 
-## Misuses
+## Misuses of our work
 
 Although there are many appropriate uses of our work, we also want to forewarn you about the potential misuses to avoid. Primarily, though our models predict ozone-based AQI, it should not be used as a proxy for AQI when proper measurements are available, as it could miss some important and dangerous fluctuations. The model's intended use is as an emergency measure, when ozone measurements are not available.
 
@@ -478,7 +469,7 @@ For the walkability dataset, we have very serious concerns about bias. Many vari
 
 # Conclusion
 
-The decision tree model seems to be the most useful in regards to the walkability dataset. The random forest regressor was expected to outcompete the other models in terms of predicting power, but the improvement was so marginal that it is far from being worth the lack of interpretability that comes with the decision tree model. 
+The decision tree model seems to be the most useful in regards to the walkability dataset. The random forest regressor was expected to outcompete the other models in terms of predicting power, but the improvement was so marginal that it is far from being worth the lack of interpretability that comes with the decision tree model.
 
 -   Make better overarching claims as to which models we would choose for purposes, which factors contribute to walkability
 
