@@ -76,7 +76,7 @@ The EPA is an organization fundamentally invested in securing and promoting the 
 
 ## AQI
 
-To collect information about atmospheric conditions and Air Quality Index, we downloaded two years (2021 & 2022) worth of atmospheric data from the EPA (source in the appendix). These data were collected by various monitoring stations across 43 counties in 32 states across the United States on a daily basis. In the final data set, one observation corresponded to one day of atmospheric measurements for a particular county, with combined measurements from different weather stations across that county. We had to omit some of the observations because predicting next-day AQI from current-day atmospheric conditions requires sequential days where all atmospheric measurements at that monitoring station are present. Sequential days that were missing any of the atmospheric measurements on either day were omitted from the data.
+To collect information about atmospheric conditions and Air Quality Index, we downloaded two years (2021 & 2022) worth of atmospheric data from the EPA (source in the appendix). These data were collected by various monitoring stations across 43 counties in 32 states across the United States on a daily basis. In the final data set, one observation corresponded to one day of atmospheric measurements for a particular county, with combined measurements from different weather stations across that county. We had to omit some of the observations because predicting next-day AQI from current-day atmospheric conditions requires sequential days where all atmospheric measurements at that monitoring station are present. Sequential days that were missing any of the atmospheric measurements on either day were omitted from the data. The final dataset consisted of 7,768 observations.
 
 **There are different AQIs for different atmospheric pollutants. For this project, we chose to predict the AQI based on ozone from atmospheric conditions (excluding ozone concentration) because the ozone AQI was the most frequent of the different AQIs after all data merging was complete.**
 
@@ -469,15 +469,11 @@ For the walkability dataset, we have very serious concerns about bias. Many vari
 
 # Conclusion
 
-The decision tree model seems to be the most useful in regards to the walkability dataset. The random forest regressor was expected to outcompete the other models in terms of predicting power, but the improvement was so marginal that it is far from being worth the lack of interpretability that comes with the decision tree model.
+For both the AQI and walkability datasets, random forests proved to be the model specifications with the highest predictive power as measured by R-squared and RMSE. We discovered that the most important variables for predicting next-day AQI were maximum no2, maximum temperature, and minimum humidity. On the other hand, the most important variables for predicting the walkability index were those relating to diveristy of employment, road network density, and diversity of housing types. 
 
--   Make better overarching claims as to which models we would choose for purposes, which factors contribute to walkability
+The single model we would recommend to you for predicting next-day AQI is our random forest model, as it has the best predictive ability. This report has sufficient information on the contributing factors to next-day ozone AQI such that the more interpretable models are not worth using at the cost of predictive power. 
 
-    -   D3B negative correlation according to decision tree
-
-    -   The mix of employment type and occupied housing, according to linear regression
-
-    -   Shape length has negative correlation, according to linear regression
+The single model we would recommend to you for predicting the walkability index of a location is the linear regression model, because it has a good balance of predictive power and interpretability. Because walkability index is such a complicated metric and this dataset has so many features, it is important to preserve the ability to interpret how and why the model is making the predictions it is.
 
 # Appendix
 
@@ -494,6 +490,3 @@ Smart Location Database Technical Documentation and User Guide (Version 3.0)
 
 National Walkability Index Methodology and User Guide
 
-## Additional Output
-
-Residual Plots:

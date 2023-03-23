@@ -2655,7 +2655,7 @@ vertical-align: -.125em;
 <h1>Data Collection &amp; Description</h1>
 <section id="aqi" class="level2">
 <h2 class="anchored" data-anchor-id="aqi">AQI</h2>
-<p>To collect information about atmospheric conditions and Air Quality Index, we downloaded two years (2021 &amp; 2022) worth of atmospheric data from the EPA (source in the appendix). These data were collected by various monitoring stations across 43 counties in 32 states across the United States on a daily basis. In the final data set, one observation corresponded to one day of atmospheric measurements for a particular county, with combined measurements from different weather stations across that county. We had to omit some of the observations because predicting next-day AQI from current-day atmospheric conditions requires sequential days where all atmospheric measurements at that monitoring station are present. Sequential days that were missing any of the atmospheric measurements on either day were omitted from the data.</p>
+<p>To collect information about atmospheric conditions and Air Quality Index, we downloaded two years (2021 &amp; 2022) worth of atmospheric data from the EPA (source in the appendix). These data were collected by various monitoring stations across 43 counties in 32 states across the United States on a daily basis. In the final data set, one observation corresponded to one day of atmospheric measurements for a particular county, with combined measurements from different weather stations across that county. We had to omit some of the observations because predicting next-day AQI from current-day atmospheric conditions requires sequential days where all atmospheric measurements at that monitoring station are present. Sequential days that were missing any of the atmospheric measurements on either day were omitted from the data. The final dataset consisted of 7,768 observations.</p>
 <p><strong>There are different AQIs for different atmospheric pollutants. For this project, we chose to predict the AQI based on ozone from atmospheric conditions (excluding ozone concentration) because the ozone AQI was the most frequent of the different AQIs after all data merging was complete.</strong></p>
 <p><strong>For each atmospheric measurement, we extracted the minimum, average, and maximum measurement across all weather stations for a given county each day.</strong> The following table details the atmospheric measurements we extracted.</p>
 <div class="cell">
@@ -3142,15 +3142,9 @@ AQI = 58.68 + 12.43 * max\_no2 + 8.43 * max\_temperature - 6.36 * min\_humidity
 </section>
 <section id="conclusion" class="level1">
 <h1>Conclusion</h1>
-<p>The decision tree model seems to be the most useful in regards to the walkability dataset. The random forest regressor was expected to outcompete the other models in terms of predicting power, but the improvement was so marginal that it is far from being worth the lack of interpretability that comes with the decision tree model.</p>
-<ul>
-<li><p>Make better overarching claims as to which models we would choose for purposes, which factors contribute to walkability</p>
-<ul>
-<li><p>D3B negative correlation according to decision tree</p></li>
-<li><p>The mix of employment type and occupied housing, according to linear regression</p></li>
-<li><p>Shape length has negative correlation, according to linear regression</p></li>
-</ul></li>
-</ul>
+<p>For both the AQI and walkability datasets, random forests proved to be the model specifications with the highest predictive power as measured by R-squared and RMSE. We discovered that the most important variables for predicting next-day AQI were maximum no2, maximum temperature, and minimum humidity. On the other hand, the most important variables for predicting the walkability index were those relating to diveristy of employment, road network density, and diversity of housing types.</p>
+<p>The single model we would recommend to you for predicting next-day AQI is our random forest model, as it has the best predictive ability. This report has sufficient information on the contributing factors to next-day ozone AQI such that the more interpretable models are not worth using at the cost of predictive power.</p>
+<p>The single model we would recommend to you for predicting the walkability index of a location is the linear regression model, because it has a good balance of predictive power and interpretability. Because walkability index is such a complicated metric and this dataset has so many features, it is important to preserve the ability to interpret how and why the model is making the predictions it is.</p>
 </section>
 <section id="appendix" class="level1">
 <h1>Appendix</h1>
@@ -3164,10 +3158,6 @@ AQI = 58.68 + 12.43 * max\_no2 + 8.43 * max\_temperature - 6.36 * min\_humidity
 <p>Smart Location Database Technical Documentation and User Guide (Version 3.0)</p>
 <p><a href="https://www.epa.gov/sites/default/files/2021-06/documents/epa_sld_3.0_technicaldocumentationuserguide_may2021.pdf" class="uri">https://www.epa.gov/sites/default/files/2021-06/documents/epa_sld_3.0_technicaldocumentationuserguide_may2021.pdf</a></p>
 <p>National Walkability Index Methodology and User Guide</p>
-</section>
-<section id="additional-output" class="level2">
-<h2 class="anchored" data-anchor-id="additional-output">Additional Output</h2>
-<p>Residual Plots:</p>
 <!-- -->
 
 </section>
@@ -3437,7 +3427,7 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
 <span id="cb1-82"><a href="#cb1-82"></a></span>
 <span id="cb1-83"><a href="#cb1-83"></a><span class="fu">## AQI</span></span>
 <span id="cb1-84"><a href="#cb1-84"></a></span>
-<span id="cb1-85"><a href="#cb1-85"></a>To collect information about atmospheric conditions and Air Quality Index, we downloaded two years (2021 &amp; 2022) worth of atmospheric data from the EPA (source in the appendix). These data were collected by various monitoring stations across 43 counties in 32 states across the United States on a daily basis. In the final data set, one observation corresponded to one day of atmospheric measurements for a particular county, with combined measurements from different weather stations across that county. We had to omit some of the observations because predicting next-day AQI from current-day atmospheric conditions requires sequential days where all atmospheric measurements at that monitoring station are present. Sequential days that were missing any of the atmospheric measurements on either day were omitted from the data.</span>
+<span id="cb1-85"><a href="#cb1-85"></a>To collect information about atmospheric conditions and Air Quality Index, we downloaded two years (2021 &amp; 2022) worth of atmospheric data from the EPA (source in the appendix). These data were collected by various monitoring stations across 43 counties in 32 states across the United States on a daily basis. In the final data set, one observation corresponded to one day of atmospheric measurements for a particular county, with combined measurements from different weather stations across that county. We had to omit some of the observations because predicting next-day AQI from current-day atmospheric conditions requires sequential days where all atmospheric measurements at that monitoring station are present. Sequential days that were missing any of the atmospheric measurements on either day were omitted from the data. The final dataset consisted of 7,768 observations.</span>
 <span id="cb1-86"><a href="#cb1-86"></a></span>
 <span id="cb1-87"><a href="#cb1-87"></a>**There are different AQIs for different atmospheric pollutants. For this project, we chose to predict the AQI based on ozone from atmospheric conditions (excluding ozone concentration) because the ozone AQI was the most frequent of the different AQIs after all data merging was complete.**</span>
 <span id="cb1-88"><a href="#cb1-88"></a></span>
@@ -3830,34 +3820,26 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
 <span id="cb1-477"><a href="#cb1-477"></a></span>
 <span id="cb1-478"><a href="#cb1-478"></a><span class="fu"># Conclusion</span></span>
 <span id="cb1-479"><a href="#cb1-479"></a></span>
-<span id="cb1-480"><a href="#cb1-480"></a>The decision tree model seems to be the most useful in regards to the walkability dataset. The random forest regressor was expected to outcompete the other models in terms of predicting power, but the improvement was so marginal that it is far from being worth the lack of interpretability that comes with the decision tree model.</span>
+<span id="cb1-480"><a href="#cb1-480"></a>For both the AQI and walkability datasets, random forests proved to be the model specifications with the highest predictive power as measured by R-squared and RMSE. We discovered that the most important variables for predicting next-day AQI were maximum no2, maximum temperature, and minimum humidity. On the other hand, the most important variables for predicting the walkability index were those relating to diveristy of employment, road network density, and diversity of housing types. </span>
 <span id="cb1-481"><a href="#cb1-481"></a></span>
-<span id="cb1-482"><a href="#cb1-482"></a><span class="ss">-   </span>Make better overarching claims as to which models we would choose for purposes, which factors contribute to walkability</span>
+<span id="cb1-482"><a href="#cb1-482"></a>The single model we would recommend to you for predicting next-day AQI is our random forest model, as it has the best predictive ability. This report has sufficient information on the contributing factors to next-day ozone AQI such that the more interpretable models are not worth using at the cost of predictive power. </span>
 <span id="cb1-483"><a href="#cb1-483"></a></span>
-<span id="cb1-484"><a href="#cb1-484"></a><span class="ss">    -   </span>D3B negative correlation according to decision tree</span>
+<span id="cb1-484"><a href="#cb1-484"></a>The single model we would recommend to you for predicting the walkability index of a location is the linear regression model, because it has a good balance of predictive power and interpretability. Because walkability index is such a complicated metric and this dataset has so many features, it is important to preserve the ability to interpret how and why the model is making the predictions it is.</span>
 <span id="cb1-485"><a href="#cb1-485"></a></span>
-<span id="cb1-486"><a href="#cb1-486"></a><span class="ss">    -   </span>The mix of employment type and occupied housing, according to linear regression</span>
+<span id="cb1-486"><a href="#cb1-486"></a><span class="fu"># Appendix</span></span>
 <span id="cb1-487"><a href="#cb1-487"></a></span>
-<span id="cb1-488"><a href="#cb1-488"></a><span class="ss">    -   </span>Shape length has negative correlation, according to linear regression</span>
+<span id="cb1-488"><a href="#cb1-488"></a><span class="fu">## Sources</span></span>
 <span id="cb1-489"><a href="#cb1-489"></a></span>
-<span id="cb1-490"><a href="#cb1-490"></a><span class="fu"># Appendix</span></span>
+<span id="cb1-490"><a href="#cb1-490"></a>How Weather Affects Air Quality \| Center for Science Education. (n.d.). UCAR. <span class="ot">&lt;https://scied.ucar.edu/learning-zone/air-quality/how-weather-affects-air-quality&gt;</span></span>
 <span id="cb1-491"><a href="#cb1-491"></a></span>
-<span id="cb1-492"><a href="#cb1-492"></a><span class="fu">## Sources</span></span>
-<span id="cb1-493"><a href="#cb1-493"></a></span>
-<span id="cb1-494"><a href="#cb1-494"></a>How Weather Affects Air Quality \| Center for Science Education. (n.d.). UCAR. <span class="ot">&lt;https://scied.ucar.edu/learning-zone/air-quality/how-weather-affects-air-quality&gt;</span></span>
-<span id="cb1-495"><a href="#cb1-495"></a></span>
-<span id="cb1-496"><a href="#cb1-496"></a><span class="ss">-   </span>This is where sources we used should be linked. Please cite them in some proper format, not just hyperlinks (example above).</span>
-<span id="cb1-497"><a href="#cb1-497"></a><span class="ss">-   </span>Any additional output from model summaries that did not fit earlier in the paper could go here as well</span>
+<span id="cb1-492"><a href="#cb1-492"></a><span class="ss">-   </span>This is where sources we used should be linked. Please cite them in some proper format, not just hyperlinks (example above).</span>
+<span id="cb1-493"><a href="#cb1-493"></a><span class="ss">-   </span>Any additional output from model summaries that did not fit earlier in the paper could go here as well</span>
+<span id="cb1-494"><a href="#cb1-494"></a></span>
+<span id="cb1-495"><a href="#cb1-495"></a>Smart Location Database Technical Documentation and User Guide (Version 3.0)</span>
+<span id="cb1-496"><a href="#cb1-496"></a></span>
+<span id="cb1-497"><a href="#cb1-497"></a><span class="ot">&lt;https://www.epa.gov/sites/default/files/2021-06/documents/epa_sld_3.0_technicaldocumentationuserguide_may2021.pdf&gt;</span></span>
 <span id="cb1-498"><a href="#cb1-498"></a></span>
-<span id="cb1-499"><a href="#cb1-499"></a>Smart Location Database Technical Documentation and User Guide (Version 3.0)</span>
-<span id="cb1-500"><a href="#cb1-500"></a></span>
-<span id="cb1-501"><a href="#cb1-501"></a><span class="ot">&lt;https://www.epa.gov/sites/default/files/2021-06/documents/epa_sld_3.0_technicaldocumentationuserguide_may2021.pdf&gt;</span></span>
-<span id="cb1-502"><a href="#cb1-502"></a></span>
-<span id="cb1-503"><a href="#cb1-503"></a>National Walkability Index Methodology and User Guide</span>
-<span id="cb1-504"><a href="#cb1-504"></a></span>
-<span id="cb1-505"><a href="#cb1-505"></a><span class="fu">## Additional Output</span></span>
-<span id="cb1-506"><a href="#cb1-506"></a></span>
-<span id="cb1-507"><a href="#cb1-507"></a>Residual Plots:</span>
+<span id="cb1-499"><a href="#cb1-499"></a>National Walkability Index Methodology and User Guide</span>
 </code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div></div></div></div></div>
 </div> <!-- /content -->
