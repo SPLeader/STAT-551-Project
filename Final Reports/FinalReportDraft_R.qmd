@@ -103,7 +103,7 @@ data.frame(`Variable Name` = c("no2", "co", "so2",
 
 ## Walkability
 
-We accessed data about walkability from the U.S. Government's open data catalog, data.gov. The data was collected by the Environmental Protection Agency (EPA) and contains demographic information, built environment characteristics, and transportation infrastructure data from 2021 for each Census block group. These inputs are used to calculate the National Walkability Index as defined by the EPA. This index can be expressed either numerically or translated into qualitative categories (see Table 2 below)
+We accessed data about walkability from the U.S. Government's open data catalog, data.gov. The data was collected by the Environmental Protection Agency (EPA) and contains demographic information, built environment characteristics, and transportation infrastructure data from 2021 for each Census block group. These inputs are used to calculate the National Walkability Index as defined by the EPA. This index can be expressed either numerically or translated into qualitative categories (see Table 2 below).
 
 ```{r, fig.cap = "Table 2. Walkability Index Classifications", include = TRUE}
 data.frame(`Walkability Index` = c("1 - 5.75", "5.76 - 10.5", "10.51 - 15.25", "15.26 - 20"),
@@ -182,9 +182,6 @@ Figure 2 reveals the seasonal trend in AQI. AQI tends to be higher in the summer
 (2) Hot and dry weather results in forest fires that can increase atmospheric pollutants
 (3) Clouds are less common at higher temperatures but are important for preventing the production of ozone
 
-```{r}
-"https://scied.ucar.edu/learning-zone/air-quality/how-weather-affects-air-quality#:~:text=Heat%20waves%20often%20lead%20to,ozone%20pollution%20and%20particulate%20pollution."
-```
 
 <br /> <br />
 
@@ -430,7 +427,7 @@ KNN is a computationally expensive algorithm due to both the breadth and depth o
 
 # Discussion
 
-# AQI
+## AQI
 
 Our model results demonstrate that we can forecast ozone-based AQI effectively without knowledge of ozone levels. On average, our random forest was only wrong by 20.953 AQI points, rarely predicting far from the actual AQI. As the estimates are in the same ballpark as the real AQI, they could potentially serve to give the public a general idea of how unsafe atmospheric ozone levels are in the absence of ozone measurements. We tuned several models for various parameters in order to arrive at this accurate of a random forest predictor. While our other models didn't prove to be as impactful, the linear model gives us an intuitive understanding that ozone is associated with high no2, high temperatures, and low humidity.
 
