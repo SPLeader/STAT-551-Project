@@ -106,12 +106,13 @@ results = search.fit(X, y)
 
 # summarize
 rmse = -results.best_score_
-r2 = ((-results.best_score_)**2) / SSE
+r2 = 1 - (((-results.best_score_)**2) / SSE)
 
 # scores not recorded because polynomial is better.
 #model_scores.loc[len(model_scores)] = ["Linear Model", r2, rmse]
 
-print('RMSE: %.3f' % )
+print('Rsq: %.3f' % r2)
+print('RMSE: %.3f' % rmse)
 print('Config: %s' % results.best_params_)
 ```
 
@@ -140,9 +141,10 @@ results = search.fit(X, y)
 
 # summarize
 rmse = -results.best_score_
-r2 = ((-results.best_score_)**2) / SSE
+r2 = 1 - (((-results.best_score_)**2) / SSE)
 model_scores.loc[len(model_scores)] = ["Linear Model", r2, rmse]
 
+print('Rsq: %.3f' % r2)
 print('RMSE: %.3f' % rmse)
 print('Config: %s' % results.best_params_)
 ```
@@ -266,7 +268,7 @@ results = search.fit(X, y)
 
 # summarize
 rmse = -results.best_score_
-r2 = ((-results.best_score_)**2) / SSE
+r2 = 1 - (((-results.best_score_)**2) / SSE)
 model_scores.loc[len(model_scores)] = ["Random Forest", r2, rmse]
 
 print('RMSE: %.3f' % rmse)
@@ -323,7 +325,7 @@ results = search.fit(X, y)
 
 # summarize
 rmse = -results.best_score_
-r2 = ((-results.best_score_)**2) / SSE
+r2 = 1 - (((-results.best_score_)**2) / SSE)
 model_scores.loc[len(model_scores)] = ["Decision Tree", r2, rmse]
 
 print('RMSE: %.3f' % rmse)
