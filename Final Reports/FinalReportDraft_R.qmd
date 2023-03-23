@@ -229,19 +229,11 @@ Figure 3 shows how the different atmospheric measurements correlate with next-da
 
 <br /> <br />
 
-```{r}
-# Correlation between each variable and next-day AQI 
-aqi %>% select(-Date, -County, -State, 
-               -AQI, -AQI_cat, -max_ozone, 
-               -mean_ozone, -min_ozone) %>%
-  cor() %>% data.frame() %>% select(AQI_next_day) 
-```
-
 ## Walkability
 
-Overall distribution of Walkability Index
+### Overall distribution of Walkability Index
 
-```{r, include = TRUE}
+```{r, fig.cap = "Figure 4. Histogram showing the distribution of walkability index", include = TRUE, message = FALSE}
 ggplot(nwi, aes(NatWalkInd, fill = cut(NatWalkInd, 100))) +
   geom_histogram(show.legend = FALSE) +
   theme_bw() + 
@@ -249,9 +241,7 @@ ggplot(nwi, aes(NatWalkInd, fill = cut(NatWalkInd, 100))) +
        x = "Walkability Index") 
 ```
 
-The histogram of Walkability Index appears quite bell-shaped and symmetric. The median Walkability Index is 13.83 and the interquartile range is 3.33. The range for the Walkability Index is 1 to 20.
-
-```{r, include = TRUE}
+```{r, fig.cap = "Table 5. Summary statistics of walkability index", include = TRUE}
 nwi %>% 
   summarise(Mean = round(mean(NatWalkInd), 2),
             SD = round(sd(NatWalkInd), 2),
@@ -260,9 +250,13 @@ nwi %>%
   knitr::kable()
 ```
 
+The histogram of Walkability Index appears quite bell-shaped and symmetric. The median Walkability Index is 13.83 and the interquartile range is 3.33. The range for the Walkability Index is 1 to 20.
+
+<br /> <br />
+
 ### Relationship between Population and Walkability Index Category
 
-```{r, include = TRUE}
+```{r, fig.cap = "Figure 5. Boxplots showing the relationship between population and walkability index category", include = TRUE}
 nwi$cat <- factor(nwi$cat , levels=c("Least walkable", "Below average walkable", "Above average walkable", "Most walkable"))
 
 ggplot(nwi, 
@@ -273,17 +267,19 @@ ggplot(nwi,
    theme_bw() + 
   theme(legend.position = "None") + 
         #axis.title.y = element_text(angle = 0, vjust = 0.5)) +
-  labs(y = "") +
+  labs(y = "Population") +
   scale_fill_manual(values = c("#A6BDDB", "#74A9CF", "#0570B0", "#034E7B"))
 ```
 
 Further exploration was done to examine if population may have a relationship with the Walkability Index Category. The Least Walkable category seemed to have the highest population, with the Below Average and Above Average Walkable categories having the lowest populations. These areas had a tighter interquartile range although there were some outliers having much higher populations. The places that were Most Walkable had a large variation in population.
 
+<br /> <br />
+
 ### Relationship between Employment Mix and Walkability Index Category
 
 Lastly, some preliminary investigation was conducted to look at the relationship between employment mix and walkability. Figure \# below shows a clear upward trend in walkability as the employment mix increases.The employment mix variable is a proportion between 0 and 1 that shows how diverse jobs are in a given area (categories of jobs are retail, office, industrial, service, and entertainment). Higher values indicate greater diversity of jobs and according to the EPA, this is correlated with more walk trips. 
 
-```{r, include = TRUE}
+```{r, fig.cap = "Figure 6. Scatterplot showing the relationship between employment mix and walkability index", include = TRUE}
 ggplot(nwi, 
        aes(x = D2B_E8MIXA, 
            y = NatWalkInd, color = cat)) +
@@ -299,7 +295,7 @@ ggplot(nwi,
 
 We used three different types of models to predict AQI: linear models, decision trees, and random forests. Each model predicts the next day's AQI based on the min, mean, and max values of our 8 predictor measurements. Notably, this does not include any measurements of the day's Ozone or AQI. We measured each model's performance by cross-validating on data the model had not been trained on. The R-Squared and Root Mean Squared Error metrics are displayed below:
 
-```{r, fig.cap = "Table 2. Accuracy metrics for our four model varieties", include = TRUE}
+```{r, fig.cap = "Table 6. Best performance metrics of our three models for AQI", include = TRUE}
 aqi_model_scores %>% 
   kable(digits = 3)
 ```
@@ -308,7 +304,7 @@ These metrics indicate that the Random Forest is our overall most effective mode
 
 To investigate the biases of each of our models, we have plotted the residual errors below:
 
-```{r, fig.cap = "Figure 4: AQI model residual plots. A moving average of the mean error is plotted to display model biases", include = TRUE}
+```{r, fig.cap = "Figure 7: AQI model residual plots. A moving average of the mean error is plotted to display model biases", include = TRUE, message = FALSE}
 aqi_df_all_preds %>% 
   ggplot(aes(x = .pred, y = err)) +
   geom_point() +
@@ -339,7 +335,7 @@ Note that in this formula, max_no2, max_temperature, and max_humidity are standa
 
 Our decision tree's predictions look far different than the others because they are made in discrete categories rather than in a more continuous manner. While this model has little bias, with only a slight overestimation bias on its highest predictions of 144, it has the largest overall errors, making it a worse predictor than other models. Nevertheless, this model may be very valuable, as we can directly see how it makes its decisions in the following decision tree flowchart:
 
-![Figure 5: Decision Tree Flowchart](../AQI%20Outputs/AQI_decision_tree_r.png)
+![Figure 8: Decision Tree Flowchart for AQI](../AQI%20Outputs/AQI_decision_tree_r.png)
 
 At each step, this decision tree chooses one variable to best separate high-AQI days from low-AQI days. The first, largest, split separates based on no2: days with a very low no2, below 18 ppb, are directed to the left side of the tree, which tends to have lower AQI. This split makes sense because ozone and no2 tend to come from the same sources such as cars and industrial facilities, so a low no2 concentration correlate with low ozone. For low no2 days, the tree finds that high temperature is the best indicator of high AQI, with humidity distinguishing further days with a max temperature between 68 and 82 degrees Fahrenheit. For high no2 days, the tree uses air pressure and temperature to distinguish AQI further.
 
@@ -353,7 +349,7 @@ Our final optimized random forest model averages the results of 500 decision tre
 
 To help determine which of the 100+ predictors to use, we used a linear regression with a LASSO penalty. Out of the 117 total variables, we use the top 8 according to the LASSO model. Most of the coefficients were absolute zero, meaning many of the variables are considerably less informative than others. By looking at the magnitudes of the top coefficients, we can compare which ones give the most information for determining the walkability index. Among the top variables are variables associated with employment entropy, road network density, and occupied housing, and we will postpone interpretation of these variables until later in the report.
 
-```{r, include = TRUE}
+```{r, fig.cap = "Figure 9: Bar plot of top six variables, as selected by LASSO", include = TRUE}
 walk_lasso_coef %>% 
   rename("Coefficient" = "coefficient",
          "Variable" = "variable") %>%
@@ -363,16 +359,14 @@ walk_lasso_coef %>%
   ggplot(aes(x = fct_reorder(Variable, desc(abs(Coefficient))), y = abs(Coefficient), fill = Variable)) +
   geom_col() +
   labs(x = "Variable",
-       y = "Coefficient (magnitude)") +
+       y = "Magnitude of Coefficient") +
   theme_bw() + 
   theme(legend.position = "none") 
 ```
 
-Figure #: Bar plot of top six most important variables
-
 For the Walkability dataset, we used various regeression models to make predictions on the numeric walkability index. For all models, 10-fold cross-validation was used to get a better sense of how these models would perform when predicting on unseen data. 
 
-```{r, include = TRUE}
+```{r, fig.cap = "Table 7. Best performance metrics of our four models for walkability index", include = TRUE}
 best_knn_rmse <- walk_knn %>% filter(.metric == "rmse") %>% slice_min(mean) %>% mutate(Model = "KNN") %>% pivot_wider(names_from = .metric, values_from = mean)
 best_knn_rsq <- walk_knn %>% filter(.metric == "rsq") %>% slice_max(mean) %>% mutate(Model = "KNN")
 best_knn <- best_knn_rmse %>% mutate(rsq = best_knn_rsq$mean) %>% select(Model, rmse, rsq)
