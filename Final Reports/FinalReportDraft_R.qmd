@@ -329,7 +329,7 @@ $$
 AQI = 58.68 + 12.43 * max\_no2 + 8.43 * max\_temperature - 6.36 * min\_humidity
 $$
 
-Note that in this formula, max_no2, max_temperature, and max_humidity are standardized, measured in standard deviations rather than typical units. This gives us a simple understanding that high no2 and temperature in a day indicate high AQI, while humidity indicates lower AQI. The association between no2 and ozone makes a lot of sense, as both are typically generated from fossil cars and industrial facilities, so we would expect them to be highly correlated. Despite being so simplified, this model still has a RMSE of only 26.169, and a R-squared of 0.484.
+Note that in this formula, max_no2, max_temperature, and max_humidity are standardized, measured in standard deviations rather than typical units. **This gives us a simple understanding that high maxmimum no2 and temperature in a day indicate high next-day AQI, while high maxmimum humidity indicates lower next-day AQI.** It is worth noting that this is consistent with the correlation trends in Figure 3 in the Exploratory Data Analysis section. The AQI this model predicts is based on ozone, indicating that there is correlation between no2 and ozone. This makes sense, as both are typically generated from fossil cars and industrial facilities, so we would expect them to be highly correlated. Despite being so simplified, this model still has a RMSE of only 26.169, and a R-squared of 0.484. **This means that this relatively simple model accounts for 48.4% of the variation in next-day AQI, and its next-day AQI predictions are typically off by roughly 26.2 points.**
 
 ### Decision Tree
 
@@ -386,9 +386,10 @@ best_tree <- best_tree_rmse %>% mutate(rsq = best_tree_rsq$mean) %>% select(Mode
 best_models <- rbind(best_knn, best_linear) %>% rbind(best_rf) %>% rbind(best_tree)
 
 best_models %>%
-  rename("RMSE" = "rmse",
-         "R-squared" = "rsq") %>%
-  arrange(desc(RMSE)) %>%
+  select(Model, rsq, rmse) %>%
+  rename("Root Mean Squared Error" = "rmse",
+         "R-Squared" = "rsq") %>%
+  arrange(desc(`Root Mean Squared Error`)) %>%
   knitr::kable(digits = 3)
 ```
 
