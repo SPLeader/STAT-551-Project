@@ -380,34 +380,15 @@ best_models %>%
 
 On the other hand, our most interpretable model, the decision tree, still resulted in reasonable performance metrics, with an R-squared of 0.719 and a RMSE of 1.223. The following sections detail our methodologies in more detail. 
 
-### Variable Selection
-
-To help determine which of the 117 predictors to use, we used linear regression with a LASSO penalty term. Most of the coefficients shrunk to zero, meaning many of the variables are considerably less informative than others. By looking at the magnitudes of the top six coefficients, we can compare which variables give the most information for determining the walkability index. Among the top variables are variables associated with employment entropy, road network density, and occupied housing. We discuss specific interpretations of these variables in the Linear Regression section.
-
-```{r, fig.cap = "Figure 9: Bar plot of top six variables, as selected by LASSO", include = TRUE}
-walk_lasso_coef %>% 
-  rename("Coefficient" = "coefficient",
-         "Variable" = "variable") %>%
-  arrange(desc(abs(Coefficient))) %>% 
-  filter(Variable != "(Intercept)") %>%
-  head(6) %>%
-  ggplot(aes(x = fct_reorder(Variable, desc(abs(Coefficient))), y = abs(Coefficient), fill = Variable)) +
-  geom_col() +
-  labs(x = "Variable",
-       y = "Magnitude of Coefficient") +
-  theme_bw() + 
-  theme(legend.position = "none") 
-```
-
 ### Linear Regression
 
-Our linear model achieved an R-squared value of 0.819, meaning it is accounting for a non-trivial amount of variation in walkability index. As a result, interpretations of the largest coefficients are especially valuable. The following plot shows the coefficients of the variables with the eight coefficients of largest magnitude.
+Our linear model achieved an R-squared value of 0.819, meaning it is accounting for a non-trivial amount of variation in walkability index. As a result, interpretations of the largest coefficients are especially valuable. The following plot shows the coefficients of the variables with the six coefficients of largest magnitude.
 
-```{r, include = TRUE}
+```{r, fig.cap = "Figure 9: Bar plot of top six variables, as indicated by OLS", include = TRUE}
 walk_linear_coef %>%
   filter(Variable != "(Intercept)") %>%
   arrange(desc(abs(Coefficient))) %>%
-  head(8) %>%
+  head(6) %>%
   ggplot(aes(x = fct_reorder(Variable, desc(abs(Coefficient))), y = Coefficient, fill = Variable)) + 
   geom_col() +
   theme_bw() + 
@@ -416,32 +397,35 @@ walk_linear_coef %>%
   labs(x = "Variable")
 ```
 
-There are three particularly large coefficients, corresponding to D2B_E8MIXA, D3A, and D2A_EPHHM. It is worth noting that the top variables here are in agreement with our LASSO variable importance.
+There are three particularly large coefficients, corresponding to D2B_E8MIXA, D3A, and D2A_EPHHM. It is worth noting that the top variables here are in agreement with our LASSO variable importance. Because these three coefficients are all close to one, this means that a single unit increase in road network density, employment entropy, and household entropy are each roughly  associated with a single unit increase in the walkability index. 
 
-Because these three coefficients are all close to one, this means that a single unit increase in road network density, employment entropy, and household entropy are each roughly  associated with a single unit increase in the walkability index. Conversely, the network density has a negative coefficient of about -0.5. The variable D3AAO specifically refers to the density of automobile-oriented links (as opposed to pedestrian oriented links). The D3AMM variable is similar but includes both auto and pedestrian-oriented network links. That both D3AMM and D3AAO both have a negative coefficient is not surprising; areas that are crowded with vehicles tend to be less walkable.
+Conversely, the network density has a negative coefficient of about -0.5. The variable D3AAO specifically refers to the density of automobile-oriented links (as opposed to pedestrian oriented links). The D3AMM variable is similar but includes both auto and pedestrian-oriented network links. That both D3AMM and D3AAO both have a negative coefficient is not surprising; areas that are crowded with vehicles tend to be less walkable.
 
 
 ### Decision Tree Regression
 
-A decision tree regressor, much like our linear regression model, has the benefit of being highly interpretable, even if it's not the most powerful model. We can create the model and interpret the top of the resulting tree similar to how we did when performing feature selection. The tree was given a very small maximum depth, so that we can avoid overfitting as well as examine the whole tree rather easily. The final decision tree achieved the worst metrics, with a higher error score and lower R2-score than any of the other final models.
+A decision tree, much like our linear regression model, has the benefit of being highly interpretable, even if its predictive ability is not optimal. We created our decision tree with very small maximum depth to examine and interpret the whole tree easily. This did result in substantial underfit, hence why it had the worst cross-validated performance metrics of all the models. Fitting this model on the walkability data resulted in the following tree:
 
-At the top of our final tree is the variable D3B. This shows that having a lower density of street intersections (not including auto-oriented intersections) is an indicator of a lower walkability score. Areas with fewer intersections would be more disconnected, putting more distance between people and their destinations, so this split makes sense. The next split considers the mix of employment types, and shows that areas with lower job diversity may have a lower walkability score. On the other end of the tree is a split for D2C_TRPMX, which is a variable referring to the mix of employment as well as residential type. It suggests that having a lower diversity of both jobs and residential type also correlates with a lower walkability score.
+![Figure 10: Decision Tree Flowchart for Walkability](../Walkability%20Outputs/walkability_decision_tree.png)
 
-![](../Walkability%20Outputs/walkability_decision_tree.png)
+The first split was made on the variable D3B. This shows that having a lower density of street intersections (not including auto-oriented intersections) is an indicator of a lower walkability score. This makes sense, as areas with fewer intersections would be more disconnected for pedestrians, making walking between destinations less feasible. 
 
-Figure #: Decision tree showing the uppermost splits (most important variables)
+For areas with a lower density of street connections, the next split considers the mix of employment types (D2B_E8MIXA), showing that areas with lower job diversity tend to have lower walkability indices. 
+
+For areas with a higher density of street connections, the next split considers the diversity in residence types, showing that areas with less living options tend to have lower walkability indices.
+
+The fact that the different branches of the tree consider different variables alludes to the fact that walkability index is a complicated metric that weighs many factors in a nuanced manner.
+
 
 ### Random Forest Regression
 
-With such a large dataset, a random forest algorithm was far from the fastest option. Regardless, it has the potential to improve upon predicting power of the other models, especially in regards to overfitting. Performing grid-searches was time consuming, but we were still able to create a model with great cross-validated metrics. Our final random forest regression model had the highest R2 and lowest error of all of our models. Unfortunately, it is also the least interpretable, meaning that despite it's predicting power, it's difficult to get a lot of analyses based on the results.
+With such a large dataset, a random forest algorithm was far from the fastest option. Regardless, we suspected that a Random Forest would result in the best performance metrics. Grid-searches were time consuming, but we were still able to find the hyperparameters that resulted in great cross-validated metrics. Our final random forest regression model had the highest R2 and lowest error of all of our models. Unfortunately, it is also the least interpretable, meaning that despite it's predictive power, that's just about all it offers.
 
 ### K-Neighbors Regression
 
-Though usually performed in classification problems, KNN was a powerful regression tool in our analysis. Fit with the top 6 predictors according to our feature selection (See Table 2), the final model achieved RMSE .868 and R2 of .867. These metrics don't beat out our best random forest model, but at the very least they demonstrate that there is more than one way to tackle this regression problem. Unfortunately, the KNN model turns out to be as uninterpretable as the random forest.
+To tune the optimal number of neighbors for our KNN model, we performed a grid search. To perform this grid search, we fit each KNN model on the same training data and compared their performance on the same validation set. The following plot shows how validation R-squared changes with k.
 
-To find the best parameters for KNN, we performed another grid search. The most impactful hyperparameter that we tuned was the number of neighbors, **k**, settling on a k-value of around 10 as that is where our R2-score plateaued. In general, we wouldn't want too high of a k value, lest we skyrocket the models bias. In this case, we were able to explain a high amount of the variability in the response with a pretty low value for k.
-
-```{r, include = TRUE}
+```{r, fig.cap = "Figure 11: Validation R-squared vs. number of neighbors (k)", include = TRUE}
 walk_knn_r2 %>%
   ggplot(aes(x = k, y = rsq)) +
   geom_line() + 
@@ -449,7 +433,9 @@ walk_knn_r2 %>%
   labs(y = "R-squared")
 ```
 
-Figure #: Tuning number of neighbors for KNN regression
+For the walkability data, it turned out that a relatively low value of k (in comparison to the entire size of the dataset) optimized validation R-squared. We settled on the optimal number of neighbors being around 10, as this is where the so-called 'elbow' in the graph is.
+
+KNN is a computationally expensive algorithm due to both the breadth and depth of the walkability dataset. To reduce this cost, we fit our different KNN models on only the top 6 predictors as indicated by OLS (See Figure 9). The final model specification achieved a cross-validated RMSE of .862 and an R-squared of .864. Although KNN performs worse than Random Forest for this data the decent metrics from KNN demonstrate that there is more than one way to effectively predict walkability index. However, just like the Random Forest, our KNN model lacks interpretability.
 
 # Discussion
 
@@ -457,19 +443,24 @@ Figure #: Tuning number of neighbors for KNN regression
 
 Our model results demonstrate that we can forecast ozone-based AQI effectively without knowledge of ozone levels. On average, our random forest was only wrong by 20.953 AQI points, rarely predicting far from the actual AQI. As the estimates are in the same ballpark as the real AQI, they could potentially serve to give the public a general idea of how unsafe atmospheric ozone levels are in the absence of ozone measurements. We tuned several models for various parameters in order to arrive at this accurate of a random forest predictor. While our other models didn't prove to be as impactful, the linear model gives us an intuitive understanding that ozone is associated with high no2, high temperatures, and low humidity.
 
+**Add sentence recommending a single model here once we have final results from William**
+
 ## Walkability
 
-**Overall, our models had good performance when predicting a location's Walkability Index. The best model in terms of predictive performance (using R-Squared as the metric of choice) was the Random Forest Regression. It was able to explain 89.34% of the variability in Walkability Index. It had similar performance to the Decision Tree and KNN models. The Random Forest model should be used if the EPA's goal is to get the best predictions, however it has the downside of not being very interpretable. If the primary goal is interpretation, then either the Decision Tree or Linear Regression models should be used (KNN is nonparametric).**
+Our model results indicate that walkability index can be predicted quite well using the publicly available data. We were able to explain 90.7% of the variation in walkability index using a Random Forest model, which is an impressive number. KNN was able to achieve comparable but slightly worse results, explaining 86.4% of the variation in walkability index. Although neither of these models is particularly interpretable, their predictive power is impressive.
 
-**Interpreting the Decision Tree, the most important variables in terms of reducing node impurity are D3B, D2b_E8MixA, and D2c_TrpMx1. As discussed previously, D3B measures street intersection density and is weighted to favor pedestrian and bicycle connectivity. Therefore, it follows that places should prioritize improving pedestrian and bicycle infrastructure such as dedicated paths or protected lanes to help enhance walkability. D2b_E8MixA measures job diversity (it is similar to the 5-tier variable, however this one also includes education, health care, and public administration jobs). Increasing job diversity will not magically make a place more walkable, however it may indicate greater socioeconomic diversity and as such, varying reliance on personal cars compared to public transit or walking. Lastly, D2c_TrpMx1 indicates how mixed employment categories and households are based on vehicle trips.**
+Our Linear Regression and Decision Tree models were highly interpretable, and also still saw variation explained of 81.9% and 71.9%, respectively. For models that are as interpretable as these, these performance metrics are remarkable. Linear Regression is particularly stand-out, as it was able to predict walkability index within 1 point, on average, while still explaining over 80% of the variation in walkability index.
+
+If we had to recommend a singular model to the EPA, we would recommend our Linear Regression model, as it has a great balance of predictive power and interpretability.
+
 
 # Ethics
 
 ## Good uses of our work
 
-It is important that as we give you these powerful machine learning model fits, you are aware of the importance of their proper usage. We hope that you will use the work detailed in this report to better understand the atmospheric factors that contribute to the future air quality of an area and its characteristics that determine its walkability. For the AQI model in particular, we also expect that you can use this model to effectively predict the air quality based on ozone even when direct ozone measurements are unable to be taken, using other atmospheric conditions as a proxy measurement. 
+It is important that as we give you these powerful machine learning model fits, you are aware of the importance of their proper usage. We hope that you will use the work detailed in this report to better understand the atmospheric factors that contribute to the future air quality of an area and its characteristics that determine its walkability. For the AQI model in particular, we also expect that you can use this model to effectively predict the air quality based on ozone even when direct ozone measurements are unable to be taken, using other atmospheric conditions as a proxy measurement.
 
-For the walkability model, we would support the usage of our models to predict areas with poor walkability for areas where it is unknown, such that changes could be implemented to make it more pedestrian-friendly. The goal of these models is to highlight a small number of factors that have a large impact on how walkable a place is. By identifying these characteristics, it is our hope that civil projects can be undertaken and that public policy changes can be implemented to improve walkability for all communities, but especially those that need it most. For example, there could be changes to the local codes that require a certain intersection density or federal incentives to having high public transportation service levels. Walkability is very strongly linked to physical health and quality of life metrics, so it is of the utmost importance to ensure all communities are walkable. 
+For the walkability model, we would support the usage of our models to predict areas with poor walkability for areas where it is unknown, such that changes could be implemented to make it more pedestrian-friendly. The goal of these models is to highlight a small number of factors that have a large impact on how walkable a place is. By identifying these characteristics, it is our hope that civil projects can be undertaken and that public policy changes can be implemented to improve walkability for all communities, but especially those that need it most. For example, there could be changes to the local codes that require a certain intersection density or federal incentives to having high public transportation service levels. Walkability is very strongly linked to physical health and quality of life metrics, so it is of the utmost importance to ensure all communities are walkable.
 
 ## Misuses
 
