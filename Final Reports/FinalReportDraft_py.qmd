@@ -17,7 +17,7 @@ format:
 editor: visual
 execute:
   message: false
-  include: false
+  include: true
   echo: false
 ---
 
@@ -32,43 +32,27 @@ from IPython.display import Markdown
 from tabulate import tabulate
 import os
 import calendar
+import pickle
+from sklearn.tree import DecisionTreeClassifier, plot_tree
 ```
 
 ```{python}
-# Data
 os.chdir('../')
 
 aqi = pd.read_csv("Project Data/Combined/aqi_ozone_all_years_prediction.csv")
-```
 
-```{python}
-aqi
-```
-
-```{python}
-os.chdir('../')
 # Reading in other outputs
 aqi_df_dt_preds = pd.read_csv("AQI Outputs/AQI_df_dt_preds_py.csv")
 aqi_df_lm_preds = pd.read_csv("AQI Outputs/AQI_df_lm_preds_py.csv")
 aqi_df_rf_preds = pd.read_csv("AQI Outputs/AQI_df_rf_preds_py.csv")
 aqi_model_metrics = pd.read_csv("AQI Outputs/AQI_model_metrics_py.csv")
-```
 
-```{python}
 # NWI Data
-os.chdir('../')
-
 nwi = pd.read_csv('cleaned_nwi.csv')
-
-print([i for i in nwi.columns])
-```
-
-```{python}
-# NWI Outputs
-os.chdir('../')
-
+dt = pickle.load(open('NWI Outputs/decision_tree_feature_selection.sav', 'rb'))
 df_nwi_lasso_features = pd.read_csv("NWI Outputs/NWI_lasso_features_py.csv")
 
+print([i for i in nwi.columns])
 ```
 
 # Introduction
@@ -169,6 +153,7 @@ plt.close()
 ```
 
 ```{python, fig.cap = "Table 2. Summary statistics of AQI", include = TRUE}
+"""
 def iqr(x):
     return x.quantile(0.75) - x.quantile(0.25)
 
@@ -177,6 +162,7 @@ aqi.agg(
         "AQI_next_day": ["mean", "std", "median", iqr],
     }
 ).transpose().rename({"mean" : "Mean‎ ‎ ‎ ‎ ‎ ‎ ", "std" : "SD‎ ‎ ‎ ‎ ‎ ‎ ", "median" : "Median‎ ‎ ‎ ‎ ‎ ‎ ", "iqr" : "IQR‎ ‎ ‎ ‎ ‎ ‎ "}, axis = 1).style.hide(axis = "index").set_table_styles([dict(selector='th', props=[('text-align', 'center')]), {'selector' : '','props' : [('border', '1px solid black')]}]).format(precision=0, formatter={('Mean', 'Median', 'IQR', 'SD'): "{:.2f}"})
+"""
 ```
 
 Overall, the distribution of AQI scores is single-peaked and right-skewed, with a median next-day AQI of 44 and an interquartile range of 30. The graph is likely right-skewed because AQI is bounded on the lower end by 0, but has no upper limit.
@@ -320,7 +306,17 @@ plt.show()
 plt.close()
 ```
 
-![Figure 5: Decision tree showing the uppermost splits (most important variables)](NWI%20Outputs/decision_tree_feature_selection.png)
+```{python, fig.cap = 'Figure #: Tree plot for feature selection'}
+all_features = list(nwi.drop(columns=['D1C8_OFF', 'CSA', 'OBJECTID', 'GEOID10', 'GEOID20', 'STATEFP', 'COUNTYFP', 'CSA_Name', 'CBSA_Name', 'cat', 'CBG', 'D4A', 'D4D', 'CBG', 'NatWalkInd', 'D2A_Ranked', 'D2B_Ranked', 'D3B_Ranked', 'D4A_Ranked']).columns)
+
+plt.clf()
+plot_tree(dt, proportion=True, max_depth=1, feature_names=all_features, 
+        class_names=list(nwi['NatWalkInd'].unique()), filled=True)
+plt.title('Decision Tree on all predictors')
+
+plt.show()
+plt.close()
+```
 
 # Model Results
 
@@ -389,11 +385,16 @@ Our final optimized random forest model averages the results of 500 decision tre
 
 For the Walkability dataset, we used both regression (predicting the numeric Walkability Index) and classification (predicting the Walkability Index category) methods. For both approaches, 10-fold cross-validation was used to get a better sense of how these models would perform when predicting on unseen data.
 
-```{python}
+```{python, fig.cap = "Talbe #: NWI Walkability Model Metrics", include = TRUE}
+df_walkability_model_metrics = pd.DataFrame(
+  data = {
+    'Model Specification' : ['Linear Regression', 'K-Neighbors Regression', 'Decision Tree Regression', 'Random Forest Regression'],
+    'MSE' : ['1.3600', '0.5960', '0.5817', '0.5794'],
+    'R-Squared' : ['0.7503', '0.8895', '0.8934', '0.8929']
+})
 
+Markdown(tabulate(df_walkability_model_metrics, headers = ['Model Specification','MSE', 'R-Squared'], showindex = "never"))
 ```
-
-![](../WalkabilityImages/walk%20mod%20performance-01.png)
 
 ### Linear Regression
 
