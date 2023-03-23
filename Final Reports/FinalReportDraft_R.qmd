@@ -410,7 +410,7 @@ The fact that the different branches of the tree consider different variables al
 
 ### Random Forest Regression
 
-With such a large dataset, a random forest algorithm was far from the fastest option. Regardless, we suspected that a Random Forest would result in the best performance metrics. Grid-searches were time consuming, but we were still able to find the hyperparameters that resulted in great cross-validated metrics. Our final random forest regression model had the highest R2 and lowest error of all of our models. Unfortunately, it is also the least interpretable, it's predictive power is the only thing it offers.
+With such a large dataset, a random forest algorithm was a very compute intensive modeling option. Regardless, we tuned a Random Forest model, resulting in the highest cross-validated metrics of any of our models. This random forest has excellent predictive accuracy, so we would recommend it when trying to predict walkability scores, but we cannot use it to gain any further interpretable insight.
 
 ### K-Neighbors Regression
 
@@ -476,6 +476,8 @@ The single model we would recommend to you for predicting the walkability index 
 
 ## Sources
 
+“AirData Website File Download Page.” EPA, Environmental Protection Agency, 1 Jan. 2023, [https://aqs.epa.gov/aqsweb/airdata/download_files.html](https://aqs.epa.gov/aqsweb/airdata/download_files.html). 
+
 "Center for Science Education." How Weather Affects Air Quality | Center for Science Education, [https://scied.ucar.edu/learning-zone/air-quality/how-weather-affects-air-quality](https://scied.ucar.edu/learning-zone/air-quality/how-weather-affects-air-quality).
 
 Champan, Jim, et al. EPA, Environmental Protection Agency, June 2021, [https://www.epa.gov/smartgrowth/smart-location-database-technical-documentation-and-user-guide](https://www.epa.gov/smartgrowth/smart-location-database-technical-documentation-and-user-guide).
@@ -483,4 +485,5 @@ Champan, Jim, et al. EPA, Environmental Protection Agency, June 2021, [https://w
 Thomas, John, et al. "National Walkability Index Methodology and User Guide." EPA, Environmental Protection Agency, June 2021, [https://www.epa.gov/smartgrowth/national-walkability-index-user-guide-and-methodology](https://www.epa.gov/smartgrowth/national-walkability-index-user-guide-and-methodology).
 
 "Walkability Index." Catalog, Responsible Party U.S. Environmental Protection Agency, Office of Sustainable Communities (Point of Contact), 3 July 2021, [https://catalog.data.gov/dataset/walkability-index](https://catalog.data.gov/dataset/walkability-index).
+
 
