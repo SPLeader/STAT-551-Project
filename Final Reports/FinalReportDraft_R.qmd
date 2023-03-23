@@ -70,17 +70,17 @@ walk_knn_r2 <- read_csv(here("Walkability Outputs",
 
 # Introduction
 
-The EPA is an organization fundamentally invested in securing and promoting the health and well-being of the environment. In this paper, we analyze two distinct but related environmental issues: air pollution and car dependency. For both issues, we used publicly available data sourced from the EPA to construct machine learning models to make predictions. For air pollution, we predicted a county's next-day Air Quality Index (AQI) from the previous day's atmospheric conditions to determine which factors contribute to AQI and how accurately we can determine tomorrow's AQI from today's conditions. For car dependency, we predicted the walkability index of a localized area based on demographic information to deduce which demographic characteristics contribute most meaningfully to the walkability of a location.
+The EPA is an organization fundamentally invested in securing and promoting the health and well-being of the environment. In this paper, we analyze two distinct but related environmental issues: air pollution and car dependency. For both issues, we used publicly available data sourced from the EPA to construct machine learning models to make predictions. For air pollution, we predicted a county's next-day Air Quality Index (AQI) from the previous day's atmospheric conditions to determine which factors contribute to AQI and how accurately we can determine tomorrow's AQI from today's conditions. For car dependency, we predicted the walkability index of a localized area based on built environment charactersitics to deduce which characteristics contribute most meaningfully to the walkability of a location.
 
 # Data Collection & Description
 
 ## AQI
 
-To collect information about atmospheric conditions and Air Quality Index, we downloaded two years (2021 & 2022) worth of atmospheric data from the EPA (source in the appendix). These data were collected by various monitoring stations across 43 counties in 32 states across the United States on a daily basis. In the final data set, one observation corresponded to one day of atmospheric measurements for a particular county, with combined measurements from different weather stations across that county. We had to omit some of the observations because predicting next-day AQI from current-day atmospheric conditions requires sequential days where all atmospheric measurements at that monitoring station are present. Sequential days that were missing any of the atmospheric measurements on either day were omitted from the data. The final dataset consisted of 7,768 observations.
+To collect information about atmospheric conditions and Air Quality Index, we downloaded two years worth of atmospheric data (2021 & 2022) from the EPA (source in the appendix). These data were collected by various monitoring stations across 43 counties in 32 states across the United States on a daily basis. In the final data set, one observation corresponded to one day of atmospheric measurements for a particular county, with combined measurements from different weather stations across that county. We had to omit some of the observations because predicting next-day AQI from current-day atmospheric conditions requires sequential days where all atmospheric measurements at that monitoring station are present. Sequential days that were missing any of the atmospheric measurements on either day were omitted from the data. The final dataset consisted of 7,768 observations.
 
-**There are different AQIs for different atmospheric pollutants. For this project, we chose to predict the AQI based on ozone from atmospheric conditions (excluding ozone concentration) because the ozone AQI was the most frequent of the different AQIs after all data merging was complete.**
+**There are different AQIs for different atmospheric pollutants. For this project, we chose to predict the AQI based on ozone from atmospheric conditions (excluding ozone concentration) because the ozone AQI was the most frequently reported in this dataset.**
 
-**For each atmospheric measurement, we extracted the minimum, average, and maximum measurement across all weather stations for a given county each day.** The following table details the atmospheric measurements we extracted.
+**For each atmospheric measurement, we extracted the minimum, average, and maximum measurement across all weather stations for a given county each day. We did not use Ozone measurements as predictors so that our models can be used when Ozone measurements are not available.** The following table details the atmospheric measurements we extracted.
 
 ```{r, fig.cap = "Table 1. Variable summary for AQI dataset", include = TRUE}
 data.frame(`Variable Name` = c("no2", "co", "so2", 
@@ -103,7 +103,7 @@ data.frame(`Variable Name` = c("no2", "co", "so2",
 
 ## Walkability
 
-Data about walkability was accessed from the U.S. Government's open data catalog, data.gov. The data was collected by the Environmental Protection Agency (EPA) and contains demographic information, built environment characteristics, and transportation infrastructure data from 2021 for each Census block group. These inputs are used to calculate the National Walkability Index as defined by the EPA. This index can be expressed either numerically or translated into qualitative categories (see Table 2 below)
+We accessed data about walkability from the U.S. Government's open data catalog, data.gov. The data was collected by the Environmental Protection Agency (EPA) and contains demographic information, built environment characteristics, and transportation infrastructure data from 2021 for each Census block group. These inputs are used to calculate the National Walkability Index as defined by the EPA. This index can be expressed either numerically or translated into qualitative categories (see Table 2 below)
 
 ```{r, fig.cap = "Table 2. Walkability Index Classifications", include = TRUE}
 data.frame(`Walkability Index` = c("1 - 5.75", "5.76 - 10.5", "10.51 - 15.25", "15.26 - 20"),
@@ -128,7 +128,7 @@ data.frame(`Variable Name` = c("D2B_E8MIXA", "D3A", "D2A_EPHHM", "D3AMM", "D3AAO
                "Road network density in terms of multi-modal (auto and pedestrian) links per square mile",
                "Network density in terms of miles of auto-oriented links per square mile",
                "Employment and household entropy (mix)")) %>%
-  rename(`Variable Name` = Variable.Name,
+  rename(`Variable Name` = Variable.Name,
          `Variable Description` = Variable.Description) %>%
   kable()
 ```
@@ -261,13 +261,13 @@ ggplot(nwi,
   scale_fill_manual(values = c("#A6BDDB", "#74A9CF", "#0570B0", "#034E7B"))
 ```
 
-Further exploration was done to examine if population may have a relationship with the Walkability Index Category. The Least Walkable category seemed to have the highest population, with the Below Average and Above Average Walkable categories having the lowest populations. These areas had a tighter interquartile range although there were some outliers having much higher populations. The places that were Most Walkable had a large variation in population.
+We performed further exploration to examine if population may have a relationship with the Walkability Index Category. The Least Walkable category seemed to have the highest population, with the Below Average and Above Average Walkable categories having the lowest populations. These areas had a tighter interquartile range although there were some outliers having much higher populations. The places that were Most Walkable had a large variation in population.
 
 <br /> <br />
 
 ### Relationship between Employment Mix and Walkability Index Category
 
-Lastly, some preliminary investigation was conducted to look at the relationship between employment mix and walkability. Figure \# below shows a clear upward trend in walkability as the employment mix increases.The employment mix variable is a proportion between 0 and 1 that shows how diverse jobs are in a given area (categories of jobs are retail, office, industrial, service, and entertainment). Higher values indicate greater diversity of jobs and according to the EPA, this is correlated with more walk trips. 
+We conducted some preliminary investigation to look at the relationship between employment mix and walkability. Figure 6 below shows a clear upward trend in walkability as the employment mix increases. The employment mix variable is a proportion between 0 and 1 that shows how diverse jobs are in a given area (categories of jobs are retail, office, industrial, service, and entertainment). Higher values indicate greater diversity of jobs which, according to the EPA, is correlated with more walk trips.
 
 ```{r, fig.cap = "Figure 6. Scatterplot showing the relationship between employment mix and walkability index", include = TRUE}
 ggplot(nwi, 
@@ -283,7 +283,7 @@ ggplot(nwi,
 
 ## AQI
 
-We used three different types of models to predict AQI: linear models, decision trees, and random forests. Each model predicts the next day's AQI based on the min, mean, and max values of our 8 predictor measurements. Notably, this does not include any measurements of the day's Ozone or AQI. We measured each model's performance by cross-validating on data the model had not been trained on. The R-Squared and Root Mean Squared Error metrics are displayed below:
+We used three different types of models to predict AQI: linear models (OLS and LASSO), decision trees, and random forests. Each model predicts the next day's AQI based on the min, mean, and max values of our 8 predictor measurements. Notably, this does not include any measurements of the day's Ozone or AQI. We measured each model's performance by cross-validating on data the model had not been trained on. The R-Squared and Root Mean Squared Error metrics are displayed below:
 
 ```{r, fig.cap = "Table 6. Best performance metrics of our three models for AQI", include = TRUE}
 aqi_model_scores %>% 
@@ -291,7 +291,7 @@ aqi_model_scores %>%
   kable(digits = 3)
 ```
 
-These metrics indicate that the Random Forest is our overall most effective model, with an R-Squared value of 0.717 and an RMSE of 19.501. This indicates that the random forest accounts for 71.7% of the variability in AQI, only being wrong by an average of about 19.5 AQI points. Our decision tree was markedly worse, with an RMSE of 23.214, and our linear model fared the worst, with an RMSE of 24.441.
+These metrics indicate that the Random Forest is our overall most effective model, with an R-Squared value of 0.717 and an RMSE of 19.501 AQI points. This indicates that the random forest accounts for 71.7% of the variance in AQI, only being wrong by an average of about 19.5 AQI points. Our decision tree was markedly worse, with an RMSE of 23.214 AQI points, and our linear model fared the worst, with an RMSE of 24.441 AQI points.
 
 To investigate the biases of each of our models, we have plotted the residual errors below:
 
@@ -312,7 +312,7 @@ With these results in mind, we will briefly discuss each model's strengths and w
 
 ### Linear Model
 
-Our final linear model ended up slightly biased with its lowest predictions being under the true AQI, and its higher predictions tending to over-predict by about 10 points. After comparing several linear model specifications, we settled on this model which uses our predictors in both their original and squared forms to predict AQI. This allowed us to reduce the biases on the high and low somewhat, but some bias remained.
+Our final linear model ended up slightly biased, with its lowest predictions being under the true AQI and its higher predictions tending to over-predict by about 10 points. After comparing several linear model specifications, we opted to use quadratic linear regression. This quadratic model performed better than the original linear regression, but did not remove all of the bias on the high and low predictions.
 
 Despite its biases and inaccuracies, the linear model is useful for its interpretability. We found three of our predictors to be far more important than the others by using LASSO regression, giving us a simple understanding of the basic associations at play. See the formula below:
 
@@ -320,11 +320,11 @@ $$
 AQI = 58.68 + 12.43 * max\_no2 + 8.43 * max\_temperature - 6.36 * min\_humidity
 $$
 
-Note that in this formula, max_no2, max_temperature, and max_humidity are standardized, measured in standard deviations rather than typical units. **This gives us a simple understanding that high maxmimum no2 and temperature in a day indicate high next-day AQI, while high maxmimum humidity indicates lower next-day AQI.** It is worth noting that this is consistent with the correlation trends in Figure 3 in the Exploratory Data Analysis section. The AQI this model predicts is based on ozone, indicating that there is correlation between no2 and ozone. This makes sense, as both are typically generated from fossil cars and industrial facilities, so we would expect them to be highly correlated. Despite being so simplified, this model still has a RMSE of only 26.169, and a R-squared of 0.484. **This means that this relatively simple model accounts for 48.4% of the variation in next-day AQI, and its next-day AQI predictions are typically off by roughly 26.2 points.**
+Note that in this formula, max_no2, max_temperature, and max_humidity are standardized, measured in standard deviations rather than typical units. **This gives us a simple understanding that high maxmimum no2 and temperature in a day indicate high next-day AQI, while high maxmimum humidity indicates lower next-day AQI.** This is consistent with the correlation trends in Figure 3 in the Exploratory Data Analysis section. The AQI this model predicts is based on ozone, indicating that there is correlation between no2 and ozone. This makes sense, as both are typically generated from fossil cars and industrial facilities, so we would expect them to be highly correlated. Despite being so simplified, this model still has a RMSE of only 26.169, and a R-squared of 0.484. **This means that this relatively simple model accounts for 48.4% of the variance in next-day AQI, and its next-day AQI predictions are typically off by roughly 26.2 points.**
 
 ### Decision Tree
 
-Our decision tree's predictions look far different than the others because they are made in discrete categories rather than in a more continuous manner. While this model has little bias, with only a slight overestimation bias on its highest predictions of 144, it has the largest overall errors, making it worse at predicting next-day AQI than other models. Nevertheless, this model may be very valuable, as we can directly see how it makes its decisions in the following decision tree flowchart:
+Unlike our other models, our decision tree’s predictions form discrete vertical lines on the residuals plot because the decision tree only splits its predictions into a relatively small number of distinct values. This limitation makes it impossible for the decision tree to perfectly predict the data, but it still performs better than the linear model because it can respond to non-linear relationships very effectively. The decision tree also allows us to directly see how it makes its decisions. The following decision tree flowchart is simplified down to only 4 layers of splits, but should grant insight into which variables are most important in which circumstances:
 
 ![Figure 8: Decision Tree Flowchart for AQI](../AQI%20Outputs/AQI_decision_tree_r.png)
 
@@ -367,13 +367,13 @@ best_models %>%
   knitr::kable(digits = 3)
 ```
 
-**The model that resulted in the best cross-validated metrics was our Random Forest, observing an R-squared of 0.907 and a RMSE of 0.718.** This means that this model is able to account for over 90% of variation in walkability index, and its predictions of walkability index were only off by 0.718, on average. Naturally, the model that had the best performance metrics was the least interpretable. 
+**The model that resulted in the best cross-validated metrics was our Random Forest, observing an R-squared of 0.907 and a RMSE of 0.718.** This means that this model is able to account for over 90% of variance in walkability index, and its predictions were only off by 0.718 walkability index points, on average.  
 
 On the other hand, our most interpretable model, the decision tree, still resulted in reasonable performance metrics, with an R-squared of 0.719 and a RMSE of 1.223. The following sections detail our methodologies in more detail. 
 
 ### Linear Regression
 
-Our linear model achieved an R-squared value of 0.819, meaning it is accounting for a non-trivial amount of variation in walkability index. As a result, interpretations of the largest coefficients are especially valuable. The following plot shows the coefficients of the variables with the six coefficients of largest magnitude.
+Our linear model achieved an R-squared value of 0.819, meaning it is accounting for a non-trivial amount of variance in walkability index. As a result, interpretations of the largest coefficients are especially valuable. The following plot shows the coefficients of the variables with the six coefficients of largest magnitude.
 
 ```{r, fig.cap = "Figure 9: Bar plot of top six variables, as indicated by OLS", include = TRUE}
 walk_linear_coef %>%
@@ -390,7 +390,7 @@ walk_linear_coef %>%
 
 There are three particularly large coefficients, corresponding to D2B_E8MIXA, D3A, and D2A_EPHHM. It is worth noting that the top variables here are in agreement with our LASSO variable importance. Because these three coefficients are all close to one, this means that a single unit increase in road network density, employment entropy, and household entropy are each roughly  associated with a single unit increase in the walkability index. 
 
-Conversely, the network density has a negative coefficient of about -0.5. The variable D3AAO specifically refers to the density of automobile-oriented links (as opposed to pedestrian oriented links). The D3AMM variable is similar but includes both auto and pedestrian-oriented network links. That both D3AMM and D3AAO both have a negative coefficient is not surprising; areas that are crowded with vehicles tend to be less walkable.
+Conversely, the network density has a negative coefficient of about -0.5. The variable D3AAO specifically refers to the density of automobile-oriented links (as opposed to pedestrian-oriented links). The D3AMM variable is similar but includes both auto and pedestrian-oriented network links. That both D3AMM and D3AAO both have a negative coefficient is not surprising; areas that are crowded with vehicles tend to be less walkable.
 
 
 ### Decision Tree Regression
@@ -410,7 +410,7 @@ The fact that the different branches of the tree consider different variables al
 
 ### Random Forest Regression
 
-With such a large dataset, a random forest algorithm was far from the fastest option. Regardless, we suspected that a Random Forest would result in the best performance metrics. Grid-searches were time consuming, but we were still able to find the hyperparameters that resulted in great cross-validated metrics. Our final random forest regression model had the highest R2 and lowest error of all of our models. Unfortunately, it is also the least interpretable, meaning that despite it's predictive power, that's just about all it offers.
+With such a large dataset, a random forest algorithm was far from the fastest option. Regardless, we suspected that a Random Forest would result in the best performance metrics. Grid-searches were time consuming, but we were still able to find the hyperparameters that resulted in great cross-validated metrics. Our final random forest regression model had the highest R2 and lowest error of all of our models. Unfortunately, it is also the least interpretable, it's predictive power is the only thing it offers.
 
 ### K-Neighbors Regression
 
@@ -434,16 +434,11 @@ KNN is a computationally expensive algorithm due to both the breadth and depth o
 
 Our model results demonstrate that we can forecast ozone-based AQI effectively without knowledge of ozone levels. On average, our random forest was only wrong by 20.953 AQI points, rarely predicting far from the actual AQI. As the estimates are in the same ballpark as the real AQI, they could potentially serve to give the public a general idea of how unsafe atmospheric ozone levels are in the absence of ozone measurements. We tuned several models for various parameters in order to arrive at this accurate of a random forest predictor. While our other models didn't prove to be as impactful, the linear model gives us an intuitive understanding that ozone is associated with high no2, high temperatures, and low humidity.
 
-**Add sentence recommending a single model here once we have final results from William**
-
 ## Walkability
 
-Our model results indicate that walkability index can be predicted quite well using the publicly available data. We were able to explain 90.7% of the variation in walkability index using a Random Forest model, which is an impressive number. KNN was able to achieve comparable but slightly worse results, explaining 86.4% of the variation in walkability index. Although neither of these models is particularly interpretable, their predictive power is impressive.
+Our model results indicate that walkability index can be predicted quite well using the publicly available data. We were able to explain 90.7% of the variance in walkability index using a Random Forest model, which is an impressive number. KNN was able to achieve comparable but slightly worse results, explaining 86.4% of the variance in walkability index. Although neither of these models is particularly interpretable, their predictive power is impressive.
 
-Our Linear Regression and Decision Tree models were highly interpretable, and also still saw variation explained of 81.9% and 71.9%, respectively. For models that are as interpretable as these, these performance metrics are remarkable. Linear Regression is particularly stand-out, as it was able to predict walkability index within 1 point, on average, while still explaining over 80% of the variation in walkability index.
-
-If we had to recommend a singular model to the EPA, we would recommend our Linear Regression model, as it has a great balance of predictive power and interpretability.
-
+Our Linear Regression and Decision Tree models were not only highly interpretable, they also explained 81.9% and 71.9% of the variation in Walkability Index respectively. For such interpretable models, these performance metrics are remarkable. Linear Regression is particularly stand-out, as it was able to predict walkability index within 1 point, on average, while still explaining over 80% of the variation in walkability index.
 
 # Ethics
 
@@ -451,21 +446,21 @@ If we had to recommend a singular model to the EPA, we would recommend our Linea
 
 It is important that as we give you these powerful machine learning model fits, you are aware of the importance of their proper usage. We hope that you will use the work detailed in this report to better understand the atmospheric factors that contribute to the future air quality of an area and its characteristics that determine its walkability. For the AQI model in particular, we also expect that you can use this model to effectively predict the air quality based on ozone even when direct ozone measurements are unable to be taken, using other atmospheric conditions as a proxy measurement.
 
-For the walkability model, we would support the usage of our models to predict areas with poor walkability for areas where it is unknown, such that changes could be implemented to make it more pedestrian-friendly. The goal of these models is to highlight a small number of factors that have a large impact on how walkable a place is. By identifying these characteristics, it is our hope that civil projects can be undertaken and that public policy changes can be implemented to improve walkability for all communities, but especially those that need it most. For example, there could be changes to the local codes that require a certain intersection density or federal incentives to having high public transportation service levels. Walkability is very strongly linked to physical health and quality of life metrics, so it is of the utmost importance to ensure all communities are walkable.
+For the walkability model, we would support the usage of our models to predict areas with poor walkability for areas where it is currently unknown, such that changes could be implemented to make it more pedestrian-friendly. The goal of these models is to highlight a small number of factors that have a large impact on how walkable a place is. By identifying these characteristics, it is our hope that civil projects can be undertaken and that public policy changes can be implemented to improve walkability for all communities, but especially those that need it most. For example, there could be changes to the local codes that require a certain intersection density or federal incentives to having high public transportation service levels. Walkability is very strongly linked to physical health and quality of life metrics, so it is of the utmost importance to ensure all communities are walkable.
 
 ## Misuses of our work
 
-Although there are many appropriate uses of our work, we also want to forewarn you about the potential misuses to avoid. Primarily, though our models predict ozone-based AQI, it should not be used as a proxy for AQI when proper measurements are available, as it could miss some important and dangerous fluctuations. The model's intended use is as an emergency measure, when ozone measurements are not available.
+Although there are many appropriate uses of our work, we also want to forewarn you about the potential misuses to avoid. Though our models predict ozone-based AQI, they should not be used as a proxy for AQI when proper measurements are available, as it could miss some important and dangerous fluctuations. The model's intended use is as an emergency measure when ozone measurements are not available.
 
-As the EPA, it is your responsibility to use the knowledge gained from this work and the corresponding machine learning models to help the environment, not to harm it. If large polluters use these models to find ways to disguise their harmful ozone production, this could ultimately do more harm than good. For example, if they learn that cold, humid days see low ozone, they may choose emit more fumes during those times and harm the larger environment.
+As the EPA, it is your responsibility to use the knowledge gained from this work and the corresponding machine learning models to help the environment, not to harm it. If misused, these models could ultimately end up doing more harm than good. For example, entities responsible for emitting large amounts of pollutants could use these models to find ways to disguise their harmful ozone production. If these enterprises learn that cold, humid days see low ozone, they may choose emit more fumes during those times which could cause more harm to the environment.
 
 Care should be taken to protect public transportation services even if the area would be "walkable enough" without having such high service levels. It would also not be appropriate to target low-income housing developments to places that are less walkable simply because these areas tend to have a higher percentage of low-wage workers.
 
 ## Bias
 
-We must acknowledge that our project is subject to biases - deliberate or otherwise. The primary bias in this analysis came from the data collection process. Our final data set consisted of atmospheric measurements from only 43 counties across 32 states, meaning that a substantial portion of the country is left unaccounted for by this analysis. Also, we did not investigate the geographic locations of the weather stations that were monitoring the atmospheric conditions; hence it is possible that these measurements are not representative of the general population of atmospheric conditions. Finally, the data we analyzed came only from the years 2021 and 2022 - meaning that insights and trends illuminated in this report may not reflect the historical patterns.
+We must acknowledge that our project is subject to biases - deliberate or otherwise. The primary bias in the AQI analysis came from the data collection process. Our final data set consisted of atmospheric measurements from only 43 counties across 32 states, meaning that a substantial portion of the country is left unaccounted for. Also, we did not investigate the geographic locations of the weather stations that were monitoring the atmospheric conditions; hence it is possible that these measurements are not representative of the general population of atmospheric conditions (For example, perhaps weather monitoring stations tend to be close to cities, making this analysis less representative of rural areas). Finally, the data we analyzed came only from the years 2021 and 2022 - meaning that insights and trends illuminated in this report may not reflect the historical patterns.
 
-For the walkability dataset, we have very serious concerns about bias. Many variables in the dataset required information about public transit services. Local transit agencies should use a General Transit Feed Specification (GTFS) to share transit information in a standardized format. Although 95% of total transit ridership in the US is covered by the GTFS, not all places develop GTFS data for their systems or share it, particularly smaller transit agencies. Since many variables depended on this information, observations without it were removed. Unfortunately, this had a severely disproportionate impact on the less walkable places. Prior to removal, 43,250 places were designated as "Least walkable" and 68,640 places were "Below average walkable." After removal, there were only 10 least walkable places and 7,583 below average walkable places remained. Most walkable and above average walkable places only lost 4% and 15% of their locations respectively. Since the classes are so unbalanced, our models will likely (and unrealistically) predict areas will be more walkable than they are.
+For the walkability dataset, we have very serious concerns about bias. Many variables in the dataset required information about public transit services. Local transit agencies should use a General Transit Feed Specification (GTFS) to share transit information in a standardized format. Although 95% of total transit ridership in the US is covered by the GTFS, not all places develop GTFS data for their systems or share it, particularly smaller transit agencies. Since many variables depended on this information, observations without it were removed. Unfortunately, this had a severely disproportionate impact on the less walkable places. Prior to removal, 43,250 places were designated as "Least walkable" and 68,640 places were "Below average walkable." After removal, there were only 10 least walkable places and 7,583 below average walkable places remained. Most walkable and above average walkable places only lost 4% and 15% of their locations respectively. Since the Walkability Index categories are very unevenly represented in the data our models were trained on, they will likely (and unrealistically) predict areas will be more walkable than they are.
 
 # Conclusion
 
@@ -479,14 +474,11 @@ The single model we would recommend to you for predicting the walkability index 
 
 ## Sources
 
-How Weather Affects Air Quality \| Center for Science Education. (n.d.). UCAR. <https://scied.ucar.edu/learning-zone/air-quality/how-weather-affects-air-quality>
+"Center for Science Education." How Weather Affects Air Quality | Center for Science Education, [https://scied.ucar.edu/learning-zone/air-quality/how-weather-affects-air-quality](https://scied.ucar.edu/learning-zone/air-quality/how-weather-affects-air-quality).
 
--   This is where sources we used should be linked. Please cite them in some proper format, not just hyperlinks (example above).
--   Any additional output from model summaries that did not fit earlier in the paper could go here as well
+Champan, Jim, et al. EPA, Environmental Protection Agency, June 2021, [https://www.epa.gov/smartgrowth/smart-location-database-technical-documentation-and-user-guide](https://www.epa.gov/smartgrowth/smart-location-database-technical-documentation-and-user-guide).
 
-Smart Location Database Technical Documentation and User Guide (Version 3.0)
+Thomas, John, et al. "National Walkability Index Methodology and User Guide." EPA, Environmental Protection Agency, June 2021, [https://www.epa.gov/smartgrowth/national-walkability-index-user-guide-and-methodology](https://www.epa.gov/smartgrowth/national-walkability-index-user-guide-and-methodology).
 
-<https://www.epa.gov/sites/default/files/2021-06/documents/epa_sld_3.0_technicaldocumentationuserguide_may2021.pdf>
-
-National Walkability Index Methodology and User Guide
+"Walkability Index." Catalog, Responsible Party U.S. Environmental Protection Agency, Office of Sustainable Communities (Point of Contact), 3 July 2021, [https://catalog.data.gov/dataset/walkability-index](https://catalog.data.gov/dataset/walkability-index).
 
