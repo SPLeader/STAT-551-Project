@@ -310,8 +310,6 @@ Lastly, some preliminary investigation was conducted to look at the relationship
 
 To help determine which of the 100+ predictors to use, we used both regression with a LASSO penalty and a Decision Tree. The most important variables were consistent between these two model specifications. Out of the 117 variables, only 6 actually made a significant contribution to reducing impurity in the decision tree, so these were the variables we used when fitting our models. All six of these variables also had nonzero coefficients even with the LASSO penalty. A bar plot of the LASSO-selected variables and the upper part of the decision tree are shown below.
 
-![](images/lasso_coefficients.png)
-
 ```{python, fig.cap = 'Figure #: Bar plot of top six most important variables; selected as predictors for final models'}
 plt.clf()
 sns.barplot(x=df_nwi_lasso_features["Feature"][:6], y=np.abs(df_nwi_lasso_features["Coefficients"][:6]))
@@ -320,16 +318,6 @@ plt.ylabel('Coefficient')
 
 plt.show()
 plt.close()
-"""
-plt.clf()
-plt.figure().set_figwidth(20)
-sns.barplot(x=df_nwi_lasso_features["features"][:6], y=np.abs(df_nwi_lasso_features["coefficients"][:6]))
-plt.title('Top Lasso Coefficients')
-plt.ylabel('Coefficient')
-plt.savefig('NWI Outputs/lasso_coefficients.png')
-plt.show()
-plt.close()
-"""
 ```
 
 ![Figure 5: Decision tree showing the uppermost splits (most important variables)](NWI%20Outputs/decision_tree_feature_selection.png)
