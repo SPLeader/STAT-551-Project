@@ -51,7 +51,8 @@ aqi_test   <- aqi_ozone[!sample, ]
 ```
 
 ```{r}
-model_scores <- data.frame(colnames = c("Model", "R-Squared", "Root Mean Squared Error"))
+model_scores <- data.frame(matrix(, ncol = 3, nrow = 0))
+names(model_scores <- c("Model", "R-Squared", "Root Mean Squared Error"))
 ```
 
 # Linear models
@@ -267,7 +268,7 @@ The best RMSE with just 3 best variables was 26.16919, not too much worse than t
 ### Tuning
 
 ```{r}
-rf_mod <- rand_forest(mtry = tune(), min_n = tune(), trees = 100) %>%
+rf_mod <- rand_forest(mtry = tune(), min_n = tune(), trees = 1000) %>%
   set_engine("ranger") %>%
   set_mode("regression")
 
@@ -284,7 +285,7 @@ rf_wf <- workflow() %>%
 
 rf_grid <- grid_regular(min_n(c(1, 2)),
                         mtry(c(4, 8)),
-                        levels = 2)
+                        levels = 1)
 
 rf_grid_result <- rf_wf %>% 
   tune_grid(resamples = aqi_ozone_cvs,
@@ -293,10 +294,10 @@ rf_grid_result <- rf_wf %>%
 # Save metrics
 
 model_title = "Random Forest"
-model_rsq = grid_results %>% 
+model_rsq = rf_grid_result %>% 
   collect_metrics() %>% 
   filter(.metric == "rsq") %>% pull(mean) %>% max()
-model_rmse = grid_results %>% 
+model_rmse = rf_grid_result %>% 
   collect_metrics() %>% 
   filter(.metric == "rmse") %>% pull(mean) %>% max()
 
@@ -318,7 +319,7 @@ rf_grid_result %>%
 ### Single Random Forest Restiduals
 
 ```{r}
-rf_best_spec <- rand_forest(mtry = 6, min_n = 100) %>%
+rf_best_spec <- rand_forest(mtry = 6, min_n = 4, trees = 1000) %>%
   set_engine("ranger") %>%
   set_mode("regression")
 
@@ -378,7 +379,7 @@ model_title = "Decision Tree"
 model_rsq = dt_grid_result %>% 
   collect_metrics() %>% 
   filter(.metric == "rsq") %>% pull(mean) %>% max()
-model_rmse = grid_results %>% 
+model_rmse = dt_grid_result %>% 
   collect_metrics() %>% 
   filter(.metric == "rmse") %>% pull(mean) %>% max()
 
@@ -493,7 +494,7 @@ all_preds %>%
 
 ```{r}
 # Saving model performaces
-
+model_scores
 model_scores %>% 
   write.csv(here("AQI Outputs","AQI_model_metrics_r.csv"), row.names = FALSE)
 ```

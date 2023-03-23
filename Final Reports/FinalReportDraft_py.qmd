@@ -25,6 +25,8 @@ execute:
 # Imports
 
 import pandas as pd
+import numpy as np
+import seaborn as sns
 import matplotlib.pyplot as plt
 from IPython.display import Markdown
 from tabulate import tabulate
@@ -44,6 +46,7 @@ aqi
 ```
 
 ```{python}
+#os.chdir('../')
 # Reading in other outputs
 aqi_df_dt_preds = pd.read_csv("AQI Outputs/AQI_df_dt_preds_py.csv")
 aqi_df_lm_preds = pd.read_csv("AQI Outputs/AQI_df_lm_preds_py.csv")
@@ -53,7 +56,7 @@ aqi_model_metrics = pd.read_csv("AQI Outputs/AQI_model_metrics_py.csv")
 
 ```{python}
 # NWI Data
-os.chdir('../')
+#os.chdir('../')
 
 nwi = pd.read_csv('cleaned_nwi.csv')
 
@@ -62,9 +65,9 @@ print([i for i in nwi.columns])
 
 ```{python}
 # NWI Outputs
-os.chdir('../')
+#os.chdir('../')
 
-df_nwi_lasso_features.to_csv = pd.read_csv("NWI Outputs/NWI_lasso_features_py.csv")
+df_nwi_lasso_features = pd.read_csv("NWI Outputs/NWI_lasso_features_py.csv")
 
 ```
 
@@ -342,13 +345,13 @@ plt.figure().set_figwidth(20)
 plt.figure().set_figheight(1)
 
 fig, axs = plt.subplots(3, 1, sharex=True, sharey = True)
-axs[0].scatter(df_lm_preds["preds"], df_lm_preds["residuals"], s=.3)
+axs[0].scatter(aqi_df_lm_preds["preds"], aqi_df_lm_preds["residuals"], s=.3)
 axs[0].axhline(y = 0, color = 'k', linestyle = '--', linewidth=.5)
 axs[0].set_title('LM', fontdict={'fontsize' : 8})
-axs[1].scatter(df_dt_preds["preds"], df_dt_preds["residuals"], s=.3)
+axs[1].scatter(aqi_df_dt_preds["preds"], aqi_df_dt_preds["residuals"], s=.3)
 axs[1].axhline(y = 0, color = 'k', linestyle = '--', linewidth=.5)
 axs[1].set_title('DT', fontdict={'fontsize' : 8})
-axs[2].scatter(df_rf_preds["preds"], df_rf_preds["residuals"], s=.3)
+axs[2].scatter(aqi_df_rf_preds["preds"], aqi_df_rf_preds["residuals"], s=.3)
 axs[2].axhline(y = 0, color = 'k', linestyle = '--', linewidth=.5)
 axs[2].set_title('RF', fontdict={'fontsize' : 8})
 
@@ -377,7 +380,7 @@ Note that in this formula, max_no2, max_temperature, and max_humidity are standa
 
 Our decision tree's predictions look far different than the others because they are made in discrete categories rather than in a more continuous manner. While this model has little bias, with only a slight overestimation bias on its highest predictions of 144, it has the largest overall errors, making it a worse predictor than other models. Nevertheless, this model may be very valuable, as we can directly see how it makes its decisions in the following decision tree flowchart:
 
-![Figure 5: Decision Tree Flowchart](../AQI Outputs/AQI_decision_tree_py.png)
+![Figure 5: Decision Tree Flowchart](../AQI%20Outputs/AQI_decision_tree_py.png)
 
 At each step, this decision tree chooses one variable to best separate high-AQI days from low-AQI days. The first, largest, split separates based on no2: days with a very low no2, below 18 ppb, are directed to the left side of the tree, which tends to have lower AQI. This split makes sense because ozone and no2 tend to come from the same sources such as cars and industrial facilities, so a low no2 concentration correlate with low ozone. For low no2 days, the tree finds that high temperature is the best indicator of high AQI, with humidity distinguishing further days with a max temperature between 68 and 82 degrees Fahrenheit. For high no2 days, the tree uses air pressure and temperature to distinguish AQI further.
 
