@@ -225,7 +225,7 @@ aqi %>% select(-Date, -County, -State,
   ylim(c(-0.6, 0.6))
 ```
 
-Figure 3 shows how the different atmospheric measurements correlate with next-day AQI. For most atmospheric measurements, the correlation is in the same direction for the minimum, mean, and maximum. However, wind speed is a notable exception to this trend, where we can see that although the mean and minimum wind speed are negatively correlated with next-day AQI, the maximum wind speed has a slight positive correlation with next-day AQI. The single variable with the most positive correlation is maximum no2, with a correlation of \~0.59. The single variable with the most negative correlation is minimum humidity, with a correlation of \~-0.50.
+Figure 3 shows how the different atmospheric measurements correlate with next-day AQI. For most atmospheric measurements, the correlation is in the same direction for the minimum, mean, and maximum. However, wind speed is a notable exception to this trend, where we can see that although the mean and minimum wind speed are negatively correlated with next-day AQI, the maximum wind speed has a slight positive correlation with next-day AQI. The single variable with the most positive correlation to next-day AQI is maximum no2, with a correlation of \~0.59, meaning that higher maximum concentration measurements of no2 are associated with higher next-day AQIs. The single variable with the most negative correlation to next-day AQI is minimum humidity, with a correlation of \~-0.50, meaning that higher minimum humidity measurements are associated with lower next-day AQIs.
 
 <br /> <br />
 
