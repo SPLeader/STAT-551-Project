@@ -46,7 +46,7 @@ aqi
 ```
 
 ```{python}
-#os.chdir('../')
+os.chdir('../')
 # Reading in other outputs
 aqi_df_dt_preds = pd.read_csv("AQI Outputs/AQI_df_dt_preds_py.csv")
 aqi_df_lm_preds = pd.read_csv("AQI Outputs/AQI_df_lm_preds_py.csv")
@@ -56,7 +56,7 @@ aqi_model_metrics = pd.read_csv("AQI Outputs/AQI_model_metrics_py.csv")
 
 ```{python}
 # NWI Data
-#os.chdir('../')
+os.chdir('../')
 
 nwi = pd.read_csv('cleaned_nwi.csv')
 
@@ -65,7 +65,7 @@ print([i for i in nwi.columns])
 
 ```{python}
 # NWI Outputs
-#os.chdir('../')
+os.chdir('../')
 
 df_nwi_lasso_features = pd.read_csv("NWI Outputs/NWI_lasso_features_py.csv")
 
@@ -306,13 +306,21 @@ Lastly, some preliminary investigation was conducted to look at the relationship
 
 \
 
-Variable Selection
+## Variable Selection
 
 To help determine which of the 100+ predictors to use, we used both regression with a LASSO penalty and a Decision Tree. The most important variables were consistent between these two model specifications. Out of the 117 variables, only 6 actually made a significant contribution to reducing impurity in the decision tree, so these were the variables we used when fitting our models. All six of these variables also had nonzero coefficients even with the LASSO penalty. A bar plot of the LASSO-selected variables and the upper part of the decision tree are shown below.
 
 ![](images/lasso_coefficients.png)
 
 ```{python, fig.cap = 'Figure #: Bar plot of top six most important variables; selected as predictors for final models'}
+plt.clf()
+sns.barplot(x=df_nwi_lasso_features["Feature"][:6], y=np.abs(df_nwi_lasso_features["Coefficients"][:6]))
+plt.title('Top Lasso Coefficients')
+plt.ylabel('Coefficient')
+
+plt.show()
+plt.close()
+"""
 plt.clf()
 plt.figure().set_figwidth(20)
 sns.barplot(x=df_nwi_lasso_features["features"][:6], y=np.abs(df_nwi_lasso_features["coefficients"][:6]))
@@ -321,6 +329,7 @@ plt.ylabel('Coefficient')
 plt.savefig('NWI Outputs/lasso_coefficients.png')
 plt.show()
 plt.close()
+"""
 ```
 
 ![Figure 5: Decision tree showing the uppermost splits (most important variables)](NWI%20Outputs/decision_tree_feature_selection.png)
@@ -426,7 +435,7 @@ The final random forest model achieved a high R2 score of .8929 and an MSE of .5
 
 Though usually performed in classification problems, KNN was a powerful regression tool in our analysis. Fit with the top 6 predictors according to our feature selection (See Table 2), the final model achieved mean squared error .5960 and R2 of .8895.
 
-![](../NWI Outputs/KNN_n_scores.png)
+![](../NWI%20Outputs/KNN_n_scores.png)
 
 Figure #: Tuning number of neighbors for KNN regression
 
