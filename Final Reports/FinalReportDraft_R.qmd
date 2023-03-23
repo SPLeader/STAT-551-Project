@@ -333,11 +333,13 @@ Note that in this formula, max_no2, max_temperature, and max_humidity are standa
 
 ### Decision Tree
 
-Our decision tree's predictions look far different than the others because they are made in discrete categories rather than in a more continuous manner. While this model has little bias, with only a slight overestimation bias on its highest predictions of 144, it has the largest overall errors, making it a worse predictor than other models. Nevertheless, this model may be very valuable, as we can directly see how it makes its decisions in the following decision tree flowchart:
+Our decision tree's predictions look far different than the others because they are made in discrete categories rather than in a more continuous manner. While this model has little bias, with only a slight overestimation bias on its highest predictions of 144, it has the largest overall errors, making it worse at predicting next-day AQI than other models. Nevertheless, this model may be very valuable, as we can directly see how it makes its decisions in the following decision tree flowchart:
 
 ![Figure 8: Decision Tree Flowchart for AQI](../AQI%20Outputs/AQI_decision_tree_r.png)
 
-At each step, this decision tree chooses one variable to best separate high-AQI days from low-AQI days. The first, largest, split separates based on no2: days with a very low no2, below 18 ppb, are directed to the left side of the tree, which tends to have lower AQI. This split makes sense because ozone and no2 tend to come from the same sources such as cars and industrial facilities, so a low no2 concentration correlate with low ozone. For low no2 days, the tree finds that high temperature is the best indicator of high AQI, with humidity distinguishing further days with a max temperature between 68 and 82 degrees Fahrenheit. For high no2 days, the tree uses air pressure and temperature to distinguish AQI further.
+At each step, this decision tree chooses one variable to best separate high next-day AQI days from low next-day AQI days. The first, largest, split separates based on no2: days with a very low maximum no2, below 18 ppb, are directed to the left side of the tree, which tends to have lower next-day AQI. This is consistent with our finding from the linear model, as we know there is a meaningful positive correlation between no2 and ozone (and therefore AQI based on ozone). For low no2 days, the tree finds that high maximum temperature is the best indicator of high next-day AQI, with minimum humidity distinguishing further days with a max temperature between 68 and 82 degrees Fahrenheit. For high no2 days, the tree uses minimum and maximum air pressure and maximum temperature to distinguish AQI further.
+
+This goes to show that next-day AQI is complicated to predict, with the different sides of the tree using different sets of variables. **This tree indicates that there are complex interactions between atmospheric conditions that contribute to next-day AQI.**
 
 ### Random Forest
 
@@ -345,26 +347,7 @@ Our final optimized random forest model averages the results of 500 decision tre
 
 ## Walkability
 
-### Variable Selection
-
-To help determine which of the 100+ predictors to use, we used a linear regression with a LASSO penalty. Out of the 117 total variables, we use the top 8 according to the LASSO model. Most of the coefficients were absolute zero, meaning many of the variables are considerably less informative than others. By looking at the magnitudes of the top coefficients, we can compare which ones give the most information for determining the walkability index. Among the top variables are variables associated with employment entropy, road network density, and occupied housing, and we will postpone interpretation of these variables until later in the report.
-
-```{r, fig.cap = "Figure 9: Bar plot of top six variables, as selected by LASSO", include = TRUE}
-walk_lasso_coef %>% 
-  rename("Coefficient" = "coefficient",
-         "Variable" = "variable") %>%
-  arrange(desc(abs(Coefficient))) %>% 
-  filter(Variable != "(Intercept)") %>%
-  head(6) %>%
-  ggplot(aes(x = fct_reorder(Variable, desc(abs(Coefficient))), y = abs(Coefficient), fill = Variable)) +
-  geom_col() +
-  labs(x = "Variable",
-       y = "Magnitude of Coefficient") +
-  theme_bw() + 
-  theme(legend.position = "none") 
-```
-
-For the Walkability dataset, we used various regeression models to make predictions on the numeric walkability index. For all models, 10-fold cross-validation was used to get a better sense of how these models would perform when predicting on unseen data. 
+We used four different types of regeression models to predict walkability index: Linear Regression, Decision Tree, KNN, and Random Forest. For each model, we calculated the R-squared and RMSE based on 10-fold cross-validation.
 
 ```{r, fig.cap = "Table 7. Best performance metrics of our four models for walkability index", include = TRUE}
 best_knn_rmse <- walk_knn %>% filter(.metric == "rmse") %>% slice_min(mean) %>% mutate(Model = "KNN") %>% pivot_wider(names_from = .metric, values_from = mean)
@@ -393,13 +376,32 @@ best_models %>%
   knitr::kable(digits = 3)
 ```
 
+**The model that resulted in the best cross-validated metrics was our Random Forest, observing an R-squared of 0.907 and a RMSE of 0.718.** This means that this model is able to account for over 90% of variation in walkability index, and its predictions of walkability index were only off by 0.718, on average. Naturally, the model that had the best performance metrics was the least interpretable. 
+
+On the other hand, our most interpretable model, the decision tree, still resulted in reasonable performance metrics, with an R-squared of 0.719 and a RMSE of 1.223. The following sections detail our methodologies in more detail. 
+
+### Variable Selection
+
+To help determine which of the 117 predictors to use, we used linear regression with a LASSO penalty term. Most of the coefficients shrunk to zero, meaning many of the variables are considerably less informative than others. By looking at the magnitudes of the top six coefficients, we can compare which variables give the most information for determining the walkability index. Among the top variables are variables associated with employment entropy, road network density, and occupied housing. We discuss specific interpretations of these variables in the Linear Regression section.
+
+```{r, fig.cap = "Figure 9: Bar plot of top six variables, as selected by LASSO", include = TRUE}
+walk_lasso_coef %>% 
+  rename("Coefficient" = "coefficient",
+         "Variable" = "variable") %>%
+  arrange(desc(abs(Coefficient))) %>% 
+  filter(Variable != "(Intercept)") %>%
+  head(6) %>%
+  ggplot(aes(x = fct_reorder(Variable, desc(abs(Coefficient))), y = abs(Coefficient), fill = Variable)) +
+  geom_col() +
+  labs(x = "Variable",
+       y = "Magnitude of Coefficient") +
+  theme_bw() + 
+  theme(legend.position = "none") 
+```
+
 ### Linear Regression
 
-Our linear model achieved a notable R-squared value, meaning we can use it to make some pretty valuable interpretations regarding the data. There are three particularly large coefficients, which tell us that these variables have a relevance with predicting walkability. The top variables here are in agreement with our LASSO model.
-
-According to our coefficients, a single unit increase in road network density, employment entropy, and household entropy are each associated with roughly a single unit increase in the walkability index. On the other hand, the network density has a negative correlation of about half the strength. The variable D3AAO specifically refers to the density of auto-oriented links (as opposed to pedestrian oriented links). The D3AMM variable is similar but includes both auto and pedestrian-oriented network links. That they both have a negative coefficient is not surprising; areas that are crowded with vehicles tend to be less walkable.
-
-The RMSE of 0.982 makes our linear regression model less effective than the others, but it was definitely good enough (and interpretable enough) for us to gain some valuable insight.
+Our linear model achieved an R-squared value of 0.819, meaning it is accounting for a non-trivial amount of variation in walkability index. As a result, interpretations of the largest coefficients are especially valuable. The following plot shows the coefficients of the variables with the eight coefficients of largest magnitude.
 
 ```{r, include = TRUE}
 walk_linear_coef %>%
@@ -413,6 +415,11 @@ walk_linear_coef %>%
   scale_x_discrete(guide = guide_axis(n.dodge = 2)) +
   labs(x = "Variable")
 ```
+
+There are three particularly large coefficients, corresponding to D2B_E8MIXA, D3A, and D2A_EPHHM. It is worth noting that the top variables here are in agreement with our LASSO variable importance.
+
+Because these three coefficients are all close to one, this means that a single unit increase in road network density, employment entropy, and household entropy are each roughly  associated with a single unit increase in the walkability index. Conversely, the network density has a negative coefficient of about -0.5. The variable D3AAO specifically refers to the density of automobile-oriented links (as opposed to pedestrian oriented links). The D3AMM variable is similar but includes both auto and pedestrian-oriented network links. That both D3AMM and D3AAO both have a negative coefficient is not surprising; areas that are crowded with vehicles tend to be less walkable.
+
 
 ### Decision Tree Regression
 
