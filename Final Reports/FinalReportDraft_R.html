@@ -2943,7 +2943,7 @@ vertical-align: -.125em;
 <h1>Model Results</h1>
 <section id="aqi-2" class="level2">
 <h2 class="anchored" data-anchor-id="aqi-2">AQI</h2>
-<p>We used three different types of models to predict AQI: linear models (OLS and LASSO), decision trees, and random forests. Each model predicts the next day’s AQI based on the min, mean, and max values of our 8 predictor measurements. Notably, this does not include any measurements of the day’s Ozone or AQI. We measured each model’s performance by cross-validating on data the model had not been trained on. The R-Squared and Root Mean Squared Error metrics are displayed below:</p>
+<p>We used three different types of models to predict AQI: linear models (LASSO), decision trees, and random forests. Each model predicts the next day’s AQI based on the min, mean, and max values of our 8 predictor measurements. Notably, this does not include any measurements of the day’s Ozone or AQI. We measured each model’s performance by cross-validating on data the model had not been trained on. The R-Squared and Root Mean Squared Error metrics are displayed below:</p>
 <div class="cell">
 <div class="cell-output-display">
 <table class="table table-sm table-striped">
@@ -3111,7 +3111,7 @@ AQI = 58.68 + 12.43 * max\_no2 + 8.43 * max\_temperature - 6.36 * min\_humidity
 <h1>Discussion</h1>
 <section id="aqi-3" class="level2">
 <h2 class="anchored" data-anchor-id="aqi-3">AQI</h2>
-<p>Our model results demonstrate that we can forecast ozone-based AQI effectively without knowledge of ozone levels. On average, our random forest was only wrong by 20.953 AQI points, rarely predicting far from the actual AQI. As the estimates are in the same ballpark as the real AQI, they could potentially serve to give the public a general idea of how unsafe atmospheric ozone levels are in the absence of ozone measurements. We tuned several models for various parameters in order to arrive at this accurate of a random forest predictor. While our other models didn’t prove to be as impactful, the linear model gives us an intuitive understanding that ozone is associated with high no2, high temperatures, and low humidity.</p>
+<p>Our model results demonstrate that we can forecast ozone-based AQI effectively without knowledge of ozone levels. On average, our random forest was only wrong by 19.501 AQI points, rarely predicting far from the actual AQI. As the estimates are in the same ballpark as the real AQI, they could potentially serve to give the public a general idea of how unsafe atmospheric ozone levels are in the absence of ozone measurements. We tuned several models for various parameters in order to arrive at this accurate of a random forest predictor. While our other models didn’t prove to be as impactful, the linear model gives us an intuitive understanding that ozone is associated with high no2, high temperatures, and low humidity.</p>
 </section>
 <section id="walkability-3" class="level2">
 <h2 class="anchored" data-anchor-id="walkability-3">Walkability</h2>
@@ -3142,18 +3142,17 @@ AQI = 58.68 + 12.43 * max\_no2 + 8.43 * max\_temperature - 6.36 * min\_humidity
 <h1>Conclusion</h1>
 <p>Our goal was to leverage machine learning to assist you, the EPA, with your mission of furthering environmental protection, advancing environmental justice, and safeguarding communities. We specifically created a tool to help you understand the factors that contribute to next-day AQI and predict the harmful effects of ozone without any direct measurements of ozone concentrations. We also developed a model that can capture over 80% of the variance in walkability index using built environment characteristics. This can help you inform the public of air quality danger and help lobby for projects to reduce the car dependency of locations with low walkability.</p>
 <p>For both the AQI and walkability datasets, random forests proved to be the model specifications with the highest predictive power as measured by R-squared and RMSE. We discovered that the most important variables for predicting next-day AQI were maximum no2, maximum temperature, and minimum humidity. On the other hand, the most important variables for predicting the walkability index were those relating to diveristy of employment, road network density, and diversity of housing types.</p>
-<p>The single model we would recommend to you for predicting next-day AQI is our random forest model, as it has the best predictive ability. This report has sufficient information on the contributing factors to next-day ozone AQI such that the more interpretable models are not worth using at the cost of predictive power.</p>
-<p>The single model we would recommend to you for predicting the walkability index of a location is the linear regression model, because it has a good balance of predictive power and interpretability. Because walkability index is such a complicated metric and this dataset has so many features, it is important to preserve the ability to interpret how and why the model is making the predictions it is.</p>
+<p>Ultimately, for both AQI and walkability, we suggest using the Random Forest model to predict because they each achieved the best performance metrics. We can still benefit from the other models by using their interpretatable elements, but when predicting we would suggest using the best available model. Particularly with the AQI predictions, the random forest displayed far less bias than the others, and will likely perform best on future data.</p>
 </section>
 <section id="appendix" class="level1">
 <h1>Appendix</h1>
 <section id="sources" class="level2">
 <h2 class="anchored" data-anchor-id="sources">Sources</h2>
-<p>“AirData Website File Download Page.” EPA, Environmental Protection Agency, 1 Jan. 2023, <a href="https://aqs.epa.gov/aqsweb/airdata/download_files.html">https://aqs.epa.gov/aqsweb/airdata/download_files.html</a>.</p>
-<p>“Center for Science Education.” How Weather Affects Air Quality | Center for Science Education, <a href="https://scied.ucar.edu/learning-zone/air-quality/how-weather-affects-air-quality">https://scied.ucar.edu/learning-zone/air-quality/how-weather-affects-air-quality</a>.</p>
-<p>Champan, Jim, et al. EPA, Environmental Protection Agency, June 2021, <a href="https://www.epa.gov/smartgrowth/smart-location-database-technical-documentation-and-user-guide">https://www.epa.gov/smartgrowth/smart-location-database-technical-documentation-and-user-guide</a>.</p>
-<p>Thomas, John, et al. “National Walkability Index Methodology and User Guide.” EPA, Environmental Protection Agency, June 2021, <a href="https://www.epa.gov/smartgrowth/national-walkability-index-user-guide-and-methodology">https://www.epa.gov/smartgrowth/national-walkability-index-user-guide-and-methodology</a>.</p>
-<p>“Walkability Index.” Catalog, Responsible Party U.S. Environmental Protection Agency, Office of Sustainable Communities (Point of Contact), 3 July 2021, <a href="https://catalog.data.gov/dataset/walkability-index">https://catalog.data.gov/dataset/walkability-index</a>.</p>
+<p>“AirData Website File Download Page.” EPA, Environmental Protection Agency, 1 Jan. 2023, <a href="https://aqs.epa.gov/aqsweb/airdata/download_files.html" class="uri">https://aqs.epa.gov/aqsweb/airdata/download_files.html</a>.</p>
+<p>“Center for Science Education.” How Weather Affects Air Quality | Center for Science Education, <a href="https://scied.ucar.edu/learning-zone/air-quality/how-weather-affects-air-quality" class="uri">https://scied.ucar.edu/learning-zone/air-quality/how-weather-affects-air-quality</a>.</p>
+<p>Champan, Jim, et al. EPA, Environmental Protection Agency, June 2021, <a href="https://www.epa.gov/smartgrowth/smart-location-database-technical-documentation-and-user-guide" class="uri">https://www.epa.gov/smartgrowth/smart-location-database-technical-documentation-and-user-guide</a>.</p>
+<p>Thomas, John, et al. “National Walkability Index Methodology and User Guide.” EPA, Environmental Protection Agency, June 2021, <a href="https://www.epa.gov/smartgrowth/national-walkability-index-user-guide-and-methodology" class="uri">https://www.epa.gov/smartgrowth/national-walkability-index-user-guide-and-methodology</a>.</p>
+<p>“Walkability Index.” Catalog, Responsible Party U.S. Environmental Protection Agency, Office of Sustainable Communities (Point of Contact), 3 July 2021, <a href="https://catalog.data.gov/dataset/walkability-index" class="uri">https://catalog.data.gov/dataset/walkability-index</a>.</p>
 <!-- -->
 
 </section>
@@ -3529,307 +3528,301 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
 <span id="cb1-188"><a href="#cb1-188"></a>(2) Hot and dry weather results in forest fires that can increase atmospheric pollutants</span>
 <span id="cb1-189"><a href="#cb1-189"></a>(3) Clouds are less common at higher temperatures but are important for preventing the production of ozone</span>
 <span id="cb1-190"><a href="#cb1-190"></a></span>
-<span id="cb1-191"><a href="#cb1-191"></a></span>
-<span id="cb1-192"><a href="#cb1-192"></a><span class="kw">&lt;br</span> <span class="kw">/&gt;</span> <span class="kw">&lt;br</span> <span class="kw">/&gt;</span></span>
-<span id="cb1-193"><a href="#cb1-193"></a></span>
-<span id="cb1-194"><a href="#cb1-194"></a><span class="fu">### Correlations between predictors and AQI</span></span>
-<span id="cb1-195"><a href="#cb1-195"></a></span>
-<span id="cb1-196"><a href="#cb1-196"></a><span class="in">```{r, fig.cap = &quot;Figure 3. Predictor correlations with AQI, by min, mean, and max concentration&quot;, include = TRUE}</span></span>
-<span id="cb1-197"><a href="#cb1-197"></a>aqi <span class="sc">%&gt;%</span> <span class="fu">select</span>(<span class="sc">-</span>Date, <span class="sc">-</span>County, <span class="sc">-</span>State, </span>
-<span id="cb1-198"><a href="#cb1-198"></a>               <span class="sc">-</span>AQI, <span class="sc">-</span>AQI_cat, <span class="sc">-</span>max_ozone, </span>
-<span id="cb1-199"><a href="#cb1-199"></a>               <span class="sc">-</span>mean_ozone, <span class="sc">-</span>min_ozone) <span class="sc">%&gt;%</span></span>
-<span id="cb1-200"><a href="#cb1-200"></a>  <span class="fu">cor</span>() <span class="sc">%&gt;%</span> </span>
-<span id="cb1-201"><a href="#cb1-201"></a>  <span class="fu">data.frame</span>() <span class="sc">%&gt;%</span></span>
-<span id="cb1-202"><a href="#cb1-202"></a>  <span class="fu">select</span>(AQI_next_day) <span class="sc">%&gt;%</span> </span>
-<span id="cb1-203"><a href="#cb1-203"></a>  <span class="fu">mutate</span>(<span class="at">variable =</span> <span class="fu">rownames</span>(.),</span>
-<span id="cb1-204"><a href="#cb1-204"></a>         <span class="at">variable_category =</span> <span class="fu">str_replace</span>(variable, <span class="st">&quot;.+_&quot;</span>, <span class="st">&quot;&quot;</span>),</span>
-<span id="cb1-205"><a href="#cb1-205"></a>         <span class="at">variable_type =</span> <span class="fu">str_replace</span>(variable, <span class="st">&quot;_.+&quot;</span>, <span class="st">&quot;&quot;</span>)) <span class="sc">%&gt;%</span></span>
-<span id="cb1-206"><a href="#cb1-206"></a>  <span class="fu">filter</span>(variable <span class="sc">!=</span> <span class="st">&quot;AQI_next_day&quot;</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb1-207"><a href="#cb1-207"></a>  <span class="fu">rename</span>(<span class="st">&quot;Correlation&quot;</span> <span class="ot">=</span> AQI_next_day) <span class="sc">%&gt;%</span></span>
-<span id="cb1-208"><a href="#cb1-208"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> <span class="fu">factor</span>(variable_category, </span>
-<span id="cb1-209"><a href="#cb1-209"></a>                        <span class="at">levels =</span> <span class="fu">c</span>(<span class="st">&quot;no2&quot;</span>, <span class="st">&quot;temp&quot;</span>, <span class="st">&quot;co&quot;</span>, </span>
-<span id="cb1-210"><a href="#cb1-210"></a>                                   <span class="st">&quot;so2&quot;</span>, <span class="st">&quot;no&quot;</span>, <span class="st">&quot;wind&quot;</span>, </span>
-<span id="cb1-211"><a href="#cb1-211"></a>                                   <span class="st">&quot;pressure&quot;</span>, <span class="st">&quot;humid&quot;</span>)), <span class="at">y =</span> Correlation, <span class="at">fill =</span> variable_type)) <span class="sc">+</span> </span>
-<span id="cb1-212"><a href="#cb1-212"></a>  <span class="fu">geom_col</span>(<span class="at">position =</span> <span class="st">&quot;dodge&quot;</span>, <span class="at">width =</span> <span class="fl">0.75</span>) <span class="sc">+</span></span>
-<span id="cb1-213"><a href="#cb1-213"></a>  <span class="fu">theme_bw</span>() <span class="sc">+</span></span>
-<span id="cb1-214"><a href="#cb1-214"></a>  <span class="fu">scale_fill_manual</span>(<span class="at">values =</span> <span class="fu">c</span>(<span class="st">&quot;#88CCEE&quot;</span>, <span class="st">&quot;#CC6677&quot;</span>, <span class="st">&quot;#DDCC77&quot;</span>)) <span class="sc">+</span></span>
-<span id="cb1-215"><a href="#cb1-215"></a>  <span class="fu">labs</span>(<span class="at">y =</span> <span class="st">&quot;Correlation&quot;</span>,</span>
-<span id="cb1-216"><a href="#cb1-216"></a>       <span class="at">x =</span> <span class="st">&quot;Predictor&quot;</span>,</span>
-<span id="cb1-217"><a href="#cb1-217"></a>       <span class="at">fill =</span> <span class="st">&quot;&quot;</span>) <span class="sc">+</span></span>
-<span id="cb1-218"><a href="#cb1-218"></a>  <span class="fu">ylim</span>(<span class="fu">c</span>(<span class="sc">-</span><span class="fl">0.6</span>, <span class="fl">0.6</span>))</span>
-<span id="cb1-219"><a href="#cb1-219"></a><span class="in">```</span></span>
-<span id="cb1-220"><a href="#cb1-220"></a></span>
-<span id="cb1-221"><a href="#cb1-221"></a>Figure 3 shows how the different atmospheric measurements correlate with next-day AQI. For most atmospheric measurements, the correlation is in the same direction for the minimum, mean, and maximum. However, wind speed is a notable exception to this trend, where we can see that although the mean and minimum wind speed are negatively correlated with next-day AQI, the maximum wind speed has a slight positive correlation with next-day AQI. The single variable with the most positive correlation to next-day AQI is maximum no2, with a correlation of \~0.59, meaning that higher maximum concentration measurements of no2 are associated with higher next-day AQIs. The single variable with the most negative correlation to next-day AQI is minimum humidity, with a correlation of \~-0.50, meaning that higher minimum humidity measurements are associated with lower next-day AQIs.</span>
-<span id="cb1-222"><a href="#cb1-222"></a></span>
-<span id="cb1-223"><a href="#cb1-223"></a><span class="kw">&lt;br</span> <span class="kw">/&gt;</span> <span class="kw">&lt;br</span> <span class="kw">/&gt;</span></span>
-<span id="cb1-224"><a href="#cb1-224"></a></span>
-<span id="cb1-225"><a href="#cb1-225"></a><span class="fu">## Walkability</span></span>
-<span id="cb1-226"><a href="#cb1-226"></a></span>
-<span id="cb1-227"><a href="#cb1-227"></a><span class="fu">### Overall distribution of Walkability Index</span></span>
-<span id="cb1-228"><a href="#cb1-228"></a></span>
-<span id="cb1-229"><a href="#cb1-229"></a><span class="in">```{r, fig.cap = &quot;Figure 4. Histogram showing the distribution of walkability index&quot;, include = TRUE, message = FALSE}</span></span>
-<span id="cb1-230"><a href="#cb1-230"></a><span class="fu">ggplot</span>(nwi, <span class="fu">aes</span>(NatWalkInd, <span class="at">fill =</span> <span class="fu">cut</span>(NatWalkInd, <span class="dv">100</span>))) <span class="sc">+</span></span>
-<span id="cb1-231"><a href="#cb1-231"></a>  <span class="fu">geom_histogram</span>(<span class="at">show.legend =</span> <span class="cn">FALSE</span>) <span class="sc">+</span></span>
-<span id="cb1-232"><a href="#cb1-232"></a>  <span class="fu">theme_bw</span>() <span class="sc">+</span> </span>
-<span id="cb1-233"><a href="#cb1-233"></a>  <span class="fu">labs</span>(<span class="at">y =</span> <span class="st">&quot;&quot;</span>,</span>
-<span id="cb1-234"><a href="#cb1-234"></a>       <span class="at">x =</span> <span class="st">&quot;Walkability Index&quot;</span>) </span>
-<span id="cb1-235"><a href="#cb1-235"></a><span class="in">```</span></span>
-<span id="cb1-236"><a href="#cb1-236"></a></span>
-<span id="cb1-237"><a href="#cb1-237"></a><span class="in">```{r, fig.cap = &quot;Table 5. Summary statistics of walkability index&quot;, include = TRUE}</span></span>
-<span id="cb1-238"><a href="#cb1-238"></a>nwi <span class="sc">%&gt;%</span> </span>
-<span id="cb1-239"><a href="#cb1-239"></a>  <span class="fu">summarise</span>(<span class="at">Mean =</span> <span class="fu">round</span>(<span class="fu">mean</span>(NatWalkInd), <span class="dv">2</span>),</span>
-<span id="cb1-240"><a href="#cb1-240"></a>            <span class="at">SD =</span> <span class="fu">round</span>(<span class="fu">sd</span>(NatWalkInd), <span class="dv">2</span>),</span>
-<span id="cb1-241"><a href="#cb1-241"></a>            <span class="at">Median =</span> <span class="fu">median</span>(NatWalkInd),</span>
-<span id="cb1-242"><a href="#cb1-242"></a>            <span class="at">IQR =</span> <span class="fu">IQR</span>(NatWalkInd)) <span class="sc">%&gt;%</span></span>
-<span id="cb1-243"><a href="#cb1-243"></a>  knitr<span class="sc">::</span><span class="fu">kable</span>()</span>
-<span id="cb1-244"><a href="#cb1-244"></a><span class="in">```</span></span>
-<span id="cb1-245"><a href="#cb1-245"></a></span>
-<span id="cb1-246"><a href="#cb1-246"></a>The histogram of Walkability Index appears quite bell-shaped and symmetric. The median Walkability Index is 13.83 and the interquartile range is 3.33. The range for the Walkability Index is 1 to 20.</span>
-<span id="cb1-247"><a href="#cb1-247"></a></span>
-<span id="cb1-248"><a href="#cb1-248"></a><span class="kw">&lt;br</span> <span class="kw">/&gt;</span> <span class="kw">&lt;br</span> <span class="kw">/&gt;</span></span>
-<span id="cb1-249"><a href="#cb1-249"></a></span>
-<span id="cb1-250"><a href="#cb1-250"></a><span class="fu">### Relationship between Population and Walkability Index Category</span></span>
-<span id="cb1-251"><a href="#cb1-251"></a></span>
-<span id="cb1-252"><a href="#cb1-252"></a><span class="in">```{r, fig.cap = &quot;Figure 5. Boxplots showing the relationship between population and walkability index category&quot;, include = TRUE}</span></span>
-<span id="cb1-253"><a href="#cb1-253"></a>nwi<span class="sc">$</span>cat <span class="ot">&lt;-</span> <span class="fu">factor</span>(nwi<span class="sc">$</span>cat , <span class="at">levels=</span><span class="fu">c</span>(<span class="st">&quot;Least walkable&quot;</span>, <span class="st">&quot;Below average walkable&quot;</span>, <span class="st">&quot;Above average walkable&quot;</span>, <span class="st">&quot;Most walkable&quot;</span>))</span>
-<span id="cb1-254"><a href="#cb1-254"></a></span>
-<span id="cb1-255"><a href="#cb1-255"></a><span class="fu">ggplot</span>(nwi, </span>
-<span id="cb1-256"><a href="#cb1-256"></a>       <span class="fu">aes</span>(<span class="at">x =</span> cat, </span>
-<span id="cb1-257"><a href="#cb1-257"></a>           <span class="at">y =</span> CBSA_POP, <span class="at">fill =</span> cat)) <span class="sc">+</span></span>
-<span id="cb1-258"><a href="#cb1-258"></a>  <span class="fu">geom_boxplot</span>() <span class="sc">+</span></span>
-<span id="cb1-259"><a href="#cb1-259"></a>    <span class="fu">xlab</span>(<span class="st">&quot;Walkability Index Category&quot;</span>) <span class="sc">+</span> </span>
-<span id="cb1-260"><a href="#cb1-260"></a>   <span class="fu">theme_bw</span>() <span class="sc">+</span> </span>
-<span id="cb1-261"><a href="#cb1-261"></a>  <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">&quot;None&quot;</span>) <span class="sc">+</span> </span>
-<span id="cb1-262"><a href="#cb1-262"></a>        <span class="co">#axis.title.y = element_text(angle = 0, vjust = 0.5)) +</span></span>
-<span id="cb1-263"><a href="#cb1-263"></a>  <span class="fu">labs</span>(<span class="at">y =</span> <span class="st">&quot;Population&quot;</span>) <span class="sc">+</span></span>
-<span id="cb1-264"><a href="#cb1-264"></a>  <span class="fu">scale_fill_manual</span>(<span class="at">values =</span> <span class="fu">c</span>(<span class="st">&quot;#A6BDDB&quot;</span>, <span class="st">&quot;#74A9CF&quot;</span>, <span class="st">&quot;#0570B0&quot;</span>, <span class="st">&quot;#034E7B&quot;</span>))</span>
-<span id="cb1-265"><a href="#cb1-265"></a><span class="in">```</span></span>
-<span id="cb1-266"><a href="#cb1-266"></a></span>
-<span id="cb1-267"><a href="#cb1-267"></a>We performed further exploration to examine if population may have a relationship with the Walkability Index Category. The Least Walkable category seemed to have the highest population, with the Below Average and Above Average Walkable categories having the lowest populations. These areas had a tighter interquartile range although there were some outliers having much higher populations. The places that were Most Walkable had a large variation in population.</span>
-<span id="cb1-268"><a href="#cb1-268"></a></span>
-<span id="cb1-269"><a href="#cb1-269"></a><span class="kw">&lt;br</span> <span class="kw">/&gt;</span> <span class="kw">&lt;br</span> <span class="kw">/&gt;</span></span>
-<span id="cb1-270"><a href="#cb1-270"></a></span>
-<span id="cb1-271"><a href="#cb1-271"></a><span class="fu">### Relationship between Employment Mix and Walkability Index Category</span></span>
-<span id="cb1-272"><a href="#cb1-272"></a></span>
-<span id="cb1-273"><a href="#cb1-273"></a>We conducted some preliminary investigation to look at the relationship between employment mix and walkability. Figure 6 below shows a clear upward trend in walkability as the employment mix increases. The employment mix variable is a proportion between 0 and 1 that shows how diverse jobs are in a given area (categories of jobs are retail, office, industrial, service, and entertainment). Higher values indicate greater diversity of jobs which, according to the EPA, is correlated with more walk trips.</span>
-<span id="cb1-274"><a href="#cb1-274"></a></span>
-<span id="cb1-275"><a href="#cb1-275"></a><span class="in">```{r, fig.cap = &quot;Figure 6. Scatterplot showing the relationship between employment mix and walkability index&quot;, include = TRUE}</span></span>
-<span id="cb1-276"><a href="#cb1-276"></a><span class="fu">ggplot</span>(nwi, </span>
-<span id="cb1-277"><a href="#cb1-277"></a>       <span class="fu">aes</span>(<span class="at">x =</span> D2B_E8MIXA, </span>
-<span id="cb1-278"><a href="#cb1-278"></a>           <span class="at">y =</span> NatWalkInd, <span class="at">color =</span> cat)) <span class="sc">+</span></span>
-<span id="cb1-279"><a href="#cb1-279"></a>    <span class="fu">geom_point</span>() <span class="sc">+</span> </span>
-<span id="cb1-280"><a href="#cb1-280"></a>     <span class="fu">labs</span>(<span class="at">x=</span><span class="st">&quot;Employment Mix&quot;</span>, <span class="at">y=</span><span class="st">&quot;Walkability Index&quot;</span>, <span class="at">color =</span> <span class="st">&quot;Category&quot;</span>) <span class="sc">+</span></span>
-<span id="cb1-281"><a href="#cb1-281"></a>   <span class="fu">theme_bw</span>() <span class="sc">+</span> </span>
-<span id="cb1-282"><a href="#cb1-282"></a>    <span class="fu">scale_color_manual</span>(<span class="at">values =</span> <span class="fu">c</span>(<span class="st">&quot;darkred&quot;</span>, <span class="st">&quot;chocolate&quot;</span>, <span class="st">&quot;gold&quot;</span>, <span class="st">&quot;limegreen&quot;</span>))</span>
-<span id="cb1-283"><a href="#cb1-283"></a><span class="in">```</span></span>
-<span id="cb1-284"><a href="#cb1-284"></a></span>
-<span id="cb1-285"><a href="#cb1-285"></a><span class="fu"># Model Results</span></span>
-<span id="cb1-286"><a href="#cb1-286"></a></span>
-<span id="cb1-287"><a href="#cb1-287"></a><span class="fu">## AQI</span></span>
-<span id="cb1-288"><a href="#cb1-288"></a></span>
-<span id="cb1-289"><a href="#cb1-289"></a>We used three different types of models to predict AQI: linear models (OLS and LASSO), decision trees, and random forests. Each model predicts the next day&#39;s AQI based on the min, mean, and max values of our 8 predictor measurements. Notably, this does not include any measurements of the day&#39;s Ozone or AQI. We measured each model&#39;s performance by cross-validating on data the model had not been trained on. The R-Squared and Root Mean Squared Error metrics are displayed below:</span>
-<span id="cb1-290"><a href="#cb1-290"></a></span>
-<span id="cb1-291"><a href="#cb1-291"></a><span class="in">```{r, fig.cap = &quot;Table 6. Best performance metrics of our three models for AQI&quot;, include = TRUE}</span></span>
-<span id="cb1-292"><a href="#cb1-292"></a>aqi_model_scores <span class="sc">%&gt;%</span> </span>
-<span id="cb1-293"><a href="#cb1-293"></a>  <span class="fu">arrange</span>(<span class="fu">desc</span>(<span class="st">`</span><span class="at">Root Mean Squared Error</span><span class="st">`</span>)) <span class="sc">%&gt;%</span></span>
-<span id="cb1-294"><a href="#cb1-294"></a>  <span class="fu">kable</span>(<span class="at">digits =</span> <span class="dv">3</span>)</span>
-<span id="cb1-295"><a href="#cb1-295"></a><span class="in">```</span></span>
-<span id="cb1-296"><a href="#cb1-296"></a></span>
-<span id="cb1-297"><a href="#cb1-297"></a>These metrics indicate that the Random Forest is our overall most effective model, with an R-Squared value of 0.717 and an RMSE of 19.501 AQI points. This indicates that the random forest accounts for 71.7% of the variance in AQI, only being wrong by an average of about 19.5 AQI points. Our decision tree was markedly worse, with an RMSE of 23.214 AQI points, and our linear model fared the worst, with an RMSE of 24.441 AQI points.</span>
-<span id="cb1-298"><a href="#cb1-298"></a></span>
-<span id="cb1-299"><a href="#cb1-299"></a>To investigate the biases of each of our models, we have plotted the residual errors below:</span>
-<span id="cb1-300"><a href="#cb1-300"></a></span>
-<span id="cb1-301"><a href="#cb1-301"></a><span class="in">```{r, fig.cap = &quot;Figure 7: AQI model residual plots. A moving average of the mean error is plotted to display model biases&quot;, include = TRUE, message = FALSE}</span></span>
-<span id="cb1-302"><a href="#cb1-302"></a>aqi_df_all_preds <span class="sc">%&gt;%</span> </span>
-<span id="cb1-303"><a href="#cb1-303"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> .pred, <span class="at">y =</span> err)) <span class="sc">+</span></span>
-<span id="cb1-304"><a href="#cb1-304"></a>  <span class="fu">geom_point</span>() <span class="sc">+</span></span>
-<span id="cb1-305"><a href="#cb1-305"></a>  <span class="fu">geom_hline</span>(<span class="at">yintercept =</span> <span class="dv">0</span>) <span class="sc">+</span> </span>
-<span id="cb1-306"><a href="#cb1-306"></a>  <span class="fu">geom_smooth</span>(<span class="at">se =</span> <span class="cn">FALSE</span>, <span class="at">color =</span> <span class="st">&quot;red&quot;</span>) <span class="sc">+</span></span>
-<span id="cb1-307"><a href="#cb1-307"></a>  <span class="fu">facet_grid</span>(<span class="at">rows =</span> <span class="fu">vars</span>(model)) <span class="sc">+</span></span>
-<span id="cb1-308"><a href="#cb1-308"></a>  <span class="fu">xlab</span>(<span class="st">&quot;Prediction&quot;</span>) <span class="sc">+</span></span>
-<span id="cb1-309"><a href="#cb1-309"></a>  <span class="fu">ylab</span>(<span class="st">&quot;Error&quot;</span>) <span class="sc">+</span></span>
-<span id="cb1-310"><a href="#cb1-310"></a>  <span class="fu">theme_bw</span>() <span class="sc">+</span></span>
-<span id="cb1-311"><a href="#cb1-311"></a>  <span class="fu">theme</span>(<span class="at">strip.text.y.right =</span> <span class="fu">element_text</span>(<span class="at">angle =</span> <span class="dv">0</span>))</span>
-<span id="cb1-312"><a href="#cb1-312"></a><span class="in">```</span></span>
-<span id="cb1-313"><a href="#cb1-313"></a></span>
-<span id="cb1-314"><a href="#cb1-314"></a>With these results in mind, we will briefly discuss each model&#39;s strengths and weaknesses.</span>
-<span id="cb1-315"><a href="#cb1-315"></a></span>
-<span id="cb1-316"><a href="#cb1-316"></a><span class="fu">### Linear Model</span></span>
-<span id="cb1-317"><a href="#cb1-317"></a></span>
-<span id="cb1-318"><a href="#cb1-318"></a>Our final linear model ended up slightly biased, with its lowest predictions being under the true AQI and its higher predictions tending to over-predict by about 10 points. After comparing several linear model specifications, we opted to use quadratic linear regression. This quadratic model performed better than the original linear regression, but did not remove all of the bias on the high and low predictions.</span>
-<span id="cb1-319"><a href="#cb1-319"></a></span>
-<span id="cb1-320"><a href="#cb1-320"></a>Despite its biases and inaccuracies, the linear model is useful for its interpretability. We found three of our predictors to be far more important than the others by using LASSO regression, giving us a simple understanding of the basic associations at play. See the formula below:</span>
-<span id="cb1-321"><a href="#cb1-321"></a></span>
-<span id="cb1-322"><a href="#cb1-322"></a>$$</span>
-<span id="cb1-323"><a href="#cb1-323"></a>AQI = 58.68 + 12.43 * max<span class="sc">\_</span>no2 + 8.43 * max<span class="sc">\_</span>temperature - 6.36 * min<span class="sc">\_</span>humidity</span>
-<span id="cb1-324"><a href="#cb1-324"></a>$$</span>
-<span id="cb1-325"><a href="#cb1-325"></a></span>
-<span id="cb1-326"><a href="#cb1-326"></a>Note that in this formula, max_no2, max_temperature, and max_humidity are standardized, measured in standard deviations rather than typical units. **This gives us a simple understanding that high maxmimum no2 and temperature in a day indicate high next-day AQI, while high maxmimum humidity indicates lower next-day AQI.** This is consistent with the correlation trends in Figure 3 in the Exploratory Data Analysis section. The AQI this model predicts is based on ozone, indicating that there is correlation between no2 and ozone. This makes sense, as both are typically generated from fossil cars and industrial facilities, so we would expect them to be highly correlated. Despite being so simplified, this model still has a RMSE of only 26.169, and a R-squared of 0.484. **This means that this relatively simple model accounts for 48.4% of the variance in next-day AQI, and its next-day AQI predictions are typically off by roughly 26.2 points.**</span>
-<span id="cb1-327"><a href="#cb1-327"></a></span>
-<span id="cb1-328"><a href="#cb1-328"></a><span class="fu">### Decision Tree</span></span>
-<span id="cb1-329"><a href="#cb1-329"></a></span>
-<span id="cb1-330"><a href="#cb1-330"></a>Unlike our other models, our decision tree’s predictions form discrete vertical lines on the residuals plot because the decision tree only splits its predictions into a relatively small number of distinct values. This limitation makes it impossible for the decision tree to perfectly predict the data, but it still performs better than the linear model because it can respond to non-linear relationships very effectively. The decision tree also allows us to directly see how it makes its decisions. The following decision tree flowchart is simplified down to only 4 layers of splits, but should grant insight into which variables are most important in which circumstances:</span>
-<span id="cb1-331"><a href="#cb1-331"></a></span>
-<span id="cb1-332"><a href="#cb1-332"></a><span class="al">![Figure 8: Decision Tree Flowchart for AQI](../AQI%20Outputs/AQI_decision_tree_r.png)</span></span>
-<span id="cb1-333"><a href="#cb1-333"></a></span>
-<span id="cb1-334"><a href="#cb1-334"></a>At each step, this decision tree chooses one value of one variable that best splits the data into higher AQI and lower AQI categories. The first, largest, split separates based on no2: days with a very low maximum no2, below 18 ppb, are directed to the left side of the tree, which tends to have lower next-day AQI. This is consistent with our finding from the linear model, as we know there is a meaningful positive correlation between no2 and ozone (and therefore AQI based on ozone). For low no2 days, the tree finds that high maximum temperature is the best indicator of high next-day AQI, with minimum humidity distinguishing further days with a max temperature between 68 and 82 degrees Fahrenheit. For high no2 days, the tree uses minimum and maximum air pressure and maximum temperature to distinguish AQI further.</span>
-<span id="cb1-335"><a href="#cb1-335"></a></span>
-<span id="cb1-336"><a href="#cb1-336"></a>This goes to show that next-day AQI is complicated to predict, with the different sides of the tree using different sets of variables. **This tree indicates that there are complex interactions between atmospheric conditions that contribute to next-day AQI.**</span>
-<span id="cb1-337"><a href="#cb1-337"></a></span>
-<span id="cb1-338"><a href="#cb1-338"></a><span class="fu">### Random Forest</span></span>
-<span id="cb1-339"><a href="#cb1-339"></a></span>
-<span id="cb1-340"><a href="#cb1-340"></a>Our final optimized random forest model averages the results of 500 decision trees, each of which is trained on a random subset of 6 of our predictors, a random subset of our data, and splits into many more AQI categories than the decision tree above. This leads each of the individual decision trees to over-fit to different small trends in our training data. By taking the average of so many over-fit trees, each of which recognizes different indicators of AQI, the random forest is very effective at predicting AQI, but does not lend itself to a more detailed human understanding.</span>
-<span id="cb1-341"><a href="#cb1-341"></a></span>
-<span id="cb1-342"><a href="#cb1-342"></a><span class="fu">## Walkability</span></span>
-<span id="cb1-343"><a href="#cb1-343"></a></span>
-<span id="cb1-344"><a href="#cb1-344"></a>We used four different types of regeression models to predict walkability index: Linear Regression, Decision Tree, KNN, and Random Forest. For each model, we calculated the R-squared and RMSE based on 10-fold cross-validation.</span>
-<span id="cb1-345"><a href="#cb1-345"></a></span>
-<span id="cb1-346"><a href="#cb1-346"></a><span class="in">```{r, fig.cap = &quot;Table 7. Best performance metrics of our four models for walkability index&quot;, include = TRUE}</span></span>
-<span id="cb1-347"><a href="#cb1-347"></a>best_knn_rmse <span class="ot">&lt;-</span> walk_knn <span class="sc">%&gt;%</span> <span class="fu">filter</span>(.metric <span class="sc">==</span> <span class="st">&quot;rmse&quot;</span>) <span class="sc">%&gt;%</span> <span class="fu">slice_min</span>(mean) <span class="sc">%&gt;%</span> <span class="fu">mutate</span>(<span class="at">Model =</span> <span class="st">&quot;KNN&quot;</span>) <span class="sc">%&gt;%</span> <span class="fu">pivot_wider</span>(<span class="at">names_from =</span> .metric, <span class="at">values_from =</span> mean)</span>
-<span id="cb1-348"><a href="#cb1-348"></a>best_knn_rsq <span class="ot">&lt;-</span> walk_knn <span class="sc">%&gt;%</span> <span class="fu">filter</span>(.metric <span class="sc">==</span> <span class="st">&quot;rsq&quot;</span>) <span class="sc">%&gt;%</span> <span class="fu">slice_max</span>(mean) <span class="sc">%&gt;%</span> <span class="fu">mutate</span>(<span class="at">Model =</span> <span class="st">&quot;KNN&quot;</span>)</span>
-<span id="cb1-349"><a href="#cb1-349"></a>best_knn <span class="ot">&lt;-</span> best_knn_rmse <span class="sc">%&gt;%</span> <span class="fu">mutate</span>(<span class="at">rsq =</span> best_knn_rsq<span class="sc">$</span>mean) <span class="sc">%&gt;%</span> <span class="fu">select</span>(Model, rmse, rsq)</span>
-<span id="cb1-350"><a href="#cb1-350"></a></span>
-<span id="cb1-351"><a href="#cb1-351"></a>best_linear_rmse <span class="ot">&lt;-</span> walk_linear <span class="sc">%&gt;%</span> <span class="fu">filter</span>(.metric <span class="sc">==</span> <span class="st">&quot;rmse&quot;</span>) <span class="sc">%&gt;%</span> <span class="fu">slice_min</span>(mean) <span class="sc">%&gt;%</span> <span class="fu">mutate</span>(<span class="at">Model =</span> <span class="st">&quot;Linear Regression&quot;</span>) <span class="sc">%&gt;%</span> <span class="fu">pivot_wider</span>(<span class="at">names_from =</span> .metric, <span class="at">values_from =</span> mean)</span>
-<span id="cb1-352"><a href="#cb1-352"></a>best_linear_rsq <span class="ot">&lt;-</span> walk_linear <span class="sc">%&gt;%</span> <span class="fu">filter</span>(.metric <span class="sc">==</span> <span class="st">&quot;rsq&quot;</span>) <span class="sc">%&gt;%</span> <span class="fu">slice_max</span>(mean) <span class="sc">%&gt;%</span> <span class="fu">mutate</span>(<span class="at">Model =</span> <span class="st">&quot;Linear Regression&quot;</span>)</span>
-<span id="cb1-353"><a href="#cb1-353"></a>best_linear <span class="ot">&lt;-</span> best_linear_rmse <span class="sc">%&gt;%</span> <span class="fu">mutate</span>(<span class="at">rsq =</span> best_linear_rsq<span class="sc">$</span>mean) <span class="sc">%&gt;%</span> <span class="fu">select</span>(Model, rmse, rsq)</span>
-<span id="cb1-354"><a href="#cb1-354"></a></span>
-<span id="cb1-355"><a href="#cb1-355"></a>best_rf_rmse <span class="ot">&lt;-</span> walk_rf <span class="sc">%&gt;%</span> <span class="fu">filter</span>(.metric <span class="sc">==</span> <span class="st">&quot;rmse&quot;</span>) <span class="sc">%&gt;%</span> <span class="fu">slice_min</span>(mean) <span class="sc">%&gt;%</span> <span class="fu">mutate</span>(<span class="at">Model =</span> <span class="st">&quot;Random Forest&quot;</span>) <span class="sc">%&gt;%</span> <span class="fu">pivot_wider</span>(<span class="at">names_from =</span> .metric, <span class="at">values_from =</span> mean)</span>
-<span id="cb1-356"><a href="#cb1-356"></a>best_rf_rsq <span class="ot">&lt;-</span> walk_rf <span class="sc">%&gt;%</span> <span class="fu">filter</span>(.metric <span class="sc">==</span> <span class="st">&quot;rsq&quot;</span>) <span class="sc">%&gt;%</span> <span class="fu">slice_max</span>(mean) <span class="sc">%&gt;%</span> <span class="fu">mutate</span>(<span class="at">Model =</span> <span class="st">&quot;Random Forest&quot;</span>)</span>
-<span id="cb1-357"><a href="#cb1-357"></a>best_rf <span class="ot">&lt;-</span> best_rf_rmse <span class="sc">%&gt;%</span> <span class="fu">mutate</span>(<span class="at">rsq =</span> best_rf_rsq<span class="sc">$</span>mean) <span class="sc">%&gt;%</span> <span class="fu">select</span>(Model, rmse, rsq)</span>
-<span id="cb1-358"><a href="#cb1-358"></a></span>
-<span id="cb1-359"><a href="#cb1-359"></a>best_tree_rmse <span class="ot">&lt;-</span> walk_tree <span class="sc">%&gt;%</span> <span class="fu">filter</span>(.metric <span class="sc">==</span> <span class="st">&quot;rmse&quot;</span>) <span class="sc">%&gt;%</span> <span class="fu">slice_min</span>(mean) <span class="sc">%&gt;%</span> <span class="fu">mutate</span>(<span class="at">Model =</span> <span class="st">&quot;Decision Tree&quot;</span>) <span class="sc">%&gt;%</span> <span class="fu">pivot_wider</span>(<span class="at">names_from =</span> .metric, <span class="at">values_from =</span> mean)</span>
-<span id="cb1-360"><a href="#cb1-360"></a>best_tree_rsq <span class="ot">&lt;-</span> walk_tree <span class="sc">%&gt;%</span> <span class="fu">filter</span>(.metric <span class="sc">==</span> <span class="st">&quot;rsq&quot;</span>) <span class="sc">%&gt;%</span> <span class="fu">slice_max</span>(mean) <span class="sc">%&gt;%</span> <span class="fu">mutate</span>(<span class="at">Model =</span> <span class="st">&quot;Decision Tree&quot;</span>) </span>
-<span id="cb1-361"><a href="#cb1-361"></a>best_tree <span class="ot">&lt;-</span> best_tree_rmse <span class="sc">%&gt;%</span> <span class="fu">mutate</span>(<span class="at">rsq =</span> best_tree_rsq<span class="sc">$</span>mean) <span class="sc">%&gt;%</span> <span class="fu">select</span>(Model, rmse, rsq) <span class="sc">%&gt;%</span> <span class="fu">head</span>(<span class="dv">1</span>)</span>
-<span id="cb1-362"><a href="#cb1-362"></a></span>
-<span id="cb1-363"><a href="#cb1-363"></a>best_models <span class="ot">&lt;-</span> <span class="fu">rbind</span>(best_knn, best_linear) <span class="sc">%&gt;%</span> <span class="fu">rbind</span>(best_rf) <span class="sc">%&gt;%</span> <span class="fu">rbind</span>(best_tree)</span>
-<span id="cb1-364"><a href="#cb1-364"></a></span>
-<span id="cb1-365"><a href="#cb1-365"></a>best_models <span class="sc">%&gt;%</span></span>
-<span id="cb1-366"><a href="#cb1-366"></a>  <span class="fu">select</span>(Model, rsq, rmse) <span class="sc">%&gt;%</span></span>
-<span id="cb1-367"><a href="#cb1-367"></a>  <span class="fu">rename</span>(<span class="st">&quot;Root Mean Squared Error&quot;</span> <span class="ot">=</span> <span class="st">&quot;rmse&quot;</span>,</span>
-<span id="cb1-368"><a href="#cb1-368"></a>         <span class="st">&quot;R-Squared&quot;</span> <span class="ot">=</span> <span class="st">&quot;rsq&quot;</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb1-369"><a href="#cb1-369"></a>  <span class="fu">arrange</span>(<span class="fu">desc</span>(<span class="st">`</span><span class="at">Root Mean Squared Error</span><span class="st">`</span>)) <span class="sc">%&gt;%</span></span>
-<span id="cb1-370"><a href="#cb1-370"></a>  knitr<span class="sc">::</span><span class="fu">kable</span>(<span class="at">digits =</span> <span class="dv">3</span>)</span>
-<span id="cb1-371"><a href="#cb1-371"></a><span class="in">```</span></span>
-<span id="cb1-372"><a href="#cb1-372"></a></span>
-<span id="cb1-373"><a href="#cb1-373"></a>**The model that resulted in the best cross-validated metrics was our Random Forest, observing an R-squared of 0.907 and a RMSE of 0.718.** This means that this model is able to account for over 90% of variance in walkability index, and its predictions were only off by 0.718 walkability index points, on average.  </span>
-<span id="cb1-374"><a href="#cb1-374"></a></span>
-<span id="cb1-375"><a href="#cb1-375"></a>On the other hand, our most interpretable model, the decision tree, still resulted in reasonable performance metrics, with an R-squared of 0.719 and a RMSE of 1.223. The following sections detail our methodologies in more detail. </span>
-<span id="cb1-376"><a href="#cb1-376"></a></span>
-<span id="cb1-377"><a href="#cb1-377"></a><span class="fu">### Linear Regression</span></span>
-<span id="cb1-378"><a href="#cb1-378"></a></span>
-<span id="cb1-379"><a href="#cb1-379"></a>Our linear model achieved an R-squared value of 0.819, meaning it is accounting for a non-trivial amount of variance in walkability index. As a result, interpretations of the largest coefficients are especially valuable. The following plot shows the coefficients of the variables with the six coefficients of largest magnitude.</span>
-<span id="cb1-380"><a href="#cb1-380"></a></span>
-<span id="cb1-381"><a href="#cb1-381"></a><span class="in">```{r, fig.cap = &quot;Figure 9: Bar plot of top six variables, as indicated by OLS&quot;, include = TRUE}</span></span>
-<span id="cb1-382"><a href="#cb1-382"></a>walk_linear_coef <span class="sc">%&gt;%</span></span>
-<span id="cb1-383"><a href="#cb1-383"></a>  <span class="fu">filter</span>(Variable <span class="sc">!=</span> <span class="st">&quot;(Intercept)&quot;</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb1-384"><a href="#cb1-384"></a>  <span class="fu">arrange</span>(<span class="fu">desc</span>(<span class="fu">abs</span>(Coefficient))) <span class="sc">%&gt;%</span></span>
-<span id="cb1-385"><a href="#cb1-385"></a>  <span class="fu">head</span>(<span class="dv">6</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb1-386"><a href="#cb1-386"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> <span class="fu">fct_reorder</span>(Variable, <span class="fu">desc</span>(<span class="fu">abs</span>(Coefficient))), <span class="at">y =</span> Coefficient, <span class="at">fill =</span> Variable)) <span class="sc">+</span> </span>
-<span id="cb1-387"><a href="#cb1-387"></a>  <span class="fu">geom_col</span>() <span class="sc">+</span></span>
-<span id="cb1-388"><a href="#cb1-388"></a>  <span class="fu">theme_bw</span>() <span class="sc">+</span> </span>
-<span id="cb1-389"><a href="#cb1-389"></a>  <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">&quot;none&quot;</span>) <span class="sc">+</span></span>
-<span id="cb1-390"><a href="#cb1-390"></a>  <span class="fu">scale_x_discrete</span>(<span class="at">guide =</span> <span class="fu">guide_axis</span>(<span class="at">n.dodge =</span> <span class="dv">2</span>)) <span class="sc">+</span></span>
-<span id="cb1-391"><a href="#cb1-391"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">&quot;Variable&quot;</span>)</span>
-<span id="cb1-392"><a href="#cb1-392"></a><span class="in">```</span></span>
-<span id="cb1-393"><a href="#cb1-393"></a></span>
-<span id="cb1-394"><a href="#cb1-394"></a>There are three particularly large coefficients, corresponding to D2B_E8MIXA, D3A, and D2A_EPHHM. Because these three coefficients are all close to one, this means that a single unit increase in road network density, employment entropy, and household entropy are each roughly  associated with a single unit increase in the walkability index. </span>
-<span id="cb1-395"><a href="#cb1-395"></a></span>
-<span id="cb1-396"><a href="#cb1-396"></a>Conversely, the network density has a negative coefficient of about -0.5. The variable D3AAO specifically refers to the density of automobile-oriented links (as opposed to pedestrian-oriented links). The D3AMM variable is similar but includes both auto and pedestrian-oriented network links. That both D3AMM and D3AAO both have a negative coefficient is not surprising; areas that are crowded with vehicles tend to be less walkable.</span>
-<span id="cb1-397"><a href="#cb1-397"></a></span>
+<span id="cb1-191"><a href="#cb1-191"></a><span class="kw">&lt;br</span> <span class="kw">/&gt;</span> <span class="kw">&lt;br</span> <span class="kw">/&gt;</span></span>
+<span id="cb1-192"><a href="#cb1-192"></a></span>
+<span id="cb1-193"><a href="#cb1-193"></a><span class="fu">### Correlations between predictors and AQI</span></span>
+<span id="cb1-194"><a href="#cb1-194"></a></span>
+<span id="cb1-195"><a href="#cb1-195"></a><span class="in">```{r, fig.cap = &quot;Figure 3. Predictor correlations with AQI, by min, mean, and max concentration&quot;, include = TRUE}</span></span>
+<span id="cb1-196"><a href="#cb1-196"></a>aqi <span class="sc">%&gt;%</span> <span class="fu">select</span>(<span class="sc">-</span>Date, <span class="sc">-</span>County, <span class="sc">-</span>State, </span>
+<span id="cb1-197"><a href="#cb1-197"></a>               <span class="sc">-</span>AQI, <span class="sc">-</span>AQI_cat, <span class="sc">-</span>max_ozone, </span>
+<span id="cb1-198"><a href="#cb1-198"></a>               <span class="sc">-</span>mean_ozone, <span class="sc">-</span>min_ozone) <span class="sc">%&gt;%</span></span>
+<span id="cb1-199"><a href="#cb1-199"></a>  <span class="fu">cor</span>() <span class="sc">%&gt;%</span> </span>
+<span id="cb1-200"><a href="#cb1-200"></a>  <span class="fu">data.frame</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb1-201"><a href="#cb1-201"></a>  <span class="fu">select</span>(AQI_next_day) <span class="sc">%&gt;%</span> </span>
+<span id="cb1-202"><a href="#cb1-202"></a>  <span class="fu">mutate</span>(<span class="at">variable =</span> <span class="fu">rownames</span>(.),</span>
+<span id="cb1-203"><a href="#cb1-203"></a>         <span class="at">variable_category =</span> <span class="fu">str_replace</span>(variable, <span class="st">&quot;.+_&quot;</span>, <span class="st">&quot;&quot;</span>),</span>
+<span id="cb1-204"><a href="#cb1-204"></a>         <span class="at">variable_type =</span> <span class="fu">str_replace</span>(variable, <span class="st">&quot;_.+&quot;</span>, <span class="st">&quot;&quot;</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb1-205"><a href="#cb1-205"></a>  <span class="fu">filter</span>(variable <span class="sc">!=</span> <span class="st">&quot;AQI_next_day&quot;</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb1-206"><a href="#cb1-206"></a>  <span class="fu">rename</span>(<span class="st">&quot;Correlation&quot;</span> <span class="ot">=</span> AQI_next_day) <span class="sc">%&gt;%</span></span>
+<span id="cb1-207"><a href="#cb1-207"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> <span class="fu">factor</span>(variable_category, </span>
+<span id="cb1-208"><a href="#cb1-208"></a>                        <span class="at">levels =</span> <span class="fu">c</span>(<span class="st">&quot;no2&quot;</span>, <span class="st">&quot;temp&quot;</span>, <span class="st">&quot;co&quot;</span>, </span>
+<span id="cb1-209"><a href="#cb1-209"></a>                                   <span class="st">&quot;so2&quot;</span>, <span class="st">&quot;no&quot;</span>, <span class="st">&quot;wind&quot;</span>, </span>
+<span id="cb1-210"><a href="#cb1-210"></a>                                   <span class="st">&quot;pressure&quot;</span>, <span class="st">&quot;humid&quot;</span>)), <span class="at">y =</span> Correlation, <span class="at">fill =</span> variable_type)) <span class="sc">+</span> </span>
+<span id="cb1-211"><a href="#cb1-211"></a>  <span class="fu">geom_col</span>(<span class="at">position =</span> <span class="st">&quot;dodge&quot;</span>, <span class="at">width =</span> <span class="fl">0.75</span>) <span class="sc">+</span></span>
+<span id="cb1-212"><a href="#cb1-212"></a>  <span class="fu">theme_bw</span>() <span class="sc">+</span></span>
+<span id="cb1-213"><a href="#cb1-213"></a>  <span class="fu">scale_fill_manual</span>(<span class="at">values =</span> <span class="fu">c</span>(<span class="st">&quot;#88CCEE&quot;</span>, <span class="st">&quot;#CC6677&quot;</span>, <span class="st">&quot;#DDCC77&quot;</span>)) <span class="sc">+</span></span>
+<span id="cb1-214"><a href="#cb1-214"></a>  <span class="fu">labs</span>(<span class="at">y =</span> <span class="st">&quot;Correlation&quot;</span>,</span>
+<span id="cb1-215"><a href="#cb1-215"></a>       <span class="at">x =</span> <span class="st">&quot;Predictor&quot;</span>,</span>
+<span id="cb1-216"><a href="#cb1-216"></a>       <span class="at">fill =</span> <span class="st">&quot;&quot;</span>) <span class="sc">+</span></span>
+<span id="cb1-217"><a href="#cb1-217"></a>  <span class="fu">ylim</span>(<span class="fu">c</span>(<span class="sc">-</span><span class="fl">0.6</span>, <span class="fl">0.6</span>))</span>
+<span id="cb1-218"><a href="#cb1-218"></a><span class="in">```</span></span>
+<span id="cb1-219"><a href="#cb1-219"></a></span>
+<span id="cb1-220"><a href="#cb1-220"></a>Figure 3 shows how the different atmospheric measurements correlate with next-day AQI. For most atmospheric measurements, the correlation is in the same direction for the minimum, mean, and maximum. However, wind speed is a notable exception to this trend, where we can see that although the mean and minimum wind speed are negatively correlated with next-day AQI, the maximum wind speed has a slight positive correlation with next-day AQI. The single variable with the most positive correlation to next-day AQI is maximum no2, with a correlation of \~0.59, meaning that higher maximum concentration measurements of no2 are associated with higher next-day AQIs. The single variable with the most negative correlation to next-day AQI is minimum humidity, with a correlation of \~-0.50, meaning that higher minimum humidity measurements are associated with lower next-day AQIs.</span>
+<span id="cb1-221"><a href="#cb1-221"></a></span>
+<span id="cb1-222"><a href="#cb1-222"></a><span class="kw">&lt;br</span> <span class="kw">/&gt;</span> <span class="kw">&lt;br</span> <span class="kw">/&gt;</span></span>
+<span id="cb1-223"><a href="#cb1-223"></a></span>
+<span id="cb1-224"><a href="#cb1-224"></a><span class="fu">## Walkability</span></span>
+<span id="cb1-225"><a href="#cb1-225"></a></span>
+<span id="cb1-226"><a href="#cb1-226"></a><span class="fu">### Overall distribution of Walkability Index</span></span>
+<span id="cb1-227"><a href="#cb1-227"></a></span>
+<span id="cb1-228"><a href="#cb1-228"></a><span class="in">```{r, fig.cap = &quot;Figure 4. Histogram showing the distribution of walkability index&quot;, include = TRUE, message = FALSE}</span></span>
+<span id="cb1-229"><a href="#cb1-229"></a><span class="fu">ggplot</span>(nwi, <span class="fu">aes</span>(NatWalkInd, <span class="at">fill =</span> <span class="fu">cut</span>(NatWalkInd, <span class="dv">100</span>))) <span class="sc">+</span></span>
+<span id="cb1-230"><a href="#cb1-230"></a>  <span class="fu">geom_histogram</span>(<span class="at">show.legend =</span> <span class="cn">FALSE</span>) <span class="sc">+</span></span>
+<span id="cb1-231"><a href="#cb1-231"></a>  <span class="fu">theme_bw</span>() <span class="sc">+</span> </span>
+<span id="cb1-232"><a href="#cb1-232"></a>  <span class="fu">labs</span>(<span class="at">y =</span> <span class="st">&quot;&quot;</span>,</span>
+<span id="cb1-233"><a href="#cb1-233"></a>       <span class="at">x =</span> <span class="st">&quot;Walkability Index&quot;</span>) </span>
+<span id="cb1-234"><a href="#cb1-234"></a><span class="in">```</span></span>
+<span id="cb1-235"><a href="#cb1-235"></a></span>
+<span id="cb1-236"><a href="#cb1-236"></a><span class="in">```{r, fig.cap = &quot;Table 5. Summary statistics of walkability index&quot;, include = TRUE}</span></span>
+<span id="cb1-237"><a href="#cb1-237"></a>nwi <span class="sc">%&gt;%</span> </span>
+<span id="cb1-238"><a href="#cb1-238"></a>  <span class="fu">summarise</span>(<span class="at">Mean =</span> <span class="fu">round</span>(<span class="fu">mean</span>(NatWalkInd), <span class="dv">2</span>),</span>
+<span id="cb1-239"><a href="#cb1-239"></a>            <span class="at">SD =</span> <span class="fu">round</span>(<span class="fu">sd</span>(NatWalkInd), <span class="dv">2</span>),</span>
+<span id="cb1-240"><a href="#cb1-240"></a>            <span class="at">Median =</span> <span class="fu">median</span>(NatWalkInd),</span>
+<span id="cb1-241"><a href="#cb1-241"></a>            <span class="at">IQR =</span> <span class="fu">IQR</span>(NatWalkInd)) <span class="sc">%&gt;%</span></span>
+<span id="cb1-242"><a href="#cb1-242"></a>  knitr<span class="sc">::</span><span class="fu">kable</span>()</span>
+<span id="cb1-243"><a href="#cb1-243"></a><span class="in">```</span></span>
+<span id="cb1-244"><a href="#cb1-244"></a></span>
+<span id="cb1-245"><a href="#cb1-245"></a>The histogram of Walkability Index appears quite bell-shaped and symmetric. The median Walkability Index is 13.83 and the interquartile range is 3.33. The range for the Walkability Index is 1 to 20.</span>
+<span id="cb1-246"><a href="#cb1-246"></a></span>
+<span id="cb1-247"><a href="#cb1-247"></a><span class="kw">&lt;br</span> <span class="kw">/&gt;</span> <span class="kw">&lt;br</span> <span class="kw">/&gt;</span></span>
+<span id="cb1-248"><a href="#cb1-248"></a></span>
+<span id="cb1-249"><a href="#cb1-249"></a><span class="fu">### Relationship between Population and Walkability Index Category</span></span>
+<span id="cb1-250"><a href="#cb1-250"></a></span>
+<span id="cb1-251"><a href="#cb1-251"></a><span class="in">```{r, fig.cap = &quot;Figure 5. Boxplots showing the relationship between population and walkability index category&quot;, include = TRUE}</span></span>
+<span id="cb1-252"><a href="#cb1-252"></a>nwi<span class="sc">$</span>cat <span class="ot">&lt;-</span> <span class="fu">factor</span>(nwi<span class="sc">$</span>cat , <span class="at">levels=</span><span class="fu">c</span>(<span class="st">&quot;Least walkable&quot;</span>, <span class="st">&quot;Below average walkable&quot;</span>, <span class="st">&quot;Above average walkable&quot;</span>, <span class="st">&quot;Most walkable&quot;</span>))</span>
+<span id="cb1-253"><a href="#cb1-253"></a></span>
+<span id="cb1-254"><a href="#cb1-254"></a><span class="fu">ggplot</span>(nwi, </span>
+<span id="cb1-255"><a href="#cb1-255"></a>       <span class="fu">aes</span>(<span class="at">x =</span> cat, </span>
+<span id="cb1-256"><a href="#cb1-256"></a>           <span class="at">y =</span> CBSA_POP, <span class="at">fill =</span> cat)) <span class="sc">+</span></span>
+<span id="cb1-257"><a href="#cb1-257"></a>  <span class="fu">geom_boxplot</span>() <span class="sc">+</span></span>
+<span id="cb1-258"><a href="#cb1-258"></a>    <span class="fu">xlab</span>(<span class="st">&quot;Walkability Index Category&quot;</span>) <span class="sc">+</span> </span>
+<span id="cb1-259"><a href="#cb1-259"></a>   <span class="fu">theme_bw</span>() <span class="sc">+</span> </span>
+<span id="cb1-260"><a href="#cb1-260"></a>  <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">&quot;None&quot;</span>) <span class="sc">+</span> </span>
+<span id="cb1-261"><a href="#cb1-261"></a>        <span class="co">#axis.title.y = element_text(angle = 0, vjust = 0.5)) +</span></span>
+<span id="cb1-262"><a href="#cb1-262"></a>  <span class="fu">labs</span>(<span class="at">y =</span> <span class="st">&quot;Population&quot;</span>) <span class="sc">+</span></span>
+<span id="cb1-263"><a href="#cb1-263"></a>  <span class="fu">scale_fill_manual</span>(<span class="at">values =</span> <span class="fu">c</span>(<span class="st">&quot;#A6BDDB&quot;</span>, <span class="st">&quot;#74A9CF&quot;</span>, <span class="st">&quot;#0570B0&quot;</span>, <span class="st">&quot;#034E7B&quot;</span>))</span>
+<span id="cb1-264"><a href="#cb1-264"></a><span class="in">```</span></span>
+<span id="cb1-265"><a href="#cb1-265"></a></span>
+<span id="cb1-266"><a href="#cb1-266"></a>We performed further exploration to examine if population may have a relationship with the Walkability Index Category. The Least Walkable category seemed to have the highest population, with the Below Average and Above Average Walkable categories having the lowest populations. These areas had a tighter interquartile range although there were some outliers having much higher populations. The places that were Most Walkable had a large variation in population.</span>
+<span id="cb1-267"><a href="#cb1-267"></a></span>
+<span id="cb1-268"><a href="#cb1-268"></a><span class="kw">&lt;br</span> <span class="kw">/&gt;</span> <span class="kw">&lt;br</span> <span class="kw">/&gt;</span></span>
+<span id="cb1-269"><a href="#cb1-269"></a></span>
+<span id="cb1-270"><a href="#cb1-270"></a><span class="fu">### Relationship between Employment Mix and Walkability Index Category</span></span>
+<span id="cb1-271"><a href="#cb1-271"></a></span>
+<span id="cb1-272"><a href="#cb1-272"></a>We conducted some preliminary investigation to look at the relationship between employment mix and walkability. Figure 6 below shows a clear upward trend in walkability as the employment mix increases. The employment mix variable is a proportion between 0 and 1 that shows how diverse jobs are in a given area (categories of jobs are retail, office, industrial, service, and entertainment). Higher values indicate greater diversity of jobs which, according to the EPA, is correlated with more walk trips.</span>
+<span id="cb1-273"><a href="#cb1-273"></a></span>
+<span id="cb1-274"><a href="#cb1-274"></a><span class="in">```{r, fig.cap = &quot;Figure 6. Scatterplot showing the relationship between employment mix and walkability index&quot;, include = TRUE}</span></span>
+<span id="cb1-275"><a href="#cb1-275"></a><span class="fu">ggplot</span>(nwi, </span>
+<span id="cb1-276"><a href="#cb1-276"></a>       <span class="fu">aes</span>(<span class="at">x =</span> D2B_E8MIXA, </span>
+<span id="cb1-277"><a href="#cb1-277"></a>           <span class="at">y =</span> NatWalkInd, <span class="at">color =</span> cat)) <span class="sc">+</span></span>
+<span id="cb1-278"><a href="#cb1-278"></a>    <span class="fu">geom_point</span>() <span class="sc">+</span> </span>
+<span id="cb1-279"><a href="#cb1-279"></a>     <span class="fu">labs</span>(<span class="at">x=</span><span class="st">&quot;Employment Mix&quot;</span>, <span class="at">y=</span><span class="st">&quot;Walkability Index&quot;</span>, <span class="at">color =</span> <span class="st">&quot;Category&quot;</span>) <span class="sc">+</span></span>
+<span id="cb1-280"><a href="#cb1-280"></a>   <span class="fu">theme_bw</span>() <span class="sc">+</span> </span>
+<span id="cb1-281"><a href="#cb1-281"></a>    <span class="fu">scale_color_manual</span>(<span class="at">values =</span> <span class="fu">c</span>(<span class="st">&quot;darkred&quot;</span>, <span class="st">&quot;chocolate&quot;</span>, <span class="st">&quot;gold&quot;</span>, <span class="st">&quot;limegreen&quot;</span>))</span>
+<span id="cb1-282"><a href="#cb1-282"></a><span class="in">```</span></span>
+<span id="cb1-283"><a href="#cb1-283"></a></span>
+<span id="cb1-284"><a href="#cb1-284"></a><span class="fu"># Model Results</span></span>
+<span id="cb1-285"><a href="#cb1-285"></a></span>
+<span id="cb1-286"><a href="#cb1-286"></a><span class="fu">## AQI</span></span>
+<span id="cb1-287"><a href="#cb1-287"></a></span>
+<span id="cb1-288"><a href="#cb1-288"></a>We used three different types of models to predict AQI: linear models (LASSO), decision trees, and random forests. Each model predicts the next day&#39;s AQI based on the min, mean, and max values of our 8 predictor measurements. Notably, this does not include any measurements of the day&#39;s Ozone or AQI. We measured each model&#39;s performance by cross-validating on data the model had not been trained on. The R-Squared and Root Mean Squared Error metrics are displayed below:</span>
+<span id="cb1-289"><a href="#cb1-289"></a></span>
+<span id="cb1-290"><a href="#cb1-290"></a><span class="in">```{r, fig.cap = &quot;Table 6. Best performance metrics of our three models for AQI&quot;, include = TRUE}</span></span>
+<span id="cb1-291"><a href="#cb1-291"></a>aqi_model_scores <span class="sc">%&gt;%</span> </span>
+<span id="cb1-292"><a href="#cb1-292"></a>  <span class="fu">arrange</span>(<span class="fu">desc</span>(<span class="st">`</span><span class="at">Root Mean Squared Error</span><span class="st">`</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb1-293"><a href="#cb1-293"></a>  <span class="fu">kable</span>(<span class="at">digits =</span> <span class="dv">3</span>)</span>
+<span id="cb1-294"><a href="#cb1-294"></a><span class="in">```</span></span>
+<span id="cb1-295"><a href="#cb1-295"></a></span>
+<span id="cb1-296"><a href="#cb1-296"></a>These metrics indicate that the Random Forest is our overall most effective model, with an R-Squared value of 0.717 and an RMSE of 19.501 AQI points. This indicates that the random forest accounts for 71.7% of the variance in AQI, only being wrong by an average of about 19.5 AQI points. Our decision tree was markedly worse, with an RMSE of 23.214 AQI points, and our linear model fared the worst, with an RMSE of 24.441 AQI points.</span>
+<span id="cb1-297"><a href="#cb1-297"></a></span>
+<span id="cb1-298"><a href="#cb1-298"></a>To investigate the biases of each of our models, we have plotted the residual errors below:</span>
+<span id="cb1-299"><a href="#cb1-299"></a></span>
+<span id="cb1-300"><a href="#cb1-300"></a><span class="in">```{r, fig.cap = &quot;Figure 7: AQI model residual plots. A moving average of the mean error is plotted to display model biases&quot;, include = TRUE, message = FALSE}</span></span>
+<span id="cb1-301"><a href="#cb1-301"></a>aqi_df_all_preds <span class="sc">%&gt;%</span> </span>
+<span id="cb1-302"><a href="#cb1-302"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> .pred, <span class="at">y =</span> err)) <span class="sc">+</span></span>
+<span id="cb1-303"><a href="#cb1-303"></a>  <span class="fu">geom_point</span>() <span class="sc">+</span></span>
+<span id="cb1-304"><a href="#cb1-304"></a>  <span class="fu">geom_hline</span>(<span class="at">yintercept =</span> <span class="dv">0</span>) <span class="sc">+</span> </span>
+<span id="cb1-305"><a href="#cb1-305"></a>  <span class="fu">geom_smooth</span>(<span class="at">se =</span> <span class="cn">FALSE</span>, <span class="at">color =</span> <span class="st">&quot;red&quot;</span>) <span class="sc">+</span></span>
+<span id="cb1-306"><a href="#cb1-306"></a>  <span class="fu">facet_grid</span>(<span class="at">rows =</span> <span class="fu">vars</span>(model)) <span class="sc">+</span></span>
+<span id="cb1-307"><a href="#cb1-307"></a>  <span class="fu">xlab</span>(<span class="st">&quot;Prediction&quot;</span>) <span class="sc">+</span></span>
+<span id="cb1-308"><a href="#cb1-308"></a>  <span class="fu">ylab</span>(<span class="st">&quot;Error&quot;</span>) <span class="sc">+</span></span>
+<span id="cb1-309"><a href="#cb1-309"></a>  <span class="fu">theme_bw</span>() <span class="sc">+</span></span>
+<span id="cb1-310"><a href="#cb1-310"></a>  <span class="fu">theme</span>(<span class="at">strip.text.y.right =</span> <span class="fu">element_text</span>(<span class="at">angle =</span> <span class="dv">0</span>))</span>
+<span id="cb1-311"><a href="#cb1-311"></a><span class="in">```</span></span>
+<span id="cb1-312"><a href="#cb1-312"></a></span>
+<span id="cb1-313"><a href="#cb1-313"></a>With these results in mind, we will briefly discuss each model&#39;s strengths and weaknesses.</span>
+<span id="cb1-314"><a href="#cb1-314"></a></span>
+<span id="cb1-315"><a href="#cb1-315"></a><span class="fu">### Linear Model</span></span>
+<span id="cb1-316"><a href="#cb1-316"></a></span>
+<span id="cb1-317"><a href="#cb1-317"></a>Our final linear model ended up slightly biased, with its lowest predictions being under the true AQI and its higher predictions tending to over-predict by about 10 points. After comparing several linear model specifications, we opted to use quadratic linear regression. This quadratic model performed better than the original linear regression, but did not remove all of the bias on the high and low predictions.</span>
+<span id="cb1-318"><a href="#cb1-318"></a></span>
+<span id="cb1-319"><a href="#cb1-319"></a>Despite its biases and inaccuracies, the linear model is useful for its interpretability. We found three of our predictors to be far more important than the others by using LASSO regression, giving us a simple understanding of the basic associations at play. See the formula below:</span>
+<span id="cb1-320"><a href="#cb1-320"></a></span>
+<span id="cb1-321"><a href="#cb1-321"></a>$$</span>
+<span id="cb1-322"><a href="#cb1-322"></a>AQI = 58.68 + 12.43 * max<span class="sc">\_</span>no2 + 8.43 * max<span class="sc">\_</span>temperature - 6.36 * min<span class="sc">\_</span>humidity</span>
+<span id="cb1-323"><a href="#cb1-323"></a>$$</span>
+<span id="cb1-324"><a href="#cb1-324"></a></span>
+<span id="cb1-325"><a href="#cb1-325"></a>Note that in this formula, max_no2, max_temperature, and max_humidity are standardized, measured in standard deviations rather than typical units. **This gives us a simple understanding that high maxmimum no2 and temperature in a day indicate high next-day AQI, while high maxmimum humidity indicates lower next-day AQI.** This is consistent with the correlation trends in Figure 3 in the Exploratory Data Analysis section. The AQI this model predicts is based on ozone, indicating that there is correlation between no2 and ozone. This makes sense, as both are typically generated from fossil cars and industrial facilities, so we would expect them to be highly correlated. Despite being so simplified, this model still has a RMSE of only 26.169, and a R-squared of 0.484. **This means that this relatively simple model accounts for 48.4% of the variance in next-day AQI, and its next-day AQI predictions are typically off by roughly 26.2 points.**</span>
+<span id="cb1-326"><a href="#cb1-326"></a></span>
+<span id="cb1-327"><a href="#cb1-327"></a><span class="fu">### Decision Tree</span></span>
+<span id="cb1-328"><a href="#cb1-328"></a></span>
+<span id="cb1-329"><a href="#cb1-329"></a>Unlike our other models, our decision tree&#39;s predictions form discrete vertical lines on the residuals plot because the decision tree only splits its predictions into a relatively small number of distinct values. This limitation makes it impossible for the decision tree to perfectly predict the data, but it still performs better than the linear model because it can respond to non-linear relationships very effectively. The decision tree also allows us to directly see how it makes its decisions. The following decision tree flowchart is simplified down to only 4 layers of splits, but should grant insight into which variables are most important in which circumstances:</span>
+<span id="cb1-330"><a href="#cb1-330"></a></span>
+<span id="cb1-331"><a href="#cb1-331"></a><span class="al">![Figure 8: Decision Tree Flowchart for AQI](../AQI%20Outputs/AQI_decision_tree_r.png)</span></span>
+<span id="cb1-332"><a href="#cb1-332"></a></span>
+<span id="cb1-333"><a href="#cb1-333"></a>At each step, this decision tree chooses one value of one variable that best splits the data into higher AQI and lower AQI categories. The first, largest, split separates based on no2: days with a very low maximum no2, below 18 ppb, are directed to the left side of the tree, which tends to have lower next-day AQI. This is consistent with our finding from the linear model, as we know there is a meaningful positive correlation between no2 and ozone (and therefore AQI based on ozone). For low no2 days, the tree finds that high maximum temperature is the best indicator of high next-day AQI, with minimum humidity distinguishing further days with a max temperature between 68 and 82 degrees Fahrenheit. For high no2 days, the tree uses minimum and maximum air pressure and maximum temperature to distinguish AQI further.</span>
+<span id="cb1-334"><a href="#cb1-334"></a></span>
+<span id="cb1-335"><a href="#cb1-335"></a>This goes to show that next-day AQI is complicated to predict, with the different sides of the tree using different sets of variables. **This tree indicates that there are complex interactions between atmospheric conditions that contribute to next-day AQI.**</span>
+<span id="cb1-336"><a href="#cb1-336"></a></span>
+<span id="cb1-337"><a href="#cb1-337"></a><span class="fu">### Random Forest</span></span>
+<span id="cb1-338"><a href="#cb1-338"></a></span>
+<span id="cb1-339"><a href="#cb1-339"></a>Our final optimized random forest model averages the results of 500 decision trees, each of which is trained on a random subset of 6 of our predictors, a random subset of our data, and splits into many more AQI categories than the decision tree above. This leads each of the individual decision trees to over-fit to different small trends in our training data. By taking the average of so many over-fit trees, each of which recognizes different indicators of AQI, the random forest is very effective at predicting AQI, but does not lend itself to a more detailed human understanding.</span>
+<span id="cb1-340"><a href="#cb1-340"></a></span>
+<span id="cb1-341"><a href="#cb1-341"></a><span class="fu">## Walkability</span></span>
+<span id="cb1-342"><a href="#cb1-342"></a></span>
+<span id="cb1-343"><a href="#cb1-343"></a>We used four different types of regeression models to predict walkability index: Linear Regression, Decision Tree, KNN, and Random Forest. For each model, we calculated the R-squared and RMSE based on 10-fold cross-validation.</span>
+<span id="cb1-344"><a href="#cb1-344"></a></span>
+<span id="cb1-345"><a href="#cb1-345"></a><span class="in">```{r, fig.cap = &quot;Table 7. Best performance metrics of our four models for walkability index&quot;, include = TRUE}</span></span>
+<span id="cb1-346"><a href="#cb1-346"></a>best_knn_rmse <span class="ot">&lt;-</span> walk_knn <span class="sc">%&gt;%</span> <span class="fu">filter</span>(.metric <span class="sc">==</span> <span class="st">&quot;rmse&quot;</span>) <span class="sc">%&gt;%</span> <span class="fu">slice_min</span>(mean) <span class="sc">%&gt;%</span> <span class="fu">mutate</span>(<span class="at">Model =</span> <span class="st">&quot;KNN&quot;</span>) <span class="sc">%&gt;%</span> <span class="fu">pivot_wider</span>(<span class="at">names_from =</span> .metric, <span class="at">values_from =</span> mean)</span>
+<span id="cb1-347"><a href="#cb1-347"></a>best_knn_rsq <span class="ot">&lt;-</span> walk_knn <span class="sc">%&gt;%</span> <span class="fu">filter</span>(.metric <span class="sc">==</span> <span class="st">&quot;rsq&quot;</span>) <span class="sc">%&gt;%</span> <span class="fu">slice_max</span>(mean) <span class="sc">%&gt;%</span> <span class="fu">mutate</span>(<span class="at">Model =</span> <span class="st">&quot;KNN&quot;</span>)</span>
+<span id="cb1-348"><a href="#cb1-348"></a>best_knn <span class="ot">&lt;-</span> best_knn_rmse <span class="sc">%&gt;%</span> <span class="fu">mutate</span>(<span class="at">rsq =</span> best_knn_rsq<span class="sc">$</span>mean) <span class="sc">%&gt;%</span> <span class="fu">select</span>(Model, rmse, rsq)</span>
+<span id="cb1-349"><a href="#cb1-349"></a></span>
+<span id="cb1-350"><a href="#cb1-350"></a>best_linear_rmse <span class="ot">&lt;-</span> walk_linear <span class="sc">%&gt;%</span> <span class="fu">filter</span>(.metric <span class="sc">==</span> <span class="st">&quot;rmse&quot;</span>) <span class="sc">%&gt;%</span> <span class="fu">slice_min</span>(mean) <span class="sc">%&gt;%</span> <span class="fu">mutate</span>(<span class="at">Model =</span> <span class="st">&quot;Linear Regression&quot;</span>) <span class="sc">%&gt;%</span> <span class="fu">pivot_wider</span>(<span class="at">names_from =</span> .metric, <span class="at">values_from =</span> mean)</span>
+<span id="cb1-351"><a href="#cb1-351"></a>best_linear_rsq <span class="ot">&lt;-</span> walk_linear <span class="sc">%&gt;%</span> <span class="fu">filter</span>(.metric <span class="sc">==</span> <span class="st">&quot;rsq&quot;</span>) <span class="sc">%&gt;%</span> <span class="fu">slice_max</span>(mean) <span class="sc">%&gt;%</span> <span class="fu">mutate</span>(<span class="at">Model =</span> <span class="st">&quot;Linear Regression&quot;</span>)</span>
+<span id="cb1-352"><a href="#cb1-352"></a>best_linear <span class="ot">&lt;-</span> best_linear_rmse <span class="sc">%&gt;%</span> <span class="fu">mutate</span>(<span class="at">rsq =</span> best_linear_rsq<span class="sc">$</span>mean) <span class="sc">%&gt;%</span> <span class="fu">select</span>(Model, rmse, rsq)</span>
+<span id="cb1-353"><a href="#cb1-353"></a></span>
+<span id="cb1-354"><a href="#cb1-354"></a>best_rf_rmse <span class="ot">&lt;-</span> walk_rf <span class="sc">%&gt;%</span> <span class="fu">filter</span>(.metric <span class="sc">==</span> <span class="st">&quot;rmse&quot;</span>) <span class="sc">%&gt;%</span> <span class="fu">slice_min</span>(mean) <span class="sc">%&gt;%</span> <span class="fu">mutate</span>(<span class="at">Model =</span> <span class="st">&quot;Random Forest&quot;</span>) <span class="sc">%&gt;%</span> <span class="fu">pivot_wider</span>(<span class="at">names_from =</span> .metric, <span class="at">values_from =</span> mean)</span>
+<span id="cb1-355"><a href="#cb1-355"></a>best_rf_rsq <span class="ot">&lt;-</span> walk_rf <span class="sc">%&gt;%</span> <span class="fu">filter</span>(.metric <span class="sc">==</span> <span class="st">&quot;rsq&quot;</span>) <span class="sc">%&gt;%</span> <span class="fu">slice_max</span>(mean) <span class="sc">%&gt;%</span> <span class="fu">mutate</span>(<span class="at">Model =</span> <span class="st">&quot;Random Forest&quot;</span>)</span>
+<span id="cb1-356"><a href="#cb1-356"></a>best_rf <span class="ot">&lt;-</span> best_rf_rmse <span class="sc">%&gt;%</span> <span class="fu">mutate</span>(<span class="at">rsq =</span> best_rf_rsq<span class="sc">$</span>mean) <span class="sc">%&gt;%</span> <span class="fu">select</span>(Model, rmse, rsq)</span>
+<span id="cb1-357"><a href="#cb1-357"></a></span>
+<span id="cb1-358"><a href="#cb1-358"></a>best_tree_rmse <span class="ot">&lt;-</span> walk_tree <span class="sc">%&gt;%</span> <span class="fu">filter</span>(.metric <span class="sc">==</span> <span class="st">&quot;rmse&quot;</span>) <span class="sc">%&gt;%</span> <span class="fu">slice_min</span>(mean) <span class="sc">%&gt;%</span> <span class="fu">mutate</span>(<span class="at">Model =</span> <span class="st">&quot;Decision Tree&quot;</span>) <span class="sc">%&gt;%</span> <span class="fu">pivot_wider</span>(<span class="at">names_from =</span> .metric, <span class="at">values_from =</span> mean)</span>
+<span id="cb1-359"><a href="#cb1-359"></a>best_tree_rsq <span class="ot">&lt;-</span> walk_tree <span class="sc">%&gt;%</span> <span class="fu">filter</span>(.metric <span class="sc">==</span> <span class="st">&quot;rsq&quot;</span>) <span class="sc">%&gt;%</span> <span class="fu">slice_max</span>(mean) <span class="sc">%&gt;%</span> <span class="fu">mutate</span>(<span class="at">Model =</span> <span class="st">&quot;Decision Tree&quot;</span>) </span>
+<span id="cb1-360"><a href="#cb1-360"></a>best_tree <span class="ot">&lt;-</span> best_tree_rmse <span class="sc">%&gt;%</span> <span class="fu">mutate</span>(<span class="at">rsq =</span> best_tree_rsq<span class="sc">$</span>mean) <span class="sc">%&gt;%</span> <span class="fu">select</span>(Model, rmse, rsq) <span class="sc">%&gt;%</span> <span class="fu">head</span>(<span class="dv">1</span>)</span>
+<span id="cb1-361"><a href="#cb1-361"></a></span>
+<span id="cb1-362"><a href="#cb1-362"></a>best_models <span class="ot">&lt;-</span> <span class="fu">rbind</span>(best_knn, best_linear) <span class="sc">%&gt;%</span> <span class="fu">rbind</span>(best_rf) <span class="sc">%&gt;%</span> <span class="fu">rbind</span>(best_tree)</span>
+<span id="cb1-363"><a href="#cb1-363"></a></span>
+<span id="cb1-364"><a href="#cb1-364"></a>best_models <span class="sc">%&gt;%</span></span>
+<span id="cb1-365"><a href="#cb1-365"></a>  <span class="fu">select</span>(Model, rsq, rmse) <span class="sc">%&gt;%</span></span>
+<span id="cb1-366"><a href="#cb1-366"></a>  <span class="fu">rename</span>(<span class="st">&quot;Root Mean Squared Error&quot;</span> <span class="ot">=</span> <span class="st">&quot;rmse&quot;</span>,</span>
+<span id="cb1-367"><a href="#cb1-367"></a>         <span class="st">&quot;R-Squared&quot;</span> <span class="ot">=</span> <span class="st">&quot;rsq&quot;</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb1-368"><a href="#cb1-368"></a>  <span class="fu">arrange</span>(<span class="fu">desc</span>(<span class="st">`</span><span class="at">Root Mean Squared Error</span><span class="st">`</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb1-369"><a href="#cb1-369"></a>  knitr<span class="sc">::</span><span class="fu">kable</span>(<span class="at">digits =</span> <span class="dv">3</span>)</span>
+<span id="cb1-370"><a href="#cb1-370"></a><span class="in">```</span></span>
+<span id="cb1-371"><a href="#cb1-371"></a></span>
+<span id="cb1-372"><a href="#cb1-372"></a>**The model that resulted in the best cross-validated metrics was our Random Forest, observing an R-squared of 0.907 and a RMSE of 0.718.** This means that this model is able to account for over 90% of variance in walkability index, and its predictions were only off by 0.718 walkability index points, on average.</span>
+<span id="cb1-373"><a href="#cb1-373"></a></span>
+<span id="cb1-374"><a href="#cb1-374"></a>On the other hand, our most interpretable model, the decision tree, still resulted in reasonable performance metrics, with an R-squared of 0.719 and a RMSE of 1.223. The following sections detail our methodologies in more detail.</span>
+<span id="cb1-375"><a href="#cb1-375"></a></span>
+<span id="cb1-376"><a href="#cb1-376"></a><span class="fu">### Linear Regression</span></span>
+<span id="cb1-377"><a href="#cb1-377"></a></span>
+<span id="cb1-378"><a href="#cb1-378"></a>Our linear model achieved an R-squared value of 0.819, meaning it is accounting for a non-trivial amount of variance in walkability index. As a result, interpretations of the largest coefficients are especially valuable. The following plot shows the coefficients of the variables with the six coefficients of largest magnitude.</span>
+<span id="cb1-379"><a href="#cb1-379"></a></span>
+<span id="cb1-380"><a href="#cb1-380"></a><span class="in">```{r, fig.cap = &quot;Figure 9: Bar plot of top six variables, as indicated by OLS&quot;, include = TRUE}</span></span>
+<span id="cb1-381"><a href="#cb1-381"></a>walk_linear_coef <span class="sc">%&gt;%</span></span>
+<span id="cb1-382"><a href="#cb1-382"></a>  <span class="fu">filter</span>(Variable <span class="sc">!=</span> <span class="st">&quot;(Intercept)&quot;</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb1-383"><a href="#cb1-383"></a>  <span class="fu">arrange</span>(<span class="fu">desc</span>(<span class="fu">abs</span>(Coefficient))) <span class="sc">%&gt;%</span></span>
+<span id="cb1-384"><a href="#cb1-384"></a>  <span class="fu">head</span>(<span class="dv">6</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb1-385"><a href="#cb1-385"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> <span class="fu">fct_reorder</span>(Variable, <span class="fu">desc</span>(<span class="fu">abs</span>(Coefficient))), <span class="at">y =</span> Coefficient, <span class="at">fill =</span> Variable)) <span class="sc">+</span> </span>
+<span id="cb1-386"><a href="#cb1-386"></a>  <span class="fu">geom_col</span>() <span class="sc">+</span></span>
+<span id="cb1-387"><a href="#cb1-387"></a>  <span class="fu">theme_bw</span>() <span class="sc">+</span> </span>
+<span id="cb1-388"><a href="#cb1-388"></a>  <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">&quot;none&quot;</span>) <span class="sc">+</span></span>
+<span id="cb1-389"><a href="#cb1-389"></a>  <span class="fu">scale_x_discrete</span>(<span class="at">guide =</span> <span class="fu">guide_axis</span>(<span class="at">n.dodge =</span> <span class="dv">2</span>)) <span class="sc">+</span></span>
+<span id="cb1-390"><a href="#cb1-390"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">&quot;Variable&quot;</span>)</span>
+<span id="cb1-391"><a href="#cb1-391"></a><span class="in">```</span></span>
+<span id="cb1-392"><a href="#cb1-392"></a></span>
+<span id="cb1-393"><a href="#cb1-393"></a>There are three particularly large coefficients, corresponding to D2B_E8MIXA, D3A, and D2A_EPHHM. Because these three coefficients are all close to one, this means that a single unit increase in road network density, employment entropy, and household entropy are each roughly associated with a single unit increase in the walkability index.</span>
+<span id="cb1-394"><a href="#cb1-394"></a></span>
+<span id="cb1-395"><a href="#cb1-395"></a>Conversely, the network density has a negative coefficient of about -0.5. The variable D3AAO specifically refers to the density of automobile-oriented links (as opposed to pedestrian-oriented links). The D3AMM variable is similar but includes both auto and pedestrian-oriented network links. That both D3AMM and D3AAO both have a negative coefficient is not surprising; areas that are crowded with vehicles tend to be less walkable.</span>
+<span id="cb1-396"><a href="#cb1-396"></a></span>
+<span id="cb1-397"><a href="#cb1-397"></a><span class="fu">### Decision Tree Regression</span></span>
 <span id="cb1-398"><a href="#cb1-398"></a></span>
-<span id="cb1-399"><a href="#cb1-399"></a><span class="fu">### Decision Tree Regression</span></span>
+<span id="cb1-399"><a href="#cb1-399"></a>A decision tree, much like our linear regression model, has the benefit of being highly interpretable, even if its predictive ability is not optimal. We created our decision tree with very small maximum depth to examine and interpret the whole tree easily. This did result in substantial underfit, hence why it had the worst cross-validated performance metrics of all the models. Fitting this model on the walkability data resulted in the following tree:</span>
 <span id="cb1-400"><a href="#cb1-400"></a></span>
-<span id="cb1-401"><a href="#cb1-401"></a>A decision tree, much like our linear regression model, has the benefit of being highly interpretable, even if its predictive ability is not optimal. We created our decision tree with very small maximum depth to examine and interpret the whole tree easily. This did result in substantial underfit, hence why it had the worst cross-validated performance metrics of all the models. Fitting this model on the walkability data resulted in the following tree:</span>
+<span id="cb1-401"><a href="#cb1-401"></a><span class="al">![Figure 10: Decision Tree Flowchart for Walkability](../Walkability%20Outputs/walkability_decision_tree.png)</span></span>
 <span id="cb1-402"><a href="#cb1-402"></a></span>
-<span id="cb1-403"><a href="#cb1-403"></a><span class="al">![Figure 10: Decision Tree Flowchart for Walkability](../Walkability%20Outputs/walkability_decision_tree.png)</span></span>
+<span id="cb1-403"><a href="#cb1-403"></a>The first split was made on the variable D3B. This shows that having a lower density of street intersections (not including auto-oriented intersections) is an indicator of a lower walkability score. This makes sense, as areas with fewer intersections would be more disconnected for pedestrians, making walking between destinations less feasible.</span>
 <span id="cb1-404"><a href="#cb1-404"></a></span>
-<span id="cb1-405"><a href="#cb1-405"></a>The first split was made on the variable D3B. This shows that having a lower density of street intersections (not including auto-oriented intersections) is an indicator of a lower walkability score. This makes sense, as areas with fewer intersections would be more disconnected for pedestrians, making walking between destinations less feasible. </span>
+<span id="cb1-405"><a href="#cb1-405"></a>For areas with a lower density of street connections, the next split considers the mix of employment types (D2B_E8MIXA), showing that areas with lower job diversity tend to have lower walkability indices.</span>
 <span id="cb1-406"><a href="#cb1-406"></a></span>
-<span id="cb1-407"><a href="#cb1-407"></a>For areas with a lower density of street connections, the next split considers the mix of employment types (D2B_E8MIXA), showing that areas with lower job diversity tend to have lower walkability indices. </span>
+<span id="cb1-407"><a href="#cb1-407"></a>For areas with a higher density of street connections, the next split considers the diversity in residence types, showing that areas with less living options tend to have lower walkability indices.</span>
 <span id="cb1-408"><a href="#cb1-408"></a></span>
-<span id="cb1-409"><a href="#cb1-409"></a>For areas with a higher density of street connections, the next split considers the diversity in residence types, showing that areas with less living options tend to have lower walkability indices.</span>
+<span id="cb1-409"><a href="#cb1-409"></a>The fact that the different branches of the tree consider different variables alludes to the fact that walkability index is a complicated metric that weighs many factors in a nuanced manner.</span>
 <span id="cb1-410"><a href="#cb1-410"></a></span>
-<span id="cb1-411"><a href="#cb1-411"></a>The fact that the different branches of the tree consider different variables alludes to the fact that walkability index is a complicated metric that weighs many factors in a nuanced manner.</span>
+<span id="cb1-411"><a href="#cb1-411"></a><span class="fu">### Random Forest Regression</span></span>
 <span id="cb1-412"><a href="#cb1-412"></a></span>
-<span id="cb1-413"><a href="#cb1-413"></a></span>
-<span id="cb1-414"><a href="#cb1-414"></a><span class="fu">### Random Forest Regression</span></span>
-<span id="cb1-415"><a href="#cb1-415"></a></span>
-<span id="cb1-416"><a href="#cb1-416"></a>With such a large dataset, a random forest algorithm was a very compute intensive modeling option. Regardless, we tuned a Random Forest model, resulting in the highest cross-validated metrics of any of our models. This random forest has excellent predictive accuracy, so we would recommend it when trying to predict walkability scores, but we cannot use it to gain any further interpretable insight.</span>
-<span id="cb1-417"><a href="#cb1-417"></a></span>
-<span id="cb1-418"><a href="#cb1-418"></a><span class="fu">### K-Neighbors Regression</span></span>
-<span id="cb1-419"><a href="#cb1-419"></a></span>
-<span id="cb1-420"><a href="#cb1-420"></a>To tune the optimal number of neighbors for our KNN model, we performed a grid search. To perform this grid search, we fit each KNN model on the same training data and compared their performance on the same validation set. The following plot shows how validation R-squared changes with k.</span>
-<span id="cb1-421"><a href="#cb1-421"></a></span>
-<span id="cb1-422"><a href="#cb1-422"></a><span class="in">```{r, fig.cap = &quot;Figure 11: Validation R-squared vs. number of neighbors (k)&quot;, include = TRUE}</span></span>
-<span id="cb1-423"><a href="#cb1-423"></a>walk_knn_r2 <span class="sc">%&gt;%</span></span>
-<span id="cb1-424"><a href="#cb1-424"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> k, <span class="at">y =</span> rsq)) <span class="sc">+</span></span>
-<span id="cb1-425"><a href="#cb1-425"></a>  <span class="fu">geom_line</span>() <span class="sc">+</span> </span>
-<span id="cb1-426"><a href="#cb1-426"></a>  <span class="fu">theme_bw</span>() <span class="sc">+</span></span>
-<span id="cb1-427"><a href="#cb1-427"></a>  <span class="fu">labs</span>(<span class="at">y =</span> <span class="st">&quot;R-squared&quot;</span>)</span>
-<span id="cb1-428"><a href="#cb1-428"></a><span class="in">```</span></span>
-<span id="cb1-429"><a href="#cb1-429"></a></span>
-<span id="cb1-430"><a href="#cb1-430"></a>For the walkability data, it turned out that a relatively low value of k (in comparison to the entire size of the dataset) optimized validation R-squared. We settled on the optimal number of neighbors being around 10, as this is where the so-called &#39;elbow&#39; in the graph is.</span>
-<span id="cb1-431"><a href="#cb1-431"></a></span>
-<span id="cb1-432"><a href="#cb1-432"></a>KNN is a computationally expensive algorithm due to both the breadth and depth of the walkability dataset. To reduce this cost, we fit our different KNN models on only the top 6 predictors as indicated by OLS (See Figure 9). The final model specification achieved a cross-validated RMSE of .862 and an R-squared of .864. Although KNN performs worse than Random Forest for this data the decent metrics from KNN demonstrate that there is more than one way to effectively predict walkability index. However, just like the Random Forest, our KNN model lacks interpretability.</span>
-<span id="cb1-433"><a href="#cb1-433"></a></span>
-<span id="cb1-434"><a href="#cb1-434"></a><span class="fu"># Discussion</span></span>
-<span id="cb1-435"><a href="#cb1-435"></a></span>
-<span id="cb1-436"><a href="#cb1-436"></a><span class="fu">## AQI</span></span>
-<span id="cb1-437"><a href="#cb1-437"></a></span>
-<span id="cb1-438"><a href="#cb1-438"></a>Our model results demonstrate that we can forecast ozone-based AQI effectively without knowledge of ozone levels. On average, our random forest was only wrong by 20.953 AQI points, rarely predicting far from the actual AQI. As the estimates are in the same ballpark as the real AQI, they could potentially serve to give the public a general idea of how unsafe atmospheric ozone levels are in the absence of ozone measurements. We tuned several models for various parameters in order to arrive at this accurate of a random forest predictor. While our other models didn&#39;t prove to be as impactful, the linear model gives us an intuitive understanding that ozone is associated with high no2, high temperatures, and low humidity.</span>
-<span id="cb1-439"><a href="#cb1-439"></a></span>
-<span id="cb1-440"><a href="#cb1-440"></a><span class="fu">## Walkability</span></span>
-<span id="cb1-441"><a href="#cb1-441"></a></span>
-<span id="cb1-442"><a href="#cb1-442"></a>Our model results indicate that walkability index can be predicted quite well using the publicly available data. We were able to explain 90.7% of the variance in walkability index using a Random Forest model, which is an impressive number. KNN was able to achieve comparable but slightly worse results, explaining 86.4% of the variance in walkability index. Although neither of these models is particularly interpretable, their predictive power is impressive.</span>
-<span id="cb1-443"><a href="#cb1-443"></a></span>
-<span id="cb1-444"><a href="#cb1-444"></a>Our Linear Regression and Decision Tree models were not only highly interpretable, they also explained 81.9% and 71.9% of the variation in Walkability Index respectively. For such interpretable models, these performance metrics are remarkable. Linear Regression is particularly stand-out, as it was able to predict walkability index within 1 point, on average, while still explaining over 80% of the variation in walkability index.</span>
-<span id="cb1-445"><a href="#cb1-445"></a></span>
-<span id="cb1-446"><a href="#cb1-446"></a><span class="fu"># Ethics</span></span>
-<span id="cb1-447"><a href="#cb1-447"></a></span>
-<span id="cb1-448"><a href="#cb1-448"></a><span class="fu">## Good uses of our work</span></span>
-<span id="cb1-449"><a href="#cb1-449"></a></span>
-<span id="cb1-450"><a href="#cb1-450"></a>It is important that as we give you these powerful machine learning model fits, you are aware of the importance of their proper usage. We hope that you will use the work detailed in this report to better understand the atmospheric factors that contribute to the future air quality of an area and its characteristics that determine its walkability. For the AQI model in particular, we also expect that you can use this model to effectively predict the air quality based on ozone even when direct ozone measurements are unable to be taken, using other atmospheric conditions as a proxy measurement.</span>
-<span id="cb1-451"><a href="#cb1-451"></a></span>
-<span id="cb1-452"><a href="#cb1-452"></a>For the walkability model, we would support the usage of our models to predict areas with poor walkability for areas where it is currently unknown, such that changes could be implemented to make it more pedestrian-friendly. The goal of these models is to highlight a small number of factors that have a large impact on how walkable a place is. By identifying these characteristics, it is our hope that civil projects can be undertaken and that public policy changes can be implemented to improve walkability for all communities, but especially those that need it most. For example, there could be changes to the local codes that require a certain intersection density or federal incentives to having high public transportation service levels. Walkability is very strongly linked to physical health and quality of life metrics, so it is of the utmost importance to ensure all communities are walkable.</span>
-<span id="cb1-453"><a href="#cb1-453"></a></span>
-<span id="cb1-454"><a href="#cb1-454"></a><span class="fu">## Misuses of our work</span></span>
-<span id="cb1-455"><a href="#cb1-455"></a></span>
-<span id="cb1-456"><a href="#cb1-456"></a>Although there are many appropriate uses of our work, we also want to forewarn you about the potential misuses to avoid. Though our models predict ozone-based AQI, they should not be used as a proxy for AQI when proper measurements are available, as it could miss some important and dangerous fluctuations. The model&#39;s intended use is as an emergency measure when ozone measurements are not available.</span>
-<span id="cb1-457"><a href="#cb1-457"></a></span>
-<span id="cb1-458"><a href="#cb1-458"></a>As the EPA, it is your responsibility to use the knowledge gained from this work and the corresponding machine learning models to help the environment, not to harm it. If misused, these models could ultimately end up doing more harm than good. For example, entities responsible for emitting large amounts of pollutants could use these models to find ways to disguise their harmful ozone production. If these enterprises learn that cold, humid days see low ozone, they may choose emit more fumes during those times which could cause more harm to the environment.</span>
-<span id="cb1-459"><a href="#cb1-459"></a></span>
-<span id="cb1-460"><a href="#cb1-460"></a>Care should be taken to protect public transportation services even if the area would be &quot;walkable enough&quot; without having such high service levels. It would also not be appropriate to target low-income housing developments to places that are less walkable simply because these areas tend to have a higher percentage of low-wage workers.</span>
-<span id="cb1-461"><a href="#cb1-461"></a></span>
-<span id="cb1-462"><a href="#cb1-462"></a><span class="fu">## Bias</span></span>
-<span id="cb1-463"><a href="#cb1-463"></a></span>
-<span id="cb1-464"><a href="#cb1-464"></a>We must acknowledge that our project is subject to biases - deliberate or otherwise. The primary bias in the AQI analysis came from the data collection process. Our final data set consisted of atmospheric measurements from only 43 counties across 32 states, meaning that a substantial portion of the country is left unaccounted for. Also, we did not investigate the geographic locations of the weather stations that were monitoring the atmospheric conditions; hence it is possible that these measurements are not representative of the general population of atmospheric conditions (For example, perhaps weather monitoring stations tend to be close to cities, making this analysis less representative of rural areas). Finally, the data we analyzed came only from the years 2021 and 2022 - meaning that insights and trends illuminated in this report may not reflect the historical patterns.</span>
-<span id="cb1-465"><a href="#cb1-465"></a></span>
-<span id="cb1-466"><a href="#cb1-466"></a>For the walkability dataset, we have very serious concerns about bias. Many variables in the dataset required information about public transit services. Local transit agencies should use a General Transit Feed Specification (GTFS) to share transit information in a standardized format. Although 95% of total transit ridership in the US is covered by the GTFS, not all places develop GTFS data for their systems or share it, particularly smaller transit agencies. Since many variables depended on this information, observations without it were removed. Unfortunately, this had a severely disproportionate impact on the less walkable places. Prior to removal, 43,250 places were designated as &quot;Least walkable&quot; and 68,640 places were &quot;Below average walkable.&quot; After removal, there were only 10 least walkable places and 7,583 below average walkable places remained. Most walkable and above average walkable places only lost 4% and 15% of their locations respectively. Since the Walkability Index categories are very unevenly represented in the data our models were trained on, they will likely (and unrealistically) predict areas will be more walkable than they are.</span>
-<span id="cb1-467"><a href="#cb1-467"></a></span>
-<span id="cb1-468"><a href="#cb1-468"></a><span class="fu"># Conclusion</span></span>
-<span id="cb1-469"><a href="#cb1-469"></a></span>
-<span id="cb1-470"><a href="#cb1-470"></a>Our goal was to leverage machine learning to assist you, the EPA, with your mission of furthering environmental protection, advancing environmental justice, and safeguarding communities. We specifically created a tool to help you understand the factors that contribute to next-day AQI and predict the harmful effects of ozone without any direct measurements of ozone concentrations. We also developed a model that can capture over 80% of the variance in walkability index using built environment characteristics. This can help you inform the public of air quality danger and help lobby for projects to reduce the car dependency of locations with low walkability.</span>
-<span id="cb1-471"><a href="#cb1-471"></a></span>
-<span id="cb1-472"><a href="#cb1-472"></a>For both the AQI and walkability datasets, random forests proved to be the model specifications with the highest predictive power as measured by R-squared and RMSE. We discovered that the most important variables for predicting next-day AQI were maximum no2, maximum temperature, and minimum humidity. On the other hand, the most important variables for predicting the walkability index were those relating to diveristy of employment, road network density, and diversity of housing types. </span>
-<span id="cb1-473"><a href="#cb1-473"></a></span>
-<span id="cb1-474"><a href="#cb1-474"></a>The single model we would recommend to you for predicting next-day AQI is our random forest model, as it has the best predictive ability. This report has sufficient information on the contributing factors to next-day ozone AQI such that the more interpretable models are not worth using at the cost of predictive power. </span>
-<span id="cb1-475"><a href="#cb1-475"></a></span>
-<span id="cb1-476"><a href="#cb1-476"></a>The single model we would recommend to you for predicting the walkability index of a location is the linear regression model, because it has a good balance of predictive power and interpretability. Because walkability index is such a complicated metric and this dataset has so many features, it is important to preserve the ability to interpret how and why the model is making the predictions it is.</span>
-<span id="cb1-477"><a href="#cb1-477"></a></span>
-<span id="cb1-478"><a href="#cb1-478"></a><span class="fu"># Appendix</span></span>
-<span id="cb1-479"><a href="#cb1-479"></a></span>
-<span id="cb1-480"><a href="#cb1-480"></a><span class="fu">## Sources</span></span>
-<span id="cb1-481"><a href="#cb1-481"></a></span>
-<span id="cb1-482"><a href="#cb1-482"></a>“AirData Website File Download Page.” EPA, Environmental Protection Agency, 1 Jan. 2023, <span class="co">[</span><span class="ot">https://aqs.epa.gov/aqsweb/airdata/download_files.html</span><span class="co">](https://aqs.epa.gov/aqsweb/airdata/download_files.html)</span>. </span>
-<span id="cb1-483"><a href="#cb1-483"></a></span>
-<span id="cb1-484"><a href="#cb1-484"></a>&quot;Center for Science Education.&quot; How Weather Affects Air Quality | Center for Science Education, <span class="co">[</span><span class="ot">https://scied.ucar.edu/learning-zone/air-quality/how-weather-affects-air-quality</span><span class="co">](https://scied.ucar.edu/learning-zone/air-quality/how-weather-affects-air-quality)</span>.</span>
-<span id="cb1-485"><a href="#cb1-485"></a></span>
-<span id="cb1-486"><a href="#cb1-486"></a>Champan, Jim, et al. EPA, Environmental Protection Agency, June 2021, <span class="co">[</span><span class="ot">https://www.epa.gov/smartgrowth/smart-location-database-technical-documentation-and-user-guide</span><span class="co">](https://www.epa.gov/smartgrowth/smart-location-database-technical-documentation-and-user-guide)</span>.</span>
-<span id="cb1-487"><a href="#cb1-487"></a></span>
-<span id="cb1-488"><a href="#cb1-488"></a>Thomas, John, et al. &quot;National Walkability Index Methodology and User Guide.&quot; EPA, Environmental Protection Agency, June 2021, <span class="co">[</span><span class="ot">https://www.epa.gov/smartgrowth/national-walkability-index-user-guide-and-methodology</span><span class="co">](https://www.epa.gov/smartgrowth/national-walkability-index-user-guide-and-methodology)</span>.</span>
-<span id="cb1-489"><a href="#cb1-489"></a></span>
-<span id="cb1-490"><a href="#cb1-490"></a>&quot;Walkability Index.&quot; Catalog, Responsible Party U.S. Environmental Protection Agency, Office of Sustainable Communities (Point of Contact), 3 July 2021, <span class="co">[</span><span class="ot">https://catalog.data.gov/dataset/walkability-index</span><span class="co">](https://catalog.data.gov/dataset/walkability-index)</span>.</span>
-<span id="cb1-491"><a href="#cb1-491"></a></span>
+<span id="cb1-413"><a href="#cb1-413"></a>With such a large dataset, a random forest algorithm was a very compute intensive modeling option. Regardless, we tuned a Random Forest model, resulting in the highest cross-validated metrics of any of our models. This random forest has excellent predictive accuracy, so we would recommend it when trying to predict walkability scores, but we cannot use it to gain any further interpretable insight.</span>
+<span id="cb1-414"><a href="#cb1-414"></a></span>
+<span id="cb1-415"><a href="#cb1-415"></a><span class="fu">### K-Neighbors Regression</span></span>
+<span id="cb1-416"><a href="#cb1-416"></a></span>
+<span id="cb1-417"><a href="#cb1-417"></a>To tune the optimal number of neighbors for our KNN model, we performed a grid search. To perform this grid search, we fit each KNN model on the same training data and compared their performance on the same validation set. The following plot shows how validation R-squared changes with k.</span>
+<span id="cb1-418"><a href="#cb1-418"></a></span>
+<span id="cb1-419"><a href="#cb1-419"></a><span class="in">```{r, fig.cap = &quot;Figure 11: Validation R-squared vs. number of neighbors (k)&quot;, include = TRUE}</span></span>
+<span id="cb1-420"><a href="#cb1-420"></a>walk_knn_r2 <span class="sc">%&gt;%</span></span>
+<span id="cb1-421"><a href="#cb1-421"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> k, <span class="at">y =</span> rsq)) <span class="sc">+</span></span>
+<span id="cb1-422"><a href="#cb1-422"></a>  <span class="fu">geom_line</span>() <span class="sc">+</span> </span>
+<span id="cb1-423"><a href="#cb1-423"></a>  <span class="fu">theme_bw</span>() <span class="sc">+</span></span>
+<span id="cb1-424"><a href="#cb1-424"></a>  <span class="fu">labs</span>(<span class="at">y =</span> <span class="st">&quot;R-squared&quot;</span>)</span>
+<span id="cb1-425"><a href="#cb1-425"></a><span class="in">```</span></span>
+<span id="cb1-426"><a href="#cb1-426"></a></span>
+<span id="cb1-427"><a href="#cb1-427"></a>For the walkability data, it turned out that a relatively low value of k (in comparison to the entire size of the dataset) optimized validation R-squared. We settled on the optimal number of neighbors being around 10, as this is where the so-called &#39;elbow&#39; in the graph is.</span>
+<span id="cb1-428"><a href="#cb1-428"></a></span>
+<span id="cb1-429"><a href="#cb1-429"></a>KNN is a computationally expensive algorithm due to both the breadth and depth of the walkability dataset. To reduce this cost, we fit our different KNN models on only the top 6 predictors as indicated by OLS (See Figure 9). The final model specification achieved a cross-validated RMSE of .862 and an R-squared of .864. Although KNN performs worse than Random Forest for this data the decent metrics from KNN demonstrate that there is more than one way to effectively predict walkability index. However, just like the Random Forest, our KNN model lacks interpretability.</span>
+<span id="cb1-430"><a href="#cb1-430"></a></span>
+<span id="cb1-431"><a href="#cb1-431"></a><span class="fu"># Discussion</span></span>
+<span id="cb1-432"><a href="#cb1-432"></a></span>
+<span id="cb1-433"><a href="#cb1-433"></a><span class="fu">## AQI</span></span>
+<span id="cb1-434"><a href="#cb1-434"></a></span>
+<span id="cb1-435"><a href="#cb1-435"></a>Our model results demonstrate that we can forecast ozone-based AQI effectively without knowledge of ozone levels. On average, our random forest was only wrong by 19.501 AQI points, rarely predicting far from the actual AQI. As the estimates are in the same ballpark as the real AQI, they could potentially serve to give the public a general idea of how unsafe atmospheric ozone levels are in the absence of ozone measurements. We tuned several models for various parameters in order to arrive at this accurate of a random forest predictor. While our other models didn&#39;t prove to be as impactful, the linear model gives us an intuitive understanding that ozone is associated with high no2, high temperatures, and low humidity.</span>
+<span id="cb1-436"><a href="#cb1-436"></a></span>
+<span id="cb1-437"><a href="#cb1-437"></a><span class="fu">## Walkability</span></span>
+<span id="cb1-438"><a href="#cb1-438"></a></span>
+<span id="cb1-439"><a href="#cb1-439"></a>Our model results indicate that walkability index can be predicted quite well using the publicly available data. We were able to explain 90.7% of the variance in walkability index using a Random Forest model, which is an impressive number. KNN was able to achieve comparable but slightly worse results, explaining 86.4% of the variance in walkability index. Although neither of these models is particularly interpretable, their predictive power is impressive.</span>
+<span id="cb1-440"><a href="#cb1-440"></a></span>
+<span id="cb1-441"><a href="#cb1-441"></a>Our Linear Regression and Decision Tree models were not only highly interpretable, they also explained 81.9% and 71.9% of the variation in Walkability Index respectively. For such interpretable models, these performance metrics are remarkable. Linear Regression is particularly stand-out, as it was able to predict walkability index within 1 point, on average, while still explaining over 80% of the variation in walkability index.</span>
+<span id="cb1-442"><a href="#cb1-442"></a></span>
+<span id="cb1-443"><a href="#cb1-443"></a><span class="fu"># Ethics</span></span>
+<span id="cb1-444"><a href="#cb1-444"></a></span>
+<span id="cb1-445"><a href="#cb1-445"></a><span class="fu">## Good uses of our work</span></span>
+<span id="cb1-446"><a href="#cb1-446"></a></span>
+<span id="cb1-447"><a href="#cb1-447"></a>It is important that as we give you these powerful machine learning model fits, you are aware of the importance of their proper usage. We hope that you will use the work detailed in this report to better understand the atmospheric factors that contribute to the future air quality of an area and its characteristics that determine its walkability. For the AQI model in particular, we also expect that you can use this model to effectively predict the air quality based on ozone even when direct ozone measurements are unable to be taken, using other atmospheric conditions as a proxy measurement.</span>
+<span id="cb1-448"><a href="#cb1-448"></a></span>
+<span id="cb1-449"><a href="#cb1-449"></a>For the walkability model, we would support the usage of our models to predict areas with poor walkability for areas where it is currently unknown, such that changes could be implemented to make it more pedestrian-friendly. The goal of these models is to highlight a small number of factors that have a large impact on how walkable a place is. By identifying these characteristics, it is our hope that civil projects can be undertaken and that public policy changes can be implemented to improve walkability for all communities, but especially those that need it most. For example, there could be changes to the local codes that require a certain intersection density or federal incentives to having high public transportation service levels. Walkability is very strongly linked to physical health and quality of life metrics, so it is of the utmost importance to ensure all communities are walkable.</span>
+<span id="cb1-450"><a href="#cb1-450"></a></span>
+<span id="cb1-451"><a href="#cb1-451"></a><span class="fu">## Misuses of our work</span></span>
+<span id="cb1-452"><a href="#cb1-452"></a></span>
+<span id="cb1-453"><a href="#cb1-453"></a>Although there are many appropriate uses of our work, we also want to forewarn you about the potential misuses to avoid. Though our models predict ozone-based AQI, they should not be used as a proxy for AQI when proper measurements are available, as it could miss some important and dangerous fluctuations. The model&#39;s intended use is as an emergency measure when ozone measurements are not available.</span>
+<span id="cb1-454"><a href="#cb1-454"></a></span>
+<span id="cb1-455"><a href="#cb1-455"></a>As the EPA, it is your responsibility to use the knowledge gained from this work and the corresponding machine learning models to help the environment, not to harm it. If misused, these models could ultimately end up doing more harm than good. For example, entities responsible for emitting large amounts of pollutants could use these models to find ways to disguise their harmful ozone production. If these enterprises learn that cold, humid days see low ozone, they may choose emit more fumes during those times which could cause more harm to the environment.</span>
+<span id="cb1-456"><a href="#cb1-456"></a></span>
+<span id="cb1-457"><a href="#cb1-457"></a>Care should be taken to protect public transportation services even if the area would be &quot;walkable enough&quot; without having such high service levels. It would also not be appropriate to target low-income housing developments to places that are less walkable simply because these areas tend to have a higher percentage of low-wage workers.</span>
+<span id="cb1-458"><a href="#cb1-458"></a></span>
+<span id="cb1-459"><a href="#cb1-459"></a><span class="fu">## Bias</span></span>
+<span id="cb1-460"><a href="#cb1-460"></a></span>
+<span id="cb1-461"><a href="#cb1-461"></a>We must acknowledge that our project is subject to biases - deliberate or otherwise. The primary bias in the AQI analysis came from the data collection process. Our final data set consisted of atmospheric measurements from only 43 counties across 32 states, meaning that a substantial portion of the country is left unaccounted for. Also, we did not investigate the geographic locations of the weather stations that were monitoring the atmospheric conditions; hence it is possible that these measurements are not representative of the general population of atmospheric conditions (For example, perhaps weather monitoring stations tend to be close to cities, making this analysis less representative of rural areas). Finally, the data we analyzed came only from the years 2021 and 2022 - meaning that insights and trends illuminated in this report may not reflect the historical patterns.</span>
+<span id="cb1-462"><a href="#cb1-462"></a></span>
+<span id="cb1-463"><a href="#cb1-463"></a>For the walkability dataset, we have very serious concerns about bias. Many variables in the dataset required information about public transit services. Local transit agencies should use a General Transit Feed Specification (GTFS) to share transit information in a standardized format. Although 95% of total transit ridership in the US is covered by the GTFS, not all places develop GTFS data for their systems or share it, particularly smaller transit agencies. Since many variables depended on this information, observations without it were removed. Unfortunately, this had a severely disproportionate impact on the less walkable places. Prior to removal, 43,250 places were designated as &quot;Least walkable&quot; and 68,640 places were &quot;Below average walkable.&quot; After removal, there were only 10 least walkable places and 7,583 below average walkable places remained. Most walkable and above average walkable places only lost 4% and 15% of their locations respectively. Since the Walkability Index categories are very unevenly represented in the data our models were trained on, they will likely (and unrealistically) predict areas will be more walkable than they are.</span>
+<span id="cb1-464"><a href="#cb1-464"></a></span>
+<span id="cb1-465"><a href="#cb1-465"></a><span class="fu"># Conclusion</span></span>
+<span id="cb1-466"><a href="#cb1-466"></a></span>
+<span id="cb1-467"><a href="#cb1-467"></a>Our goal was to leverage machine learning to assist you, the EPA, with your mission of furthering environmental protection, advancing environmental justice, and safeguarding communities. We specifically created a tool to help you understand the factors that contribute to next-day AQI and predict the harmful effects of ozone without any direct measurements of ozone concentrations. We also developed a model that can capture over 80% of the variance in walkability index using built environment characteristics. This can help you inform the public of air quality danger and help lobby for projects to reduce the car dependency of locations with low walkability.</span>
+<span id="cb1-468"><a href="#cb1-468"></a></span>
+<span id="cb1-469"><a href="#cb1-469"></a>For both the AQI and walkability datasets, random forests proved to be the model specifications with the highest predictive power as measured by R-squared and RMSE. We discovered that the most important variables for predicting next-day AQI were maximum no2, maximum temperature, and minimum humidity. On the other hand, the most important variables for predicting the walkability index were those relating to diveristy of employment, road network density, and diversity of housing types.</span>
+<span id="cb1-470"><a href="#cb1-470"></a></span>
+<span id="cb1-471"><a href="#cb1-471"></a>Ultimately, for both AQI and walkability, we suggest using the Random Forest model to predict because they each achieved the best performance metrics. We can still benefit from the other models by using their interpretatable elements, but when predicting we would suggest using the best available model. Particularly with the AQI predictions, the random forest displayed far less bias than the others, and will likely perform best on future data.</span>
+<span id="cb1-472"><a href="#cb1-472"></a></span>
+<span id="cb1-473"><a href="#cb1-473"></a><span class="fu"># Appendix</span></span>
+<span id="cb1-474"><a href="#cb1-474"></a></span>
+<span id="cb1-475"><a href="#cb1-475"></a><span class="fu">## Sources</span></span>
+<span id="cb1-476"><a href="#cb1-476"></a></span>
+<span id="cb1-477"><a href="#cb1-477"></a>&quot;AirData Website File Download Page.&quot; EPA, Environmental Protection Agency, 1 Jan. 2023, <span class="ot">&lt;https://aqs.epa.gov/aqsweb/airdata/download_files.html&gt;</span>.</span>
+<span id="cb1-478"><a href="#cb1-478"></a></span>
+<span id="cb1-479"><a href="#cb1-479"></a>&quot;Center for Science Education.&quot; How Weather Affects Air Quality \| Center for Science Education, <span class="ot">&lt;https://scied.ucar.edu/learning-zone/air-quality/how-weather-affects-air-quality&gt;</span>.</span>
+<span id="cb1-480"><a href="#cb1-480"></a></span>
+<span id="cb1-481"><a href="#cb1-481"></a>Champan, Jim, et al. EPA, Environmental Protection Agency, June 2021, <span class="ot">&lt;https://www.epa.gov/smartgrowth/smart-location-database-technical-documentation-and-user-guide&gt;</span>.</span>
+<span id="cb1-482"><a href="#cb1-482"></a></span>
+<span id="cb1-483"><a href="#cb1-483"></a>Thomas, John, et al. &quot;National Walkability Index Methodology and User Guide.&quot; EPA, Environmental Protection Agency, June 2021, <span class="ot">&lt;https://www.epa.gov/smartgrowth/national-walkability-index-user-guide-and-methodology&gt;</span>.</span>
+<span id="cb1-484"><a href="#cb1-484"></a></span>
+<span id="cb1-485"><a href="#cb1-485"></a>&quot;Walkability Index.&quot; Catalog, Responsible Party U.S. Environmental Protection Agency, Office of Sustainable Communities (Point of Contact), 3 July 2021, <span class="ot">&lt;https://catalog.data.gov/dataset/walkability-index&gt;</span>.</span>
 </code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div></div></div></div></div>
 </div> <!-- /content -->
