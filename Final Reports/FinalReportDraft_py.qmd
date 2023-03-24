@@ -58,7 +58,7 @@ nwi = pd.read_csv('cleaned_nwi.csv')
 ```{python, include = FALSE}
 # NWI Outputs
 #os.chdir('../')
-
+df_lr_coef = pd.read_csv("NWI Outputs/NWI_LR_coef_py.csv")
 df_nwi_lasso_features = pd.read_csv("NWI Outputs/NWI_lasso_features_py.csv")
 ```
 
@@ -382,7 +382,19 @@ On the other hand, our most interpretable model, the decision tree, still result
 
 Our linear model achieved an R-squared value of 0.819, meaning it is accounting for a non-trivial amount of variance in walkability index. As a result, interpretations of the largest coefficients are especially valuable. The following plot shows the coefficients of the variables with the six coefficients of largest magnitude.
 
-**Coefficient plot goes here**
+```{python, fig.cap = "Figure #. Logistic Regression Coefficients", include = TRUE}
+plt.clf()
+sns.set_theme(context='notebook', style='darkgrid', palette='deep')
+
+sns.barplot(x=df_lr_coef['Feature'], y=df_lr_coef['Coefficient'])
+plt.title('Linear Regression Coefficients')
+plt.ylabel('Coefficient')
+plt.axhline(y = 0, color = 'k', linestyle = '-', linewidth=4)
+plt.xticks(rotation=45)
+plt.show()
+plt.close()
+```
+
 
 There are three particularly large coefficients, corresponding to D2B_E8MIXA, D3A, and D2A_EPHHM. Because these three coefficients are all close to one, this means that a single unit increase in road network density, employment entropy, and household entropy are each roughly associated with a single unit increase in the walkability index.
 
