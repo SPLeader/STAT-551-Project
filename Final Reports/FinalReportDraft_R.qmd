@@ -144,7 +144,7 @@ ggplot(aqi, aes(AQI_next_day, fill = cut(AQI_next_day, 100))) +
   geom_histogram(show.legend = FALSE) +
   scale_fill_discrete(h = c(200, 10), c = 200, l = 70) + 
   theme_bw() + 
-  labs(y = "",
+  labs(y = "Frequency",
        x = "AQI") 
 ```
 
@@ -171,7 +171,7 @@ aqi %>%
   theme_bw() + 
   theme(legend.position = "None") + 
         #axis.title.y = element_text(angle = 0, vjust = 0.5)) +
-  labs(y = "") +
+  labs(y = "AQI") +
   scale_fill_manual(values = c("#034E7B", "#0570B0", "#3690C0", "#74A9CF", "#A6BDDB", "#D0D1E6",
                                           "#F1EEF6", "#D0D1E6", "#A6BDDB", "#74A9CF", "#3690C0", "#0570B0"))
 ```
@@ -223,7 +223,7 @@ Figure 3 shows how the different atmospheric measurements correlate with next-da
 ggplot(nwi, aes(NatWalkInd, fill = cut(NatWalkInd, 100))) +
   geom_histogram(show.legend = FALSE) +
   theme_bw() + 
-  labs(y = "",
+  labs(y = "Frequency",
        x = "Walkability Index") 
 ```
 
