@@ -382,7 +382,7 @@ On the other hand, our most interpretable model, the decision tree, still result
 
 Our linear model achieved an R-squared value of 0.819, meaning it is accounting for a non-trivial amount of variance in walkability index. As a result, interpretations of the largest coefficients are especially valuable. The following plot shows the coefficients of the variables with the six coefficients of largest magnitude.
 
-```{python, fig.cap = "Figure #. Logistic Regression Coefficients", include = TRUE}
+```{python, fig.cap = "Figure #. Linear Regression Coefficients", include = TRUE}
 plt.clf()
 sns.set_theme(context='notebook', style='darkgrid', palette='deep')
 
