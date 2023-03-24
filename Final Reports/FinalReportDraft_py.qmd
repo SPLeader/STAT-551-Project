@@ -404,7 +404,7 @@ Conversely, the network density has a negative coefficient of about -0.5. The va
 
 A decision tree, much like our linear regression model, has the benefit of being highly interpretable, even if its predictive ability is not optimal. We created our decision tree with very small maximum depth to examine and interpret the whole tree easily. This did result in substantial underfit, hence why it had the worst cross-validated performance metrics of all the models. Fitting this model on the walkability data resulted in the following tree:
 
-![](../WalkabilityImages/decision_tree.png)
+![](../NWI Outputs/decision_tree_feature_selection.png)
 
 Figure #: Decision tree fit on most important 6 features
 

@@ -125,7 +125,7 @@ Best features according to LASSO: 'D2A_EPHHM', 'D2B_E8MIXA', 'D3APO', 'D3B', 'D3
 #### Decision Tree for feature selection
 
 ```{python}
-dt = DecisionTreeRegressor()
+dt = DecisionTreeRegressor(max_depth=2)
 dt.fit(X, y)
 ```
 
@@ -137,7 +137,7 @@ dt.fit(X, y)
 plt.clf()
 plt.figure().set_figwidth(200)
 plt.figure().set_figheight(7)
-plot_tree(dt, proportion=True, max_depth=1, feature_names=all_features, 
+plot_tree(dt, proportion=True, feature_names=all_features, 
         class_names=list(y.unique()), filled=True)
 plt.title('Decision Tree on all predictors')
 plt.savefig('NWI Outputs/decision_tree_feature_selection.png')

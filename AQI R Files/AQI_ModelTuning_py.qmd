@@ -132,7 +132,7 @@ pipe = Pipeline(steps=[("poly", poly), ("scaler", scaler), ("model", model)])
 # define grid
 grid = dict()
 grid['model__alpha'] = [1e-10, 1e-5, 1.0]
-grid['model__l1_ratio'] = [0, 0.5, 1.0] #np.arange(0, 1, 0.5)
+grid['model__l1_ratio'] = [0, 0.5, 1.0]
 # define search
 search = GridSearchCV(pipe, grid, scoring='neg_root_mean_squared_error', cv=cv, n_jobs=1)
 # perform the search
@@ -143,6 +143,8 @@ results = search.fit(X, y)
 rmse = -results.best_score_
 r2 = 1 - (((-results.best_score_)**2) / SSE)
 model_scores.loc[len(model_scores)] = ["Linear Model", r2, rmse]
+
+rmse
 
 print('Rsq: %.3f' % r2)
 print('RMSE: %.3f' % rmse)
@@ -312,9 +314,6 @@ Compared to our linear model, a random forest is much less biased. For its predi
 # Tuning Decision Tree
 model = DecisionTreeRegressor(random_state = 13)
 
-# define model evaluation method
-cv = RepeatedKFold(n_splits=5, n_repeats=1, random_state=13)
-
 grid = dict()
 grid['max_depth'] = [2, 4, 6, 8, 10]
 grid['min_impurity_decrease'] = [1, 2, 5]
@@ -328,6 +327,7 @@ rmse = -results.best_score_
 r2 = 1 - (((-results.best_score_)**2) / SSE)
 model_scores.loc[len(model_scores)] = ["Decision Tree", r2, rmse]
 
+print('Rsq: %.3f' % r2)
 print('RMSE: %.3f' % rmse)
 print('Config: %s' % results.best_params_)
 ```
