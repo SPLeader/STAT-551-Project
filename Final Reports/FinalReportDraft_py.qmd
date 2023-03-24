@@ -94,11 +94,13 @@ var_summary_table = pd.DataFrame(data =  {
 Markdown(tabulate(var_summary_table, headers = ['Variable Name','Variable Description'], showindex = "never"))
 ```
 
+*Table 1. Variable summary for AQI dataset*
+
 ## Walkability
 
 We accessed data about walkability from the U.S. Government's open data catalog, data.gov. The data was collected by the Environmental Protection Agency (EPA) and contains demographic information, built environment characteristics, and transportation infrastructure data from 2021 for each Census block group. These inputs are used to calculate the National Walkability Index as defined by the EPA. This index can be expressed either numerically or translated into qualitative categories (see Table 2 below).
 
-```{python, fig.cap = "Talbe 2: NWI Walkability Categories", include = TRUE}
+```{python, fig.cap = "Table 2: NWI Walkability Categories", include = TRUE}
 df_walkability_categories = pd.DataFrame(
   data = {
     'Walkability Index' : ['1 - 5.75', '5.76 - 10.5', '10.51 - 15.25', '15.26 - 20'],
@@ -107,6 +109,8 @@ df_walkability_categories = pd.DataFrame(
 
 Markdown(tabulate(df_walkability_categories, headers = ['Walkability Index','Category'], showindex = "never"))
 ```
+
+*Table 2: NWI Walkability Categories*
 
 In total, there are 220,740 observations for 117 variables in this dataset. Since there were so many predictors to choose from, we narrowed it down to those in the table below (more details on variable selection in the Exploratory Data Analysis section).
 
@@ -119,6 +123,8 @@ df_walkability_categories = pd.DataFrame(
 
 Markdown(tabulate(df_walkability_categories, headers = ['Variable Name','Description'], showindex = "never"))
 ```
+
+*Talbe 3: Variable Summary for Walkability Dataset*
 
 # Exploratory Data Analysis
 
@@ -149,6 +155,8 @@ plt.show()
 plt.close()
 ```
 
+*Figure 1. Overall distribution of AQI*
+
 ```{python, fig.cap = "Table 2. Summary statistics of AQI", include = TRUE}
 def iqr(x):
     return x.quantile(0.75) - x.quantile(0.25)
@@ -163,13 +171,15 @@ summary_stats
 Markdown(tabulate(summary_stats, headers = ['Mean','STD', 'Median', 'IQR'], showindex = "never"))
 ```
 
+*Table 2. Summary statistics of AQI*
+
 Overall, the distribution of AQI scores is single-peaked and right-skewed, with a median next-day AQI of 44 and an interquartile range of 30. The graph is likely right-skewed because AQI is bounded on the lower end by 0, but has no upper limit.
 
 <br /> <br />
 
 ### Overall distribution of AQI by month
 
-```{python, fig.cap = "Figure 2. Distribution of AQI by month", include = TRUE}
+```{python}
 months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", 
           "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
 
@@ -186,10 +196,12 @@ for row_key, (ax,row) in bp_dict.iteritems():
 # Plot shows in next chunk to avoid prints
 ```
 
-```{python}
+```{python, fig.cap = "Figure 2. Distribution of AQI by month", include = TRUE}
 plt.show()
 plt.close()
 ```
+
+*Figure 2. Distribution of AQI by month*
 
 Figure 2 reveals the seasonal trend in AQI. AQI tends to be higher in the summer months and lower in the winter months for these data. The exact mechanism for this relationship is unknown, but some hypotheses include:
 
@@ -221,6 +233,8 @@ aqi_seg.pivot(index = "variable_category", columns = "variable_type", values = "
 
 ```
 
+*Figure 3. Predictor correlations with AQI, by min, mean, and max concentration*
+
 Figure 3 shows how the different atmospheric measurements correlate with next-day AQI. For most atmospheric measurements, the correlation is in the same direction for the minimum, mean, and maximum. However, wind speed is a notable exception to this trend, where we can see that although the mean and minimum wind speed are negatively correlated with next-day AQI, the maximum wind speed has a slight positive correlation with next-day AQI. The single variable with the most positive correlation to next-day AQI is maximum no2, with a correlation of \~0.59, meaning that higher maximum concentration measurements of no2 are associated with higher next-day AQIs. The single variable with the most negative correlation to next-day AQI is minimum humidity, with a correlation of \~-0.50, meaning that higher minimum humidity measurements are associated with lower next-day AQIs.
 
 <br /> <br />
@@ -229,7 +243,7 @@ Figure 3 shows how the different atmospheric measurements correlate with next-da
 
 ### Overall distribution of Walkability Index
 
-```{python}
+```{python, fig.cap = "Figure 4. Histogram showing the distribution of walkability index", include = TRUE, message = FALSE}
 plt.clf()
 sns.set_theme()
 nwi['NatWalkInd'].hist()
@@ -240,38 +254,13 @@ plt.show()
 plt.close()
 ```
 
+*Figure 4. Histogram showing the distribution of walkability index*
+
 The histogram of Walkability Index appears quite bell-shaped and symmetric. The median Walkability Index is 13.83 and the interquartile range is 3.33. The range for the Walkability Index is 1 to 20.
 
 ### Relationship between Population and Walkability Index Category
 
-
-```{python}
-bp_dict = nwi[["CBSA_POP", "cat"]].boxplot(by ='cat', column =['CBSA_POP'], return_type='both', grid = False, patch_artist = True)
-
-colors = ["#034E7B", "#0570B0", "#3690C0", "#74A9CF", "#A6BDDB", "#D0D1E6",
-                                          "#F1EEF6", "#D0D1E6", "#A6BDDB", "#74A9CF", "#3690C0", "#0570B0"]
-for row_key, (ax,row) in bp_dict.iteritems():
-    ax.set_xlabel('')
-    for i,box in enumerate(row['boxes']):
-        box.set_facecolor(colors[i])
-        
-# Plot shows in next chunk to avoid prints
-```
-
-```{python}
-plt.show()
-plt.close()
-```
-
-We performed further exploration to examine if population may have a relationship with the Walkability Index Category. The Least Walkable category seemed to have the highest population, with the Below Average and Above Average Walkable categories having the lowest populations. These areas had a tighter interquartile range although there were some outliers having much higher populations. The places that were Most Walkable had a large variation in population.
-
-<br /> <br />
-
-### Relationship between Employment Mix and Walkability Index Category
-
-We conducted some preliminary investigation to look at the relationship between employment mix and walkability. Figure 6 below shows a clear upward trend in walkability as the employment mix increases. The employment mix variable is a proportion between 0 and 1 that shows how diverse jobs are in a given area (categories of jobs are retail, office, industrial, service, and entertainment). Higher values indicate greater diversity of jobs which, according to the EPA, is correlated with more walk trips.
-
-```{python}
+```{python, include = FALSE}
 labels = ["Least walkable", "Below average walkable", "Above average walkable", "Most walkable"]
 labels_short = ["Least\nWalkable", "Below average\nWalkable", "Above average\nWalkable", "Most\nWalkable"]
 
@@ -285,6 +274,8 @@ ax = sns.boxplot(
 
 ax.set_xticklabels(labels=labels_short)
 ax.set_ylabel("Population")
+ax.set_ylabel("Walkability Index Category")
+
 ```
 
 ```{python}
@@ -292,7 +283,38 @@ plt.show(ax)
 plt.close()
 ```
 
+*Figure 5. Boxplots showing the relationship between population and walkability index category*
 
+We performed further exploration to examine if population may have a relationship with the Walkability Index Category. The Least Walkable category seemed to have the highest population, with the Below Average and Above Average Walkable categories having the lowest populations. These areas had a tighter interquartile range although there were some outliers having much higher populations. The places that were Most Walkable had a large variation in population.
+
+<br /> <br />
+
+### Relationship between Employment Mix and Walkability Index Category
+
+We conducted some preliminary investigation to look at the relationship between employment mix and walkability. Figure 6 below shows a clear upward trend in walkability as the employment mix increases. The employment mix variable is a proportion between 0 and 1 that shows how diverse jobs are in a given area (categories of jobs are retail, office, industrial, service, and entertainment). Higher values indicate greater diversity of jobs which, according to the EPA, is correlated with more walk trips.
+
+# SCATTERPLOT HERE
+# pretty colors and whatnot
+# WIP
+
+```{python}
+df = nwi
+plt.clf()
+
+colors = {'Above average walkable':'#ffd700', 'Most walkable':'#32cd32', 'Below average walkable':'#d2691e', 'Least walkable':'#8b0000'}
+
+plt.scatter(df['D2B_E8MIXA'], df['NatWalkInd'], c=df['cat'].map(colors))
+plt.xlabel('Employment Mix')
+plt.ylabel('Walkability Index')
+
+plt.legend()
+
+plt.show()
+plt.close()
+```
+
+
+*Figure 6. Scatterplot showing the relationship between employment mix and walkability index*
 
 # Model Results
 
@@ -303,6 +325,8 @@ We used three different types of models to predict AQI: linear models (LASSO), d
 ```{python}
 Markdown(tabulate(aqi_model_metrics, headers = ['Model','R-Squared', 'Root Mean Squared Error'], showindex = "never"))
 ```
+
+*Table 6. Best performance metrics of our three models for AQI*
 
 These metrics indicate that the Random Forest is our overall most effective model, with an R-Squared value of 0.710 and an RMSE of 19.642 AQI points. This indicates that the random forest accounts for 71.0% of the variance in AQI, only being wrong by an average of about 19.6 AQI points. Our linear model was markedly worse, with an RMSE of 21.854 AQI points, and our decision tree fared the worst, with an RMSE of 22.936 AQI points.
 
@@ -329,6 +353,8 @@ plt.show()
 plt.close()
 ```
 
+*Figure 7: AQI model residual plots. A moving average of the mean error is plotted to display model biases*
+
 With these results in mind, we will briefly discuss each model's strengths and weaknesses.
 
 ### Linear Model
@@ -347,9 +373,9 @@ Note that in this formula, max_no2, max_temperature, and max_humidity are standa
 
 Unlike our other models, our decision tree's predictions form discrete vertical lines on the residuals plot because the decision tree only splits its predictions into a relatively small number of distinct values. This limitation makes it impossible for the decision tree to perfectly predict the data, but it still performs better than the linear model because it can respond to non-linear relationships very effectively. The decision tree also allows us to directly see how it makes its decisions. The following decision tree flowchart is simplified down to only 4 layers of splits, but should grant insight into which variables are most important in which circumstances:
 
-![Figure 5: Decision Tree Flowchart](../AQI%20Outputs/AQI_decision_tree_py.png)
+![Figure 8: Decision Tree Flowchart for AQI](../AQI%20Outputs/AQI_decision_tree_py.png)
 
-At each step, this decision tree chooses one value of one variable that best splits the data into higher AQI and lower AQI categories. The first, largest, split separates based on no2: days with a very low maximum no2, below 18 ppb, are directed to the left side of the tree, which tends to have lower next-day AQI. This is consistent with our finding from the linear model, as we know there is a meaningful positive correlation between no2 and ozone (and therefore AQI based on ozone). 
+At each step, this decision tree chooses one value of one variable that best splits the data into higher AQI and lower AQI categories. The first, largest, split separates based on no2: days with a very low maximum no2, below 18 ppb, are directed to the left side of the tree, which tends to have lower next-day AQI. This is consistent with our finding from the linear model, as we know there is a meaningful positive correlation between no2 and ozone (and therefore AQI based on ozone).
 
 For low no2 days, the tree finds that high maximum temperature is the best indicator of high next-day AQI, splitting at a maximum temperature of 81.65 degrees Fahrenheit. For high no2 days, the tree finds that high minimum pressure is the best indicator of high next-day AQI, splitting at a minimum pressure of 982.86 millibars.
 
@@ -374,6 +400,8 @@ df_walkability_model_metrics = pd.DataFrame(
 Markdown(tabulate(df_walkability_model_metrics, headers = ['Model Specification','MSE', 'R-Squared'], showindex = "never"))
 ```
 
+*Table 7. Best performance metrics of our four models for walkability index*
+
 **The model that resulted in the best cross-validated metrics was our Random Forest, observing an R-squared of 0.907 and a RMSE of 0.718.** This means that this model is able to account for over 90% of variance in walkability index, and its predictions were only off by 0.718 walkability index points, on average.
 
 On the other hand, our most interpretable model, the decision tree, still resulted in reasonable performance metrics, with an R-squared of 0.719 and a RMSE of 1.223. The following sections detail our methodologies in more detail.
@@ -382,11 +410,20 @@ On the other hand, our most interpretable model, the decision tree, still result
 
 Our linear model achieved an R-squared value of 0.819, meaning it is accounting for a non-trivial amount of variance in walkability index. As a result, interpretations of the largest coefficients are especially valuable. The following plot shows the coefficients of the variables with the six coefficients of largest magnitude.
 
-```{python, fig.cap = "Figure #. Linear Regression Coefficients", include = TRUE}
+```{python, fig.cap = "Figure 9: Bar plot of top six variables, as indicated by OLS", include = TRUE}
 plt.clf()
 sns.set_theme(context='notebook', style='darkgrid', palette='deep')
 
-sns.barplot(x=df_lr_coef['Feature'], y=df_lr_coef['Coefficient'])
+lr_features = df_lr_coef['Feature']
+lr_coefficients = df_lr_coef['Coefficient']
+
+zipped = list(zip(lr_features, lr_coefficients))
+zipped = sorted(zipped, key=lambda x: abs(x[1]), reverse=True)
+
+lr_features = [pair[0] for pair in zipped]
+lr_coefficients = [pair[1] for pair in zipped]
+
+sns.barplot(x=lr_features[:6], y=lr_coefficients[:6])
 plt.title('Linear Regression Coefficients')
 plt.ylabel('Coefficient')
 plt.axhline(y = 0, color = 'k', linestyle = '-', linewidth=4)
@@ -395,18 +432,17 @@ plt.show()
 plt.close()
 ```
 
+*Figure 9: Bar plot of top six variables, as indicated by OLS*
 
-There are three particularly large coefficients, corresponding to D2B_E8MIXA, D3A, and D2A_EPHHM. Because these three coefficients are all close to one, this means that a single unit increase in road network density, employment entropy, and household entropy are each roughly associated with a single unit increase in the walkability index.
+There are three particularly large coefficients, corresponding to D3B, D2B_E8MIXA, and D2A_EPHHM. Because these three coefficients are all close to one, this means that a single unit increase in non-car-oriented street intersection density, employment entropy, and household entropy are each roughly associated with a single unit increase in the walkability index.
 
-Conversely, the network density has a negative coefficient of about -0.5. The variable D3AAO specifically refers to the density of automobile-oriented links (as opposed to pedestrian-oriented links). The D3AMM variable is similar but includes both auto and pedestrian-oriented network links. That both D3AMM and D3AAO both have a negative coefficient is not surprising; areas that are crowded with vehicles tend to be less walkable.
+Conversely, the network density has a negative coefficient of about -0.5. The variable D3BPO3 specifically refers to the density of pedestrian oriented 3-way intersections. This could indicate that 3-way are not as good at promoting street connectivity. It's possible that this is related to that stop signs are easier for pedestrians to cross than traffic lights are. Overall, these indicate areas that are crowded with vehicles tend to be less walkable even if there are a lot of pedestrian intersections.
 
 ### Decision Tree Regression
 
 A decision tree, much like our linear regression model, has the benefit of being highly interpretable, even if its predictive ability is not optimal. We created our decision tree with very small maximum depth to examine and interpret the whole tree easily. This did result in substantial underfit, hence why it had the worst cross-validated performance metrics of all the models. Fitting this model on the walkability data resulted in the following tree:
 
-![](../NWI Outputs/decision_tree_feature_selection.png)
-
-Figure #: Decision tree fit on most important 6 features
+![Figure 10: Decision Tree Flowchart for Walkability](../NWI Outputs/decision_tree.png)
 
 The first split was made on the variable D3B. This shows that having a lower density of street intersections (not including auto-oriented intersections) is an indicator of a lower walkability score. This makes sense, as areas with fewer intersections would be more disconnected for pedestrians, making walking between destinations less feasible.
 
@@ -424,7 +460,7 @@ With such a large dataset, a random forest algorithm was a very compute intensiv
 
 To tune the optimal number of neighbors for our KNN model, we performed a grid search. To perform this grid search, we fit each KNN model on the same training data and compared their performance on the same validation set. The following plot shows how validation R-squared changes with k.
 
-**KNN plot goes here**
+![Figure 11: Validation R-squared vs. number of neighbors (k)](../NWI Outputs/KNN_n_scores.png)
 
 For the walkability data, it turned out that a relatively low value of k (in comparison to the entire size of the dataset) optimized validation R-squared. We settled on the optimal number of neighbors being around 10, as this is where the so-called 'elbow' in the graph is.
 
