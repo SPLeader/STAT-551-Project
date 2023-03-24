@@ -1,5 +1,5 @@
 ---
-title: "Final Report Draft (Python)"
+title: "Analyzing Air Quality and Walkability for the EPA"
 title-block-banner: true
 author: 
 - Sean Leader
@@ -260,8 +260,6 @@ plt.show()
 plt.close()
 ```
 
-
-
 *Figure 4. Histogram showing the distribution of walkability index*
 
 ```{python, fig.cap = "Table 2. Summary statistics of AQI", include = TRUE}
@@ -332,7 +330,6 @@ plt.legend()
 plt.show()
 plt.close()
 ```
-
 
 *Figure 6. Scatterplot showing the relationship between employment mix and walkability index. Red = Least Walkable, Orange = Below Average Walkable, Yellow = Above Average Walkable, Green = Most Walkable*
 
@@ -466,7 +463,7 @@ Conversely, the network density has a negative coefficient of about -0.5. The va
 
 A decision tree, much like our linear regression model, has the benefit of being highly interpretable, even if its predictive ability is not optimal. We created our decision tree with very small maximum depth to examine and interpret the whole tree easily. This did result in substantial underfit, hence why it had the worst cross-validated performance metrics of all the models. Fitting this model on the walkability data resulted in the following tree:
 
-![Figure 10: Decision Tree Flowchart for Walkability](../NWI Outputs/decision_tree.png)
+![Figure 10: Decision Tree Flowchart for Walkability](../NWI%20Outputs/decision_tree.png)
 
 The first split was made on the variable D3B. This shows that having a lower density of street intersections (not including auto-oriented intersections) is an indicator of a lower walkability score. This makes sense, as areas with fewer intersections would be more disconnected for pedestrians, making walking between destinations less feasible.
 
@@ -484,8 +481,7 @@ With such a large dataset, a random forest algorithm was a very compute intensiv
 
 To tune the optimal number of neighbors for our KNN model, we performed a grid search. To perform this grid search, we fit each KNN model on the same training data and compared their performance on the same validation set. The following plot shows how validation R-squared changes with k.
 
-![Figure 11: Validation R-squared vs. number of neighbors (k)](../NWI Outputs/KNN_n_scores.png)
-
+![Figure 11: Validation R-squared vs. number of neighbors (k)](../NWI%20Outputs/KNN_n_scores.png)
 
 ```{python}
 0.596**0.5
