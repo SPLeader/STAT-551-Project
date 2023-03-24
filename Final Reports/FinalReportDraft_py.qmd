@@ -348,7 +348,16 @@ Our final optimized random forest model averages the results of 500 decision tre
 
 We used four different types of regeression models to predict walkability index: Linear Regression, Decision Tree, KNN, and Random Forest. For each model, we calculated the R-squared and RMSE based on 10-fold cross-validation.
 
-**Table goes here**
+```{python}
+df_walkability_model_metrics = pd.DataFrame(
+  data = {
+    'Model Specification' : ['Linear Regression', 'K-Neighbors Regression', 'Decision Tree Regression', 'Random Forest Regression'],
+    'MSE' : ['1.3600', '0.5960', '0.5817', '0.5794'],
+    'R-Squared' : ['0.7503', '0.8895', '0.8934', '0.8929']
+})
+
+Markdown(tabulate(df_walkability_model_metrics, headers = ['Model Specification','MSE', 'R-Squared'], showindex = "never"))
+```
 
 **The model that resulted in the best cross-validated metrics was our Random Forest, observing an R-squared of 0.907 and a RMSE of 0.718.** This means that this model is able to account for over 90% of variance in walkability index, and its predictions were only off by 0.718 walkability index points, on average.
 

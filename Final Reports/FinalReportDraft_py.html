@@ -2669,7 +2669,7 @@ vertical-align: -.125em;
 <p><strong>There are different AQIs for different atmospheric pollutants. For this project, we chose to predict the AQI based on ozone from atmospheric conditions (excluding ozone concentration) because the ozone AQI was the most frequently reported in this dataset.</strong></p>
 <p><strong>For each atmospheric measurement, we extracted the minimum, average, and maximum measurement across all weather stations for a given county each day. We did not use Ozone measurements as predictors so that our models can be used when Ozone measurements are not available.</strong> The following table details the atmospheric measurements we extracted.</p>
 <div class="cell" data-execution_count="5">
-<div class="cell-output cell-output-display" data-execution_count="16">
+<div class="cell-output cell-output-display" data-execution_count="5">
 <table class="table table-sm table-striped">
 <thead>
 <tr class="header">
@@ -2723,7 +2723,7 @@ vertical-align: -.125em;
 <h2 class="anchored" data-anchor-id="walkability">Walkability</h2>
 <p>We accessed data about walkability from the U.S. Government’s open data catalog, data.gov. The data was collected by the Environmental Protection Agency (EPA) and contains demographic information, built environment characteristics, and transportation infrastructure data from 2021 for each Census block group. These inputs are used to calculate the National Walkability Index as defined by the EPA. This index can be expressed either numerically or translated into qualitative categories (see Table 2 below).</p>
 <div class="cell" data-execution_count="6">
-<div class="cell-output cell-output-display" data-execution_count="17">
+<div class="cell-output cell-output-display" data-execution_count="6">
 <table class="table table-sm table-striped">
 <thead>
 <tr class="header">
@@ -2754,7 +2754,7 @@ vertical-align: -.125em;
 </div>
 <p>In total, there are 220,740 observations for 117 variables in this dataset. Since there were so many predictors to choose from, we narrowed it down to those in the table below (more details on variable selection in the Exploratory Data Analysis section).</p>
 <div class="cell" data-execution_count="7">
-<div class="cell-output cell-output-display" data-execution_count="18">
+<div class="cell-output cell-output-display" data-execution_count="7">
 <table class="table table-sm table-striped">
 <thead>
 <tr class="header">
@@ -2805,7 +2805,7 @@ vertical-align: -.125em;
 </div>
 </div>
 <div class="cell" data-execution_count="10">
-<div class="cell-output cell-output-display" data-execution_count="21">
+<div class="cell-output cell-output-display" data-execution_count="10">
 <pre><code>&#39;\ndef iqr(x):\n    return x.quantile(0.75) - x.quantile(0.25)\n\naqi.agg(\n    {\n        &quot;AQI_next_day&quot;: [&quot;mean&quot;, &quot;std&quot;, &quot;median&quot;, iqr],\n    }\n).transpose().rename({&quot;mean&quot; : &quot;Mean\u200e \u200e \u200e \u200e \u200e \u200e &quot;, &quot;std&quot; : &quot;SD\u200e \u200e \u200e \u200e \u200e \u200e &quot;, &quot;median&quot; : &quot;Median\u200e \u200e \u200e \u200e \u200e \u200e &quot;, &quot;iqr&quot; : &quot;IQR\u200e \u200e \u200e \u200e \u200e \u200e &quot;}, axis = 1).style.hide(axis = &quot;index&quot;).set_table_styles([dict(selector=\&#39;th\&#39;, props=[(\&#39;text-align\&#39;, \&#39;center\&#39;)]), {\&#39;selector\&#39; : \&#39;\&#39;,\&#39;props\&#39; : [(\&#39;border\&#39;, \&#39;1px solid black\&#39;)]}]).format(precision=0, formatter={(\&#39;Mean\&#39;, \&#39;Median\&#39;, \&#39;IQR\&#39;, \&#39;SD\&#39;): &quot;{:.2f}&quot;})\n&#39;</code></pre>
 </div>
 </div>
@@ -2830,7 +2830,7 @@ vertical-align: -.125em;
 <section id="correlations-between-predictors-and-aqi" class="level3">
 <h3 class="anchored" data-anchor-id="correlations-between-predictors-and-aqi">Correlations between predictors and AQI</h3>
 <div class="cell" data-execution_count="13">
-<div class="cell-output cell-output-display" data-execution_count="24">
+<div class="cell-output cell-output-display" data-execution_count="13">
 <pre><code>&lt;AxesSubplot:xlabel=&#39;variable_category&#39;&gt;</code></pre>
 </div>
 <div class="cell-output cell-output-display">
@@ -2884,7 +2884,7 @@ vertical-align: -.125em;
 <h1>AQI</h1>
 <p>We used three different types of models to predict AQI: linear models (OLS and LASSO), decision trees, and random forests. Each model predicts the next day’s AQI based on the min, mean, and max values of our 8 predictor measurements. Notably, this does not include any measurements of the day’s Ozone or AQI. We measured each model’s performance by cross-validating on data the model had not been trained on. The R-Squared and Root Mean Squared Error metrics are displayed below:</p>
 <div class="cell" data-execution_count="17">
-<div class="cell-output cell-output-display" data-execution_count="28">
+<div class="cell-output cell-output-display" data-execution_count="17">
 <table class="table table-sm table-striped">
 <thead>
 <tr class="header">
@@ -2959,7 +2959,41 @@ AQI = 58.68 + 12.43 * max\_no2 + 8.43 * max\_temperature - 6.36 * min\_humidity
 <section id="walkability-2" class="level2">
 <h2 class="anchored" data-anchor-id="walkability-2">Walkability</h2>
 <p>We used four different types of regeression models to predict walkability index: Linear Regression, Decision Tree, KNN, and Random Forest. For each model, we calculated the R-squared and RMSE based on 10-fold cross-validation.</p>
-<p><strong>Table goes here</strong></p>
+<div class="cell" data-execution_count="19">
+<div class="cell-output cell-output-display" data-execution_count="19">
+<table class="table table-sm table-striped">
+<thead>
+<tr class="header">
+<th style="text-align: left;">Model Specification</th>
+<th style="text-align: right;">MSE</th>
+<th style="text-align: right;">R-Squared</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">Linear Regression</td>
+<td style="text-align: right;">1.36</td>
+<td style="text-align: right;">0.7503</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">K-Neighbors Regression</td>
+<td style="text-align: right;">0.596</td>
+<td style="text-align: right;">0.8895</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Decision Tree Regression</td>
+<td style="text-align: right;">0.5817</td>
+<td style="text-align: right;">0.8934</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Random Forest Regression</td>
+<td style="text-align: right;">0.5794</td>
+<td style="text-align: right;">0.8929</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 <p><strong>The model that resulted in the best cross-validated metrics was our Random Forest, observing an R-squared of 0.907 and a RMSE of 0.718.</strong> This means that this model is able to account for over 90% of variance in walkability index, and its predictions were only off by 0.718 walkability index points, on average.</p>
 <p>On the other hand, our most interpretable model, the decision tree, still resulted in reasonable performance metrics, with an R-squared of 0.719 and a RMSE of 1.223. The following sections detail our methodologies in more detail.</p>
 <section id="linear-regression" class="level3">
@@ -3580,109 +3614,118 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
 <span id="cb7-360"><a href="#cb7-360"></a></span>
 <span id="cb7-361"><a href="#cb7-361"></a>We used four different types of regeression models to predict walkability index: Linear Regression, Decision Tree, KNN, and Random Forest. For each model, we calculated the R-squared and RMSE based on 10-fold cross-validation.</span>
 <span id="cb7-362"><a href="#cb7-362"></a></span>
-<span id="cb7-363"><a href="#cb7-363"></a>**Table goes here**</span>
-<span id="cb7-364"><a href="#cb7-364"></a></span>
-<span id="cb7-365"><a href="#cb7-365"></a>**The model that resulted in the best cross-validated metrics was our Random Forest, observing an R-squared of 0.907 and a RMSE of 0.718.** This means that this model is able to account for over 90% of variance in walkability index, and its predictions were only off by 0.718 walkability index points, on average.</span>
-<span id="cb7-366"><a href="#cb7-366"></a></span>
-<span id="cb7-367"><a href="#cb7-367"></a>On the other hand, our most interpretable model, the decision tree, still resulted in reasonable performance metrics, with an R-squared of 0.719 and a RMSE of 1.223. The following sections detail our methodologies in more detail.</span>
-<span id="cb7-368"><a href="#cb7-368"></a></span>
-<span id="cb7-369"><a href="#cb7-369"></a><span class="fu">### Linear Regression</span></span>
-<span id="cb7-370"><a href="#cb7-370"></a></span>
-<span id="cb7-371"><a href="#cb7-371"></a>Our linear model achieved an R-squared value of 0.819, meaning it is accounting for a non-trivial amount of variance in walkability index. As a result, interpretations of the largest coefficients are especially valuable. The following plot shows the coefficients of the variables with the six coefficients of largest magnitude.</span>
+<span id="cb7-365"><a href="#cb7-365"></a><span class="in">```{python}</span></span>
+<span id="cb7-366"><a href="#cb7-366"></a>df_walkability_model_metrics <span class="op">=</span> pd.DataFrame(</span>
+<span id="cb7-367"><a href="#cb7-367"></a>  data <span class="op">=</span> {</span>
+<span id="cb7-368"><a href="#cb7-368"></a>    <span class="st">&#39;Model Specification&#39;</span> : [<span class="st">&#39;Linear Regression&#39;</span>, <span class="st">&#39;K-Neighbors Regression&#39;</span>, <span class="st">&#39;Decision Tree Regression&#39;</span>, <span class="st">&#39;Random Forest Regression&#39;</span>],</span>
+<span id="cb7-369"><a href="#cb7-369"></a>    <span class="st">&#39;MSE&#39;</span> : [<span class="st">&#39;1.3600&#39;</span>, <span class="st">&#39;0.5960&#39;</span>, <span class="st">&#39;0.5817&#39;</span>, <span class="st">&#39;0.5794&#39;</span>],</span>
+<span id="cb7-370"><a href="#cb7-370"></a>    <span class="st">&#39;R-Squared&#39;</span> : [<span class="st">&#39;0.7503&#39;</span>, <span class="st">&#39;0.8895&#39;</span>, <span class="st">&#39;0.8934&#39;</span>, <span class="st">&#39;0.8929&#39;</span>]</span>
+<span id="cb7-371"><a href="#cb7-371"></a>})</span>
 <span id="cb7-372"><a href="#cb7-372"></a></span>
-<span id="cb7-373"><a href="#cb7-373"></a>**Coefficient plot goes here**</span>
-<span id="cb7-374"><a href="#cb7-374"></a></span>
-<span id="cb7-375"><a href="#cb7-375"></a>There are three particularly large coefficients, corresponding to D2B_E8MIXA, D3A, and D2A_EPHHM. Because these three coefficients are all close to one, this means that a single unit increase in road network density, employment entropy, and household entropy are each roughly associated with a single unit increase in the walkability index.</span>
-<span id="cb7-376"><a href="#cb7-376"></a></span>
-<span id="cb7-377"><a href="#cb7-377"></a>Conversely, the network density has a negative coefficient of about -0.5. The variable D3AAO specifically refers to the density of automobile-oriented links (as opposed to pedestrian-oriented links). The D3AMM variable is similar but includes both auto and pedestrian-oriented network links. That both D3AMM and D3AAO both have a negative coefficient is not surprising; areas that are crowded with vehicles tend to be less walkable.</span>
-<span id="cb7-378"><a href="#cb7-378"></a></span>
-<span id="cb7-379"><a href="#cb7-379"></a><span class="fu">### Decision Tree Regression</span></span>
-<span id="cb7-380"><a href="#cb7-380"></a></span>
-<span id="cb7-381"><a href="#cb7-381"></a>A decision tree, much like our linear regression model, has the benefit of being highly interpretable, even if its predictive ability is not optimal. We created our decision tree with very small maximum depth to examine and interpret the whole tree easily. This did result in substantial underfit, hence why it had the worst cross-validated performance metrics of all the models. Fitting this model on the walkability data resulted in the following tree:</span>
-<span id="cb7-382"><a href="#cb7-382"></a></span>
-<span id="cb7-383"><a href="#cb7-383"></a><span class="al">![](../WalkabilityImages/decision_tree.png)</span></span>
-<span id="cb7-384"><a href="#cb7-384"></a></span>
-<span id="cb7-385"><a href="#cb7-385"></a>Figure #: Decision tree fit on most important 6 features</span>
-<span id="cb7-386"><a href="#cb7-386"></a></span>
-<span id="cb7-387"><a href="#cb7-387"></a>The first split was made on the variable D3B. This shows that having a lower density of street intersections (not including auto-oriented intersections) is an indicator of a lower walkability score. This makes sense, as areas with fewer intersections would be more disconnected for pedestrians, making walking between destinations less feasible.</span>
-<span id="cb7-388"><a href="#cb7-388"></a></span>
-<span id="cb7-389"><a href="#cb7-389"></a>For areas with a lower density of street connections, the next split considers the mix of employment types (D2B_E8MIXA), showing that areas with lower job diversity tend to have lower walkability indices.</span>
-<span id="cb7-390"><a href="#cb7-390"></a></span>
-<span id="cb7-391"><a href="#cb7-391"></a>For areas with a higher density of street connections, the next split considers the diversity in residence types, showing that areas with less living options tend to have lower walkability indices.</span>
-<span id="cb7-392"><a href="#cb7-392"></a></span>
-<span id="cb7-393"><a href="#cb7-393"></a>The fact that the different branches of the tree consider different variables alludes to the fact that walkability index is a complicated metric that weighs many factors in a nuanced manner.</span>
-<span id="cb7-394"><a href="#cb7-394"></a></span>
-<span id="cb7-395"><a href="#cb7-395"></a><span class="fu">### Random Forest Regression</span></span>
-<span id="cb7-396"><a href="#cb7-396"></a></span>
-<span id="cb7-397"><a href="#cb7-397"></a>With such a large dataset, a random forest algorithm was a very compute intensive modeling option. Regardless, we tuned a Random Forest model, resulting in the highest cross-validated metrics of any of our models. This random forest has excellent predictive accuracy, so we would recommend it when trying to predict walkability scores, but we cannot use it to gain any further interpretable insight.</span>
-<span id="cb7-398"><a href="#cb7-398"></a></span>
-<span id="cb7-399"><a href="#cb7-399"></a><span class="fu">### K-Neighbors Regression</span></span>
-<span id="cb7-400"><a href="#cb7-400"></a></span>
-<span id="cb7-401"><a href="#cb7-401"></a>To tune the optimal number of neighbors for our KNN model, we performed a grid search. To perform this grid search, we fit each KNN model on the same training data and compared their performance on the same validation set. The following plot shows how validation R-squared changes with k.</span>
-<span id="cb7-402"><a href="#cb7-402"></a></span>
-<span id="cb7-403"><a href="#cb7-403"></a>**KNN plot goes here**</span>
-<span id="cb7-404"><a href="#cb7-404"></a></span>
-<span id="cb7-405"><a href="#cb7-405"></a>For the walkability data, it turned out that a relatively low value of k (in comparison to the entire size of the dataset) optimized validation R-squared. We settled on the optimal number of neighbors being around 10, as this is where the so-called &#39;elbow&#39; in the graph is.</span>
-<span id="cb7-406"><a href="#cb7-406"></a></span>
-<span id="cb7-407"><a href="#cb7-407"></a>KNN is a computationally expensive algorithm due to both the breadth and depth of the walkability dataset. To reduce this cost, we fit our different KNN models on only the top 6 predictors as indicated by OLS (See Figure 9). The final model specification achieved a cross-validated RMSE of .862 and an R-squared of .864. Although KNN performs worse than Random Forest for this data the decent metrics from KNN demonstrate that there is more than one way to effectively predict walkability index. However, just like the Random Forest, our KNN model lacks interpretability.</span>
-<span id="cb7-408"><a href="#cb7-408"></a></span>
-<span id="cb7-409"><a href="#cb7-409"></a><span class="fu"># Discussion</span></span>
-<span id="cb7-410"><a href="#cb7-410"></a></span>
-<span id="cb7-411"><a href="#cb7-411"></a><span class="fu">## AQI</span></span>
-<span id="cb7-412"><a href="#cb7-412"></a></span>
-<span id="cb7-413"><a href="#cb7-413"></a>Our model results demonstrate that we can forecast ozone-based AQI effectively without knowledge of ozone levels. On average, our random forest was only wrong by 20.953 AQI points, rarely predicting far from the actual AQI. As the estimates are in the same ballpark as the real AQI, they could potentially serve to give the public a general idea of how unsafe atmospheric ozone levels are in the absence of ozone measurements. We tuned several models for various parameters in order to arrive at this accurate of a random forest predictor. While our other models didn&#39;t prove to be as impactful, the linear model gives us an intuitive understanding that ozone is associated with high no2, high temperatures, and low humidity.</span>
-<span id="cb7-414"><a href="#cb7-414"></a></span>
-<span id="cb7-415"><a href="#cb7-415"></a><span class="fu">## Walkability</span></span>
-<span id="cb7-416"><a href="#cb7-416"></a></span>
-<span id="cb7-417"><a href="#cb7-417"></a>Our model results indicate that walkability index can be predicted quite well using the publicly available data. We were able to explain 90.7% of the variance in walkability index using a Random Forest model, which is an impressive number. KNN was able to achieve comparable but slightly worse results, explaining 86.4% of the variance in walkability index. Although neither of these models is particularly interpretable, their predictive power is impressive.</span>
-<span id="cb7-418"><a href="#cb7-418"></a></span>
-<span id="cb7-419"><a href="#cb7-419"></a>Our Linear Regression and Decision Tree models were not only highly interpretable, they also explained 81.9% and 71.9% of the variation in Walkability Index respectively. For such interpretable models, these performance metrics are remarkable. Linear Regression is particularly stand-out, as it was able to predict walkability index within 1 point, on average, while still explaining over 80% of the variation in walkability index.</span>
-<span id="cb7-420"><a href="#cb7-420"></a></span>
-<span id="cb7-421"><a href="#cb7-421"></a><span class="fu"># Ethics</span></span>
-<span id="cb7-422"><a href="#cb7-422"></a></span>
-<span id="cb7-423"><a href="#cb7-423"></a><span class="fu">## Good uses of our work</span></span>
-<span id="cb7-424"><a href="#cb7-424"></a></span>
-<span id="cb7-425"><a href="#cb7-425"></a>It is important that as we give you these powerful machine learning model fits, you are aware of the importance of their proper usage. We hope that you will use the work detailed in this report to better understand the atmospheric factors that contribute to the future air quality of an area and its characteristics that determine its walkability. For the AQI model in particular, we also expect that you can use this model to effectively predict the air quality based on ozone even when direct ozone measurements are unable to be taken, using other atmospheric conditions as a proxy measurement.</span>
-<span id="cb7-426"><a href="#cb7-426"></a></span>
-<span id="cb7-427"><a href="#cb7-427"></a>For the walkability model, we would support the usage of our models to predict areas with poor walkability for areas where it is currently unknown, such that changes could be implemented to make it more pedestrian-friendly. The goal of these models is to highlight a small number of factors that have a large impact on how walkable a place is. By identifying these characteristics, it is our hope that civil projects can be undertaken and that public policy changes can be implemented to improve walkability for all communities, but especially those that need it most. For example, there could be changes to the local codes that require a certain intersection density or federal incentives to having high public transportation service levels. Walkability is very strongly linked to physical health and quality of life metrics, so it is of the utmost importance to ensure all communities are walkable.</span>
-<span id="cb7-428"><a href="#cb7-428"></a></span>
-<span id="cb7-429"><a href="#cb7-429"></a><span class="fu">## Misuses</span></span>
-<span id="cb7-430"><a href="#cb7-430"></a></span>
-<span id="cb7-431"><a href="#cb7-431"></a>Although there are many appropriate uses of our work, we also want to forewarn you about the potential misuses to avoid. Though our models predict ozone-based AQI, they should not be used as a proxy for AQI when proper measurements are available, as it could miss some important and dangerous fluctuations. The model&#39;s intended use is as an emergency measure when ozone measurements are not available.</span>
-<span id="cb7-432"><a href="#cb7-432"></a></span>
-<span id="cb7-433"><a href="#cb7-433"></a>As the EPA, it is your responsibility to use the knowledge gained from this work and the corresponding machine learning models to help the environment, not to harm it. If misused, these models could ultimately end up doing more harm than good. For example, entities responsible for emitting large amounts of pollutants could use these models to find ways to disguise their harmful ozone production. If these enterprises learn that cold, humid days see low ozone, they may choose emit more fumes during those times which could cause more harm to the environment.</span>
-<span id="cb7-434"><a href="#cb7-434"></a></span>
-<span id="cb7-435"><a href="#cb7-435"></a>Care should be taken to protect public transportation services even if the area would be &quot;walkable enough&quot; without having such high service levels. It would also not be appropriate to target low-income housing developments to places that are less walkable simply because these areas tend to have a higher percentage of low-wage workers.</span>
-<span id="cb7-436"><a href="#cb7-436"></a></span>
-<span id="cb7-437"><a href="#cb7-437"></a><span class="fu">## Bias</span></span>
-<span id="cb7-438"><a href="#cb7-438"></a></span>
-<span id="cb7-439"><a href="#cb7-439"></a>We must acknowledge that our project is subject to biases - deliberate or otherwise. The primary bias in the AQI analysis came from the data collection process. Our final data set consisted of atmospheric measurements from only 43 counties across 32 states, meaning that a substantial portion of the country is left unaccounted for. Also, we did not investigate the geographic locations of the weather stations that were monitoring the atmospheric conditions; hence it is possible that these measurements are not representative of the general population of atmospheric conditions (For example, perhaps weather monitoring stations tend to be close to cities, making this analysis less representative of rural areas). Finally, the data we analyzed came only from the years 2021 and 2022 - meaning that insights and trends illuminated in this report may not reflect the historical patterns.</span>
-<span id="cb7-440"><a href="#cb7-440"></a></span>
-<span id="cb7-441"><a href="#cb7-441"></a>For the walkability dataset, we have very serious concerns about bias. Many variables in the dataset required information about public transit services. Local transit agencies should use a General Transit Feed Specification (GTFS) to share transit information in a standardized format. Although 95% of total transit ridership in the US is covered by the GTFS, not all places develop GTFS data for their systems or share it, particularly smaller transit agencies. Since many variables depended on this information, observations without it were removed. Unfortunately, this had a severely disproportionate impact on the less walkable places. Prior to removal, 43,250 places were designated as &quot;Least walkable&quot; and 68,640 places were &quot;Below average walkable.&quot; After removal, there were only 10 least walkable places and 7,583 below average walkable places remained. Most walkable and above average walkable places only lost 4% and 15% of their locations respectively. Since the Walkability Index categories are very unevenly represented in the data our models were trained on, they will likely (and unrealistically) predict areas will be more walkable than they are.</span>
-<span id="cb7-442"><a href="#cb7-442"></a></span>
-<span id="cb7-443"><a href="#cb7-443"></a><span class="fu"># Conclusion</span></span>
-<span id="cb7-444"><a href="#cb7-444"></a></span>
-<span id="cb7-445"><a href="#cb7-445"></a>Our goal was to leverage machine learning to assist you, the EPA, with your mission of furthering environmental protection, advancing environmental justice, and safeguarding communities. We specifically created a tool to help you understand the factors that contribute to next-day AQI and predict the harmful effects of ozone without any direct measurements of ozone concentrations. We also developed a model that can capture over 80% of the variance in walkability index using built environment characteristics. This can help you inform the public of air quality danger and help lobby for projects to reduce the car dependency of locations with low walkability.</span>
-<span id="cb7-446"><a href="#cb7-446"></a></span>
-<span id="cb7-447"><a href="#cb7-447"></a>For both the AQI and walkability datasets, random forests proved to be the model specifications with the highest predictive power as measured by R-squared and RMSE. We discovered that the most important variables for predicting next-day AQI were maximum no2, maximum temperature, and minimum humidity. On the other hand, the most important variables for predicting the walkability index were those relating to diveristy of employment, road network density, and diversity of housing types.</span>
-<span id="cb7-448"><a href="#cb7-448"></a></span>
-<span id="cb7-449"><a href="#cb7-449"></a>The single model we would recommend to you for predicting next-day AQI is our random forest model, as it has the best predictive ability. This report has sufficient information on the contributing factors to next-day ozone AQI such that the more interpretable models are not worth using at the cost of predictive power.</span>
-<span id="cb7-450"><a href="#cb7-450"></a></span>
-<span id="cb7-451"><a href="#cb7-451"></a>The single model we would recommend to you for predicting the walkability index of a location is the linear regression model, because it has a good balance of predictive power and interpretability. Because walkability index is such a complicated metric and this dataset has so many features, it is important to preserve the ability to interpret how and why the model is making the predictions it is.</span>
-<span id="cb7-452"><a href="#cb7-452"></a></span>
-<span id="cb7-453"><a href="#cb7-453"></a><span class="fu"># Appendix</span></span>
-<span id="cb7-454"><a href="#cb7-454"></a></span>
-<span id="cb7-455"><a href="#cb7-455"></a><span class="fu">## Sources</span></span>
-<span id="cb7-456"><a href="#cb7-456"></a></span>
-<span id="cb7-457"><a href="#cb7-457"></a>&quot;AirData Website File Download Page.&quot; EPA, Environmental Protection Agency, 1 Jan. 2023, <span class="ot">&lt;https://aqs.epa.gov/aqsweb/airdata/download_files.html&gt;</span>.</span>
-<span id="cb7-458"><a href="#cb7-458"></a></span>
-<span id="cb7-459"><a href="#cb7-459"></a>&quot;Center for Science Education.&quot; How Weather Affects Air Quality \| Center for Science Education, <span class="ot">&lt;https://scied.ucar.edu/learning-zone/air-quality/how-weather-affects-air-quality&gt;</span>.</span>
-<span id="cb7-460"><a href="#cb7-460"></a></span>
-<span id="cb7-461"><a href="#cb7-461"></a>Champan, Jim, et al. EPA, Environmental Protection Agency, June 2021, <span class="ot">&lt;https://www.epa.gov/smartgrowth/smart-location-database-technical-documentation-and-user-guide&gt;</span>.</span>
-<span id="cb7-462"><a href="#cb7-462"></a></span>
-<span id="cb7-463"><a href="#cb7-463"></a>Thomas, John, et al. &quot;National Walkability Index Methodology and User Guide.&quot; EPA, Environmental Protection Agency, June 2021, <span class="ot">&lt;https://www.epa.gov/smartgrowth/national-walkability-index-user-guide-and-methodology&gt;</span>.</span>
-<span id="cb7-464"><a href="#cb7-464"></a></span>
-<span id="cb7-465"><a href="#cb7-465"></a>&quot;Walkability Index.&quot; Catalog, Responsible Party U.S. Environmental Protection Agency, Office of Sustainable Communities (Point of Contact), 3 July 2021, <span class="ot">&lt;https://catalog.data.gov/dataset/walkability-index&gt;</span>.</span>
+<span id="cb7-373"><a href="#cb7-373"></a>Markdown(tabulate(df_walkability_model_metrics, headers <span class="op">=</span> [<span class="st">&#39;Model Specification&#39;</span>,<span class="st">&#39;MSE&#39;</span>, <span class="st">&#39;R-Squared&#39;</span>], showindex <span class="op">=</span> <span class="st">&quot;never&quot;</span>))</span>
+<span id="cb7-374"><a href="#cb7-374"></a><span class="in">```</span></span>
+<span id="cb7-375"><a href="#cb7-375"></a></span>
+<span id="cb7-376"><a href="#cb7-376"></a>**The model that resulted in the best cross-validated metrics was our Random Forest, observing an R-squared of 0.907 and a RMSE of 0.718.** This means that this model is able to account for over 90% of variance in walkability index, and its predictions were only off by 0.718 walkability index points, on average.</span>
+<span id="cb7-377"><a href="#cb7-377"></a></span>
+<span id="cb7-378"><a href="#cb7-378"></a>On the other hand, our most interpretable model, the decision tree, still resulted in reasonable performance metrics, with an R-squared of 0.719 and a RMSE of 1.223. The following sections detail our methodologies in more detail.</span>
+<span id="cb7-379"><a href="#cb7-379"></a></span>
+<span id="cb7-380"><a href="#cb7-380"></a><span class="fu">### Linear Regression</span></span>
+<span id="cb7-381"><a href="#cb7-381"></a></span>
+<span id="cb7-382"><a href="#cb7-382"></a>Our linear model achieved an R-squared value of 0.819, meaning it is accounting for a non-trivial amount of variance in walkability index. As a result, interpretations of the largest coefficients are especially valuable. The following plot shows the coefficients of the variables with the six coefficients of largest magnitude.</span>
+<span id="cb7-383"><a href="#cb7-383"></a></span>
+<span id="cb7-384"><a href="#cb7-384"></a>**Coefficient plot goes here**</span>
+<span id="cb7-385"><a href="#cb7-385"></a></span>
+<span id="cb7-386"><a href="#cb7-386"></a>There are three particularly large coefficients, corresponding to D2B_E8MIXA, D3A, and D2A_EPHHM. Because these three coefficients are all close to one, this means that a single unit increase in road network density, employment entropy, and household entropy are each roughly associated with a single unit increase in the walkability index.</span>
+<span id="cb7-387"><a href="#cb7-387"></a></span>
+<span id="cb7-388"><a href="#cb7-388"></a>Conversely, the network density has a negative coefficient of about -0.5. The variable D3AAO specifically refers to the density of automobile-oriented links (as opposed to pedestrian-oriented links). The D3AMM variable is similar but includes both auto and pedestrian-oriented network links. That both D3AMM and D3AAO both have a negative coefficient is not surprising; areas that are crowded with vehicles tend to be less walkable.</span>
+<span id="cb7-389"><a href="#cb7-389"></a></span>
+<span id="cb7-390"><a href="#cb7-390"></a><span class="fu">### Decision Tree Regression</span></span>
+<span id="cb7-391"><a href="#cb7-391"></a></span>
+<span id="cb7-392"><a href="#cb7-392"></a>A decision tree, much like our linear regression model, has the benefit of being highly interpretable, even if its predictive ability is not optimal. We created our decision tree with very small maximum depth to examine and interpret the whole tree easily. This did result in substantial underfit, hence why it had the worst cross-validated performance metrics of all the models. Fitting this model on the walkability data resulted in the following tree:</span>
+<span id="cb7-393"><a href="#cb7-393"></a></span>
+<span id="cb7-394"><a href="#cb7-394"></a><span class="al">![](../WalkabilityImages/decision_tree.png)</span></span>
+<span id="cb7-395"><a href="#cb7-395"></a></span>
+<span id="cb7-396"><a href="#cb7-396"></a>Figure #: Decision tree fit on most important 6 features</span>
+<span id="cb7-397"><a href="#cb7-397"></a></span>
+<span id="cb7-398"><a href="#cb7-398"></a>The first split was made on the variable D3B. This shows that having a lower density of street intersections (not including auto-oriented intersections) is an indicator of a lower walkability score. This makes sense, as areas with fewer intersections would be more disconnected for pedestrians, making walking between destinations less feasible.</span>
+<span id="cb7-399"><a href="#cb7-399"></a></span>
+<span id="cb7-400"><a href="#cb7-400"></a>For areas with a lower density of street connections, the next split considers the mix of employment types (D2B_E8MIXA), showing that areas with lower job diversity tend to have lower walkability indices.</span>
+<span id="cb7-401"><a href="#cb7-401"></a></span>
+<span id="cb7-402"><a href="#cb7-402"></a>For areas with a higher density of street connections, the next split considers the diversity in residence types, showing that areas with less living options tend to have lower walkability indices.</span>
+<span id="cb7-403"><a href="#cb7-403"></a></span>
+<span id="cb7-404"><a href="#cb7-404"></a>The fact that the different branches of the tree consider different variables alludes to the fact that walkability index is a complicated metric that weighs many factors in a nuanced manner.</span>
+<span id="cb7-405"><a href="#cb7-405"></a></span>
+<span id="cb7-406"><a href="#cb7-406"></a><span class="fu">### Random Forest Regression</span></span>
+<span id="cb7-407"><a href="#cb7-407"></a></span>
+<span id="cb7-408"><a href="#cb7-408"></a>With such a large dataset, a random forest algorithm was a very compute intensive modeling option. Regardless, we tuned a Random Forest model, resulting in the highest cross-validated metrics of any of our models. This random forest has excellent predictive accuracy, so we would recommend it when trying to predict walkability scores, but we cannot use it to gain any further interpretable insight.</span>
+<span id="cb7-409"><a href="#cb7-409"></a></span>
+<span id="cb7-410"><a href="#cb7-410"></a><span class="fu">### K-Neighbors Regression</span></span>
+<span id="cb7-411"><a href="#cb7-411"></a></span>
+<span id="cb7-412"><a href="#cb7-412"></a>To tune the optimal number of neighbors for our KNN model, we performed a grid search. To perform this grid search, we fit each KNN model on the same training data and compared their performance on the same validation set. The following plot shows how validation R-squared changes with k.</span>
+<span id="cb7-413"><a href="#cb7-413"></a></span>
+<span id="cb7-414"><a href="#cb7-414"></a>**KNN plot goes here**</span>
+<span id="cb7-415"><a href="#cb7-415"></a></span>
+<span id="cb7-416"><a href="#cb7-416"></a>For the walkability data, it turned out that a relatively low value of k (in comparison to the entire size of the dataset) optimized validation R-squared. We settled on the optimal number of neighbors being around 10, as this is where the so-called &#39;elbow&#39; in the graph is.</span>
+<span id="cb7-417"><a href="#cb7-417"></a></span>
+<span id="cb7-418"><a href="#cb7-418"></a>KNN is a computationally expensive algorithm due to both the breadth and depth of the walkability dataset. To reduce this cost, we fit our different KNN models on only the top 6 predictors as indicated by OLS (See Figure 9). The final model specification achieved a cross-validated RMSE of .862 and an R-squared of .864. Although KNN performs worse than Random Forest for this data the decent metrics from KNN demonstrate that there is more than one way to effectively predict walkability index. However, just like the Random Forest, our KNN model lacks interpretability.</span>
+<span id="cb7-419"><a href="#cb7-419"></a></span>
+<span id="cb7-420"><a href="#cb7-420"></a><span class="fu"># Discussion</span></span>
+<span id="cb7-421"><a href="#cb7-421"></a></span>
+<span id="cb7-422"><a href="#cb7-422"></a><span class="fu">## AQI</span></span>
+<span id="cb7-423"><a href="#cb7-423"></a></span>
+<span id="cb7-424"><a href="#cb7-424"></a>Our model results demonstrate that we can forecast ozone-based AQI effectively without knowledge of ozone levels. On average, our random forest was only wrong by 20.953 AQI points, rarely predicting far from the actual AQI. As the estimates are in the same ballpark as the real AQI, they could potentially serve to give the public a general idea of how unsafe atmospheric ozone levels are in the absence of ozone measurements. We tuned several models for various parameters in order to arrive at this accurate of a random forest predictor. While our other models didn&#39;t prove to be as impactful, the linear model gives us an intuitive understanding that ozone is associated with high no2, high temperatures, and low humidity.</span>
+<span id="cb7-425"><a href="#cb7-425"></a></span>
+<span id="cb7-426"><a href="#cb7-426"></a><span class="fu">## Walkability</span></span>
+<span id="cb7-427"><a href="#cb7-427"></a></span>
+<span id="cb7-428"><a href="#cb7-428"></a>Our model results indicate that walkability index can be predicted quite well using the publicly available data. We were able to explain 90.7% of the variance in walkability index using a Random Forest model, which is an impressive number. KNN was able to achieve comparable but slightly worse results, explaining 86.4% of the variance in walkability index. Although neither of these models is particularly interpretable, their predictive power is impressive.</span>
+<span id="cb7-429"><a href="#cb7-429"></a></span>
+<span id="cb7-430"><a href="#cb7-430"></a>Our Linear Regression and Decision Tree models were not only highly interpretable, they also explained 81.9% and 71.9% of the variation in Walkability Index respectively. For such interpretable models, these performance metrics are remarkable. Linear Regression is particularly stand-out, as it was able to predict walkability index within 1 point, on average, while still explaining over 80% of the variation in walkability index.</span>
+<span id="cb7-431"><a href="#cb7-431"></a></span>
+<span id="cb7-432"><a href="#cb7-432"></a><span class="fu"># Ethics</span></span>
+<span id="cb7-433"><a href="#cb7-433"></a></span>
+<span id="cb7-434"><a href="#cb7-434"></a><span class="fu">## Good uses of our work</span></span>
+<span id="cb7-435"><a href="#cb7-435"></a></span>
+<span id="cb7-436"><a href="#cb7-436"></a>It is important that as we give you these powerful machine learning model fits, you are aware of the importance of their proper usage. We hope that you will use the work detailed in this report to better understand the atmospheric factors that contribute to the future air quality of an area and its characteristics that determine its walkability. For the AQI model in particular, we also expect that you can use this model to effectively predict the air quality based on ozone even when direct ozone measurements are unable to be taken, using other atmospheric conditions as a proxy measurement.</span>
+<span id="cb7-437"><a href="#cb7-437"></a></span>
+<span id="cb7-438"><a href="#cb7-438"></a>For the walkability model, we would support the usage of our models to predict areas with poor walkability for areas where it is currently unknown, such that changes could be implemented to make it more pedestrian-friendly. The goal of these models is to highlight a small number of factors that have a large impact on how walkable a place is. By identifying these characteristics, it is our hope that civil projects can be undertaken and that public policy changes can be implemented to improve walkability for all communities, but especially those that need it most. For example, there could be changes to the local codes that require a certain intersection density or federal incentives to having high public transportation service levels. Walkability is very strongly linked to physical health and quality of life metrics, so it is of the utmost importance to ensure all communities are walkable.</span>
+<span id="cb7-439"><a href="#cb7-439"></a></span>
+<span id="cb7-440"><a href="#cb7-440"></a><span class="fu">## Misuses</span></span>
+<span id="cb7-441"><a href="#cb7-441"></a></span>
+<span id="cb7-442"><a href="#cb7-442"></a>Although there are many appropriate uses of our work, we also want to forewarn you about the potential misuses to avoid. Though our models predict ozone-based AQI, they should not be used as a proxy for AQI when proper measurements are available, as it could miss some important and dangerous fluctuations. The model&#39;s intended use is as an emergency measure when ozone measurements are not available.</span>
+<span id="cb7-443"><a href="#cb7-443"></a></span>
+<span id="cb7-444"><a href="#cb7-444"></a>As the EPA, it is your responsibility to use the knowledge gained from this work and the corresponding machine learning models to help the environment, not to harm it. If misused, these models could ultimately end up doing more harm than good. For example, entities responsible for emitting large amounts of pollutants could use these models to find ways to disguise their harmful ozone production. If these enterprises learn that cold, humid days see low ozone, they may choose emit more fumes during those times which could cause more harm to the environment.</span>
+<span id="cb7-445"><a href="#cb7-445"></a></span>
+<span id="cb7-446"><a href="#cb7-446"></a>Care should be taken to protect public transportation services even if the area would be &quot;walkable enough&quot; without having such high service levels. It would also not be appropriate to target low-income housing developments to places that are less walkable simply because these areas tend to have a higher percentage of low-wage workers.</span>
+<span id="cb7-447"><a href="#cb7-447"></a></span>
+<span id="cb7-448"><a href="#cb7-448"></a><span class="fu">## Bias</span></span>
+<span id="cb7-449"><a href="#cb7-449"></a></span>
+<span id="cb7-450"><a href="#cb7-450"></a>We must acknowledge that our project is subject to biases - deliberate or otherwise. The primary bias in the AQI analysis came from the data collection process. Our final data set consisted of atmospheric measurements from only 43 counties across 32 states, meaning that a substantial portion of the country is left unaccounted for. Also, we did not investigate the geographic locations of the weather stations that were monitoring the atmospheric conditions; hence it is possible that these measurements are not representative of the general population of atmospheric conditions (For example, perhaps weather monitoring stations tend to be close to cities, making this analysis less representative of rural areas). Finally, the data we analyzed came only from the years 2021 and 2022 - meaning that insights and trends illuminated in this report may not reflect the historical patterns.</span>
+<span id="cb7-451"><a href="#cb7-451"></a></span>
+<span id="cb7-452"><a href="#cb7-452"></a>For the walkability dataset, we have very serious concerns about bias. Many variables in the dataset required information about public transit services. Local transit agencies should use a General Transit Feed Specification (GTFS) to share transit information in a standardized format. Although 95% of total transit ridership in the US is covered by the GTFS, not all places develop GTFS data for their systems or share it, particularly smaller transit agencies. Since many variables depended on this information, observations without it were removed. Unfortunately, this had a severely disproportionate impact on the less walkable places. Prior to removal, 43,250 places were designated as &quot;Least walkable&quot; and 68,640 places were &quot;Below average walkable.&quot; After removal, there were only 10 least walkable places and 7,583 below average walkable places remained. Most walkable and above average walkable places only lost 4% and 15% of their locations respectively. Since the Walkability Index categories are very unevenly represented in the data our models were trained on, they will likely (and unrealistically) predict areas will be more walkable than they are.</span>
+<span id="cb7-453"><a href="#cb7-453"></a></span>
+<span id="cb7-454"><a href="#cb7-454"></a><span class="fu"># Conclusion</span></span>
+<span id="cb7-455"><a href="#cb7-455"></a></span>
+<span id="cb7-456"><a href="#cb7-456"></a>Our goal was to leverage machine learning to assist you, the EPA, with your mission of furthering environmental protection, advancing environmental justice, and safeguarding communities. We specifically created a tool to help you understand the factors that contribute to next-day AQI and predict the harmful effects of ozone without any direct measurements of ozone concentrations. We also developed a model that can capture over 80% of the variance in walkability index using built environment characteristics. This can help you inform the public of air quality danger and help lobby for projects to reduce the car dependency of locations with low walkability.</span>
+<span id="cb7-457"><a href="#cb7-457"></a></span>
+<span id="cb7-458"><a href="#cb7-458"></a>For both the AQI and walkability datasets, random forests proved to be the model specifications with the highest predictive power as measured by R-squared and RMSE. We discovered that the most important variables for predicting next-day AQI were maximum no2, maximum temperature, and minimum humidity. On the other hand, the most important variables for predicting the walkability index were those relating to diveristy of employment, road network density, and diversity of housing types.</span>
+<span id="cb7-459"><a href="#cb7-459"></a></span>
+<span id="cb7-460"><a href="#cb7-460"></a>The single model we would recommend to you for predicting next-day AQI is our random forest model, as it has the best predictive ability. This report has sufficient information on the contributing factors to next-day ozone AQI such that the more interpretable models are not worth using at the cost of predictive power.</span>
+<span id="cb7-461"><a href="#cb7-461"></a></span>
+<span id="cb7-462"><a href="#cb7-462"></a>The single model we would recommend to you for predicting the walkability index of a location is the linear regression model, because it has a good balance of predictive power and interpretability. Because walkability index is such a complicated metric and this dataset has so many features, it is important to preserve the ability to interpret how and why the model is making the predictions it is.</span>
+<span id="cb7-463"><a href="#cb7-463"></a></span>
+<span id="cb7-464"><a href="#cb7-464"></a><span class="fu"># Appendix</span></span>
+<span id="cb7-465"><a href="#cb7-465"></a></span>
+<span id="cb7-466"><a href="#cb7-466"></a><span class="fu">## Sources</span></span>
+<span id="cb7-467"><a href="#cb7-467"></a></span>
+<span id="cb7-468"><a href="#cb7-468"></a>&quot;AirData Website File Download Page.&quot; EPA, Environmental Protection Agency, 1 Jan. 2023, <span class="ot">&lt;https://aqs.epa.gov/aqsweb/airdata/download_files.html&gt;</span>.</span>
+<span id="cb7-469"><a href="#cb7-469"></a></span>
+<span id="cb7-470"><a href="#cb7-470"></a>&quot;Center for Science Education.&quot; How Weather Affects Air Quality \| Center for Science Education, <span class="ot">&lt;https://scied.ucar.edu/learning-zone/air-quality/how-weather-affects-air-quality&gt;</span>.</span>
+<span id="cb7-471"><a href="#cb7-471"></a></span>
+<span id="cb7-472"><a href="#cb7-472"></a>Champan, Jim, et al. EPA, Environmental Protection Agency, June 2021, <span class="ot">&lt;https://www.epa.gov/smartgrowth/smart-location-database-technical-documentation-and-user-guide&gt;</span>.</span>
+<span id="cb7-473"><a href="#cb7-473"></a></span>
+<span id="cb7-474"><a href="#cb7-474"></a>Thomas, John, et al. &quot;National Walkability Index Methodology and User Guide.&quot; EPA, Environmental Protection Agency, June 2021, <span class="ot">&lt;https://www.epa.gov/smartgrowth/national-walkability-index-user-guide-and-methodology&gt;</span>.</span>
+<span id="cb7-475"><a href="#cb7-475"></a></span>
+<span id="cb7-476"><a href="#cb7-476"></a>&quot;Walkability Index.&quot; Catalog, Responsible Party U.S. Environmental Protection Agency, Office of Sustainable Communities (Point of Contact), 3 July 2021, <span class="ot">&lt;https://catalog.data.gov/dataset/walkability-index&gt;</span>.</span>
 </code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div></div></div></div></div>
 </div> <!-- /content -->
