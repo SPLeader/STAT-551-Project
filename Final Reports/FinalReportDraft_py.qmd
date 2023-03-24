@@ -393,11 +393,11 @@ We used four different types of regeression models to predict walkability index:
 df_walkability_model_metrics = pd.DataFrame(
   data = {
     'Model Specification' : ['Linear Regression', 'K-Neighbors Regression', 'Decision Tree Regression', 'Random Forest Regression'],
-    'MSE' : ['1.3600', '0.5960', '0.5817', '0.5794'],
-    'R-Squared' : ['0.7503', '0.8895', '0.8934', '0.8929']
+    'R-Squared' : ['0.7503', '0.8895', '0.8929', '0.8934'],
+    'Root Mean Squared Error' : [1.3600**0.5, 0.5960**0.5, 0.5817**0.5, 0.5794**0.5],
 })
 
-Markdown(tabulate(df_walkability_model_metrics, headers = ['Model Specification','MSE', 'R-Squared'], showindex = "never"))
+Markdown(tabulate(df_walkability_model_metrics, headers = ['Model Specification', 'R-Squared', 'Root Mean Squared Error'], showindex = "never"))
 ```
 
 *Table 7. Best performance metrics of our four models for walkability index*
@@ -462,21 +462,26 @@ To tune the optimal number of neighbors for our KNN model, we performed a grid s
 
 ![Figure 11: Validation R-squared vs. number of neighbors (k)](../NWI Outputs/KNN_n_scores.png)
 
+
+```{python}
+0.596**0.5
+```
+
 For the walkability data, it turned out that a relatively low value of k (in comparison to the entire size of the dataset) optimized validation R-squared. We settled on the optimal number of neighbors being around 10, as this is where the so-called 'elbow' in the graph is.
 
-KNN is a computationally expensive algorithm due to both the breadth and depth of the walkability dataset. To reduce this cost, we fit our different KNN models on only the top 6 predictors as indicated by OLS (See Figure 9). The final model specification achieved a cross-validated RMSE of .862 and an R-squared of .864. Although KNN performs worse than Random Forest for this data the decent metrics from KNN demonstrate that there is more than one way to effectively predict walkability index. However, just like the Random Forest, our KNN model lacks interpretability.
+KNN is a computationally expensive algorithm due to both the breadth and depth of the walkability dataset. To reduce this cost, we fit our different KNN models on only the top 6 predictors as indicated by OLS (See Figure 9). The final model specification achieved a cross-validated RMSE of 0.772 and an R-squared of .889. Although KNN performs worse than Random Forest for this data the decent metrics from KNN demonstrate that there is more than one way to effectively predict walkability index. However, just like the Random Forest, our KNN model lacks interpretability.
 
 # Discussion
 
 ## AQI
 
-Our model results demonstrate that we can forecast ozone-based AQI effectively without knowledge of ozone levels. On average, our random forest was only wrong by 20.953 AQI points, rarely predicting far from the actual AQI. As the estimates are in the same ballpark as the real AQI, they could potentially serve to give the public a general idea of how unsafe atmospheric ozone levels are in the absence of ozone measurements. We tuned several models for various parameters in order to arrive at this accurate of a random forest predictor. While our other models didn't prove to be as impactful, the linear model gives us an intuitive understanding that ozone is associated with high no2, high temperatures, and low humidity.
+Our model results demonstrate that we can forecast ozone-based AQI effectively without knowledge of ozone levels. On average, our random forest was only wrong by 19.642 AQI points, rarely predicting far from the actual AQI. As the estimates are in the same ballpark as the real AQI, they could potentially serve to give the public a general idea of how unsafe atmospheric ozone levels are in the absence of ozone measurements. We tuned several models for various parameters in order to arrive at this accurate of a random forest predictor. While our other models didn't prove to be as impactful, the linear model gives us an intuitive understanding that ozone is associated with high no2, high temperatures, and low humidity.
 
 ## Walkability
 
-Our model results indicate that walkability index can be predicted quite well using the publicly available data. We were able to explain 90.7% of the variance in walkability index using a Random Forest model, which is an impressive number. KNN was able to achieve comparable but slightly worse results, explaining 86.4% of the variance in walkability index. Although neither of these models is particularly interpretable, their predictive power is impressive.
+Our model results indicate that walkability index can be predicted quite well using the publicly available data. We were able to explain 89.3% of the variance in walkability index using a Random Forest model, which is an impressive number. KNN was able to achieve comparable but slightly worse results, explaining 89% of the variance in walkability index. Although neither of these models is particularly interpretable, their predictive power is impressive.
 
-Our Linear Regression and Decision Tree models were not only highly interpretable, they also explained 81.9% and 71.9% of the variation in Walkability Index respectively. For such interpretable models, these performance metrics are remarkable. Linear Regression is particularly stand-out, as it was able to predict walkability index within 1 point, on average, while still explaining over 80% of the variation in walkability index.
+Our Linear Regression and Decision Tree models were not only highly interpretable, they also explained 75% and 89.3% of the variation in Walkability Index respectively. For such interpretable models, these performance metrics are remarkable. Linear Regression is particularly poor, as it was not able to predict walkability index within 1 point, on average, while only explaining 75% of the variation in walkability index.
 
 # Ethics
 
