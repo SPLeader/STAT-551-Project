@@ -21,7 +21,7 @@ execute:
   echo: false
 ---
 
-```{python, include = FALSE}
+```{python, include = FALSE, warn = FALSE}
 # Imports
 
 import pandas as pd
