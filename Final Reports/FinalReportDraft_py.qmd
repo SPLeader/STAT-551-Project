@@ -114,7 +114,7 @@ Markdown(tabulate(df_walkability_categories, headers = ['Walkability Index','Cat
 
 In total, there are 220,740 observations for 117 variables in this dataset. Since there were so many predictors to choose from, we narrowed it down to those in the table below (more details on variable selection in the Exploratory Data Analysis section).
 
-```{python, fig.cap = "Talbe 3: Variable Summary for Walkability Dataset", include = TRUE}
+```{python, fig.cap = "Table 3: Variable Summary for Walkability Dataset", include = TRUE}
 df_walkability_categories = pd.DataFrame(
   data = {
     'Variable Name' : ['D2a_EpHHm', 'D2b_E5MixA', 'D3apo', 'D3b', 'D3bmm4', 'D3a'],
@@ -124,7 +124,7 @@ df_walkability_categories = pd.DataFrame(
 Markdown(tabulate(df_walkability_categories, headers = ['Variable Name','Description'], showindex = "never"))
 ```
 
-*Talbe 3: Variable Summary for Walkability Dataset*
+*Table 3: Variable Summary for Walkability Dataset*
 
 # Exploratory Data Analysis
 
@@ -132,7 +132,7 @@ Markdown(tabulate(df_walkability_categories, headers = ['Variable Name','Descrip
 
 ### Overall distribution of AQI
 
-```{python}
+```{python, include = FALSE, warn = FALSE}
 # This is  the colormap I'd like to use.
 cm = plt.cm.get_cmap('RdYlBu_r')
 
@@ -146,6 +146,9 @@ col /= max(col)
 
 for c, p in zip(col, patches):
     plt.setp(p, 'facecolor', cm(c))
+    
+plt.xlabel("AQI")
+plt.ylabel("Frequency")
     
 # Prints a bunch of [None] so not included - plot shows in next chunk
 ```
@@ -171,7 +174,7 @@ summary_stats
 Markdown(tabulate(summary_stats, headers = ['Mean','STD', 'Median', 'IQR'], showindex = "never"))
 ```
 
-*Table 2. Summary statistics of AQI*
+*Table 4. Summary statistics of AQI*
 
 Overall, the distribution of AQI scores is single-peaked and right-skewed, with a median next-day AQI of 44 and an interquartile range of 30. The graph is likely right-skewed because AQI is bounded on the lower end by 0, but has no upper limit.
 
@@ -192,6 +195,9 @@ for row_key, (ax,row) in bp_dict.iteritems():
     ax.set_xlabel('')
     for i,box in enumerate(row['boxes']):
         box.set_facecolor(colors[i])
+        
+plt.xlabel("Month")
+plt.ylabel("AQI")
         
 # Plot shows in next chunk to avoid prints
 ```
@@ -229,8 +235,8 @@ var_cat_order = ["no2", "temp", "co", "so2", "no", "wind",
 aqi_seg["variable_category"] = pd.Categorical(aqi_seg["variable"].apply(lambda x : get_var_cat(x)), categories = var_cat_order, ordered = True)
 aqi_seg["variable_type"] = aqi_seg["variable"].apply(lambda x : get_var_type(x))
 
-aqi_seg.pivot(index = "variable_category", columns = "variable_type", values = "Correlation").plot.bar(color = {"max" : "#88CCEE", "mean" : "#CC6677", "min" : "#DDCC77"}, ylim = (-0.6, 0.6))
 
+aqi_seg.pivot(index = "variable_category", columns = "variable_type", values = "Correlation").plot.bar(color = {"max" : "#88CCEE", "mean" : "#CC6677", "min" : "#DDCC77"}, ylim = (-0.6, 0.6))
 ```
 
 *Figure 3. Predictor correlations with AQI, by min, mean, and max concentration*
@@ -254,7 +260,25 @@ plt.show()
 plt.close()
 ```
 
+
+
 *Figure 4. Histogram showing the distribution of walkability index*
+
+```{python, fig.cap = "Table 2. Summary statistics of AQI", include = TRUE}
+def iqr(x):
+    return x.quantile(0.75) - x.quantile(0.25)
+
+summary_stats = nwi.agg(
+    {
+        "NatWalkInd": ["mean", "std", "median", iqr],
+    }
+).transpose().rename({"mean" : "Mean‎ ‎ ‎ ‎ ‎ ‎ ", "std" : "SD‎ ‎ ‎ ‎ ‎ ‎ ", "median" : "Median‎ ‎ ‎ ‎ ‎ ‎ ", "iqr" : "IQR‎ ‎ ‎ ‎ ‎ ‎ "}, axis = 1)
+summary_stats
+
+Markdown(tabulate(summary_stats, headers = ['Mean','STD', 'Median', 'IQR'], showindex = "never"))
+```
+
+*Table 5: Summary statistics of walkability index*
 
 The histogram of Walkability Index appears quite bell-shaped and symmetric. The median Walkability Index is 13.83 and the interquartile range is 3.33. The range for the Walkability Index is 1 to 20.
 
@@ -274,7 +298,7 @@ ax = sns.boxplot(
 
 ax.set_xticklabels(labels=labels_short)
 ax.set_ylabel("Population")
-ax.set_ylabel("Walkability Index Category")
+ax.set_xlabel("Walkability Index Category")
 
 ```
 
@@ -293,11 +317,7 @@ We performed further exploration to examine if population may have a relationshi
 
 We conducted some preliminary investigation to look at the relationship between employment mix and walkability. Figure 6 below shows a clear upward trend in walkability as the employment mix increases. The employment mix variable is a proportion between 0 and 1 that shows how diverse jobs are in a given area (categories of jobs are retail, office, industrial, service, and entertainment). Higher values indicate greater diversity of jobs which, according to the EPA, is correlated with more walk trips.
 
-# SCATTERPLOT HERE
-# pretty colors and whatnot
-# WIP
-
-```{python}
+```{python, include = FALSE}
 df = nwi
 plt.clf()
 
@@ -314,7 +334,7 @@ plt.close()
 ```
 
 
-*Figure 6. Scatterplot showing the relationship between employment mix and walkability index*
+*Figure 6. Scatterplot showing the relationship between employment mix and walkability index. Red = Least Walkable, Orange = Below Average Walkable, Yellow = Above Average Walkable, Green = Most Walkable*
 
 # Model Results
 
@@ -347,6 +367,10 @@ axs[1].set_title('DT', fontdict={'fontsize' : 8})
 axs[2].scatter(aqi_df_rf_preds["preds"], aqi_df_rf_preds["residuals"], s=.3)
 axs[2].axhline(y = 0, color = 'k', linestyle = '--', linewidth=.5)
 axs[2].set_title('RF', fontdict={'fontsize' : 8})
+
+
+plt.xlabel("Predicted AQI")
+plt.ylabel("Residual")
 
 
 plt.show()
