@@ -271,6 +271,29 @@ We performed further exploration to examine if population may have a relationshi
 
 We conducted some preliminary investigation to look at the relationship between employment mix and walkability. Figure 6 below shows a clear upward trend in walkability as the employment mix increases. The employment mix variable is a proportion between 0 and 1 that shows how diverse jobs are in a given area (categories of jobs are retail, office, industrial, service, and entertainment). Higher values indicate greater diversity of jobs which, according to the EPA, is correlated with more walk trips.
 
+```{python}
+labels = ["Least walkable", "Below average walkable", "Above average walkable", "Most walkable"]
+labels_short = ["Least\nWalkable", "Below average\nWalkable", "Above average\nWalkable", "Most\nWalkable"]
+
+
+ax = sns.boxplot(
+    x='cat', 
+    y='CBSA_POP', 
+    data=nwi, 
+    order=labels
+)
+
+ax.set_xticklabels(labels=labels_short)
+ax.set_ylabel("Population")
+```
+
+```{python}
+plt.show(ax)
+plt.close()
+```
+
+
+
 # Model Results
 
 # AQI
