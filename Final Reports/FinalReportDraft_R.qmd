@@ -280,7 +280,7 @@ ggplot(nwi,
 
 ## AQI
 
-We used three different types of models to predict AQI: linear models (OLS and LASSO), decision trees, and random forests. Each model predicts the next day's AQI based on the min, mean, and max values of our 8 predictor measurements. Notably, this does not include any measurements of the day's Ozone or AQI. We measured each model's performance by cross-validating on data the model had not been trained on. The R-Squared and Root Mean Squared Error metrics are displayed below:
+We used three different types of models to predict AQI: linear models (LASSO), decision trees, and random forests. Each model predicts the next day's AQI based on the min, mean, and max values of our 8 predictor measurements. Notably, this does not include any measurements of the day's Ozone or AQI. We measured each model's performance by cross-validating on data the model had not been trained on. The R-Squared and Root Mean Squared Error metrics are displayed below:
 
 ```{r, fig.cap = "Table 6. Best performance metrics of our three models for AQI", include = TRUE}
 aqi_model_scores %>% 

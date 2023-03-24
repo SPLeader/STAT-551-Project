@@ -53,8 +53,6 @@ aqi_model_metrics = pd.read_csv("AQI Outputs/AQI_model_metrics_py.csv")
 
 # NWI Data
 nwi = pd.read_csv('cleaned_nwi.csv')
-
-print([i for i in nwi.columns])
 ```
 
 ```{python, include = FALSE}
@@ -62,8 +60,6 @@ print([i for i in nwi.columns])
 #os.chdir('../')
 
 df_nwi_lasso_features = pd.read_csv("NWI Outputs/NWI_lasso_features_py.csv")
-
-print([i for i in nwi.columns])
 ```
 
 # Introduction
@@ -154,16 +150,17 @@ plt.close()
 ```
 
 ```{python, fig.cap = "Table 2. Summary statistics of AQI", include = TRUE}
-"""
 def iqr(x):
     return x.quantile(0.75) - x.quantile(0.25)
 
-aqi.agg(
+summary_stats = aqi.agg(
     {
         "AQI_next_day": ["mean", "std", "median", iqr],
     }
-).transpose().rename({"mean" : "Mean‎ ‎ ‎ ‎ ‎ ‎ ", "std" : "SD‎ ‎ ‎ ‎ ‎ ‎ ", "median" : "Median‎ ‎ ‎ ‎ ‎ ‎ ", "iqr" : "IQR‎ ‎ ‎ ‎ ‎ ‎ "}, axis = 1).style.hide(axis = "index").set_table_styles([dict(selector='th', props=[('text-align', 'center')]), {'selector' : '','props' : [('border', '1px solid black')]}]).format(precision=0, formatter={('Mean', 'Median', 'IQR', 'SD'): "{:.2f}"})
-"""
+).transpose().rename({"mean" : "Mean‎ ‎ ‎ ‎ ‎ ‎ ", "std" : "SD‎ ‎ ‎ ‎ ‎ ‎ ", "median" : "Median‎ ‎ ‎ ‎ ‎ ‎ ", "iqr" : "IQR‎ ‎ ‎ ‎ ‎ ‎ "}, axis = 1)
+summary_stats
+
+Markdown(tabulate(summary_stats, headers = ['Mean','STD', 'Median', 'IQR'], showindex = "never"))
 ```
 
 Overall, the distribution of AQI scores is single-peaked and right-skewed, with a median next-day AQI of 44 and an interquartile range of 30. The graph is likely right-skewed because AQI is bounded on the lower end by 0, but has no upper limit.
@@ -233,8 +230,6 @@ Figure 3 shows how the different atmospheric measurements correlate with next-da
 ### Overall distribution of Walkability Index
 
 ```{python}
-# ![](images/NWI_histogram.png)
-
 plt.clf()
 sns.set_theme()
 nwi['NatWalkInd'].hist()
@@ -249,11 +244,6 @@ The histogram of Walkability Index appears quite bell-shaped and symmetric. The 
 
 ### Relationship between Population and Walkability Index Category
 
-# WIP
-
-# Work in progress
-
-# WIP on this graph
 
 ```{python}
 bp_dict = nwi[["CBSA_POP", "cat"]].boxplot(by ='cat', column =['CBSA_POP'], return_type='both', grid = False, patch_artist = True)
@@ -285,13 +275,13 @@ We conducted some preliminary investigation to look at the relationship between 
 
 # AQI
 
-We used three different types of models to predict AQI: linear models (OLS and LASSO), decision trees, and random forests. Each model predicts the next day's AQI based on the min, mean, and max values of our 8 predictor measurements. Notably, this does not include any measurements of the day's Ozone or AQI. We measured each model's performance by cross-validating on data the model had not been trained on. The R-Squared and Root Mean Squared Error metrics are displayed below:
+We used three different types of models to predict AQI: linear models (LASSO), decision trees, and random forests. Each model predicts the next day's AQI based on the min, mean, and max values of our 8 predictor measurements. Notably, this does not include any measurements of the day's Ozone or AQI. We measured each model's performance by cross-validating on data the model had not been trained on. The R-Squared and Root Mean Squared Error metrics are displayed below:
 
 ```{python}
 Markdown(tabulate(aqi_model_metrics, headers = ['Model','R-Squared', 'Root Mean Squared Error'], showindex = "never"))
 ```
 
-These metrics indicate that the Random Forest is our overall most effective model, with an R-Squared value of 0.717 and an RMSE of 19.501 AQI points. This indicates that the random forest accounts for 71.7% of the variance in AQI, only being wrong by an average of about 19.5 AQI points. Our decision tree was markedly worse, with an RMSE of 23.214 AQI points, and our linear model fared the worst, with an RMSE of 24.441 AQI points.
+These metrics indicate that the Random Forest is our overall most effective model, with an R-Squared value of 0.710 and an RMSE of 19.642 AQI points. This indicates that the random forest accounts for 71.0% of the variance in AQI, only being wrong by an average of about 19.6 AQI points. Our linear model was markedly worse, with an RMSE of 21.854 AQI points, and our decision tree fared the worst, with an RMSE of 22.936 AQI points.
 
 To investigate the biases of each of our models, we have plotted the residual errors below:
 
@@ -325,10 +315,10 @@ Our final linear model ended up slightly biased, with its lowest predictions bei
 Despite its biases and inaccuracies, the linear model is useful for its interpretability. We found three of our predictors to be far more important than the others by using LASSO regression, giving us a simple understanding of the basic associations at play. See the formula below:
 
 $$
-AQI = 58.68 + 12.43 * max\_no2 + 8.43 * max\_temperature - 6.36 * min\_humidity
+AQI = 58.61 + 12.20 * max\_no2 + 8.16 * max\_temperature - 6.45 * min\_humidity
 $$
 
-Note that in this formula, max_no2, max_temperature, and max_humidity are standardized, measured in standard deviations rather than typical units. **This gives us a simple understanding that high maxmimum no2 and temperature in a day indicate high next-day AQI, while high maxmimum humidity indicates lower next-day AQI.** This is consistent with the correlation trends in Figure 3 in the Exploratory Data Analysis section. The AQI this model predicts is based on ozone, indicating that there is correlation between no2 and ozone. This makes sense, as both are typically generated from fossil cars and industrial facilities, so we would expect them to be highly correlated. Despite being so simplified, this model still has a RMSE of only 26.169, and a R-squared of 0.484. **This means that this relatively simple model accounts for 48.4% of the variance in next-day AQI, and its next-day AQI predictions are typically off by roughly 26.2 points.**
+Note that in this formula, max_no2, max_temperature, and max_humidity are standardized, measured in standard deviations rather than typical units. **This gives us a simple understanding that high maxmimum no2 and temperature in a day indicate high next-day AQI, while high maxmimum humidity indicates lower next-day AQI.** This is consistent with the correlation trends in Figure 3 in the Exploratory Data Analysis section. The AQI this model predicts is based on ozone, indicating that there is correlation between no2 and ozone. This makes sense, as both are typically generated from fossil cars and industrial facilities, so we would expect them to be highly correlated. Despite being so simplified, this model still has a RMSE of only 21.85, and a R-squared of 0.641. **This means that this relatively simple model accounts for 64.1% of the variance in next-day AQI, and its next-day AQI predictions are typically off by roughly 21.9 points.**
 
 ### Decision Tree
 
@@ -336,7 +326,9 @@ Unlike our other models, our decision tree's predictions form discrete vertical 
 
 ![Figure 5: Decision Tree Flowchart](../AQI%20Outputs/AQI_decision_tree_py.png)
 
-At each step, this decision tree chooses one value of one variable that best splits the data into higher AQI and lower AQI categories. The first, largest, split separates based on no2: days with a very low maximum no2, below 18 ppb, are directed to the left side of the tree, which tends to have lower next-day AQI. This is consistent with our finding from the linear model, as we know there is a meaningful positive correlation between no2 and ozone (and therefore AQI based on ozone). For low no2 days, the tree finds that high maximum temperature is the best indicator of high next-day AQI, with minimum humidity distinguishing further days with a max temperature between 68 and 82 degrees Fahrenheit. For high no2 days, the tree uses minimum and maximum air pressure and maximum temperature to distinguish AQI further.
+At each step, this decision tree chooses one value of one variable that best splits the data into higher AQI and lower AQI categories. The first, largest, split separates based on no2: days with a very low maximum no2, below 18 ppb, are directed to the left side of the tree, which tends to have lower next-day AQI. This is consistent with our finding from the linear model, as we know there is a meaningful positive correlation between no2 and ozone (and therefore AQI based on ozone). 
+
+For low no2 days, the tree finds that high maximum temperature is the best indicator of high next-day AQI, splitting at a maximum temperature of 81.65 degrees Fahrenheit. For high no2 days, the tree finds that high minimum pressure is the best indicator of high next-day AQI, splitting at a minimum pressure of 982.86 millibars.
 
 This goes to show that next-day AQI is complicated to predict, with the different sides of the tree using different sets of variables. **This tree indicates that there are complex interactions between atmospheric conditions that contribute to next-day AQI.**
 
